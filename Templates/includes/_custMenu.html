@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}South Canteen - Order{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+<div class="container-fluid">
+    <div class="row">
+        {% include 'includes/_sidebar.html' %}
+        <div class="col-10">
+            <h4 class="p-4 text-center">{{stall_name}}</h4>
+            {% include 'includes/_stallItems.html' %}
+            <a href="/cart">
+                <button type="button" class="btn btn-primary btn-round mt-3">
+                    <i class="fas fa-shopping-cart text-left"></i> Cart
+                </button>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}South Canteen Storeowners - Current Orders{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Current Orders</h1>
+<div>
+  {% if count == 0 %}
+  <p>There are no orders.</p>
+  {% elif count == 1 %}
+  <p>There is 1 order.</p>
+  {% else %}
+  <p>There are {{ count }} orders.</p>
+  {% endif %}
+</div>
+<div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Food</th>
+        <th>Quantity</th>
+        <th>Remarks</th>
+        <th>Time Ordered</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for orders in order_list %}
+        <tr>
+          <td>{{ orders.get_orderID }}</td>
+          <td>{{ orders.get_item }}</td>
+          <td>{{ orders.get_itemQuantity }}</td>
+          <td>{{ orders.get_remarks }}</td>
+          <td>{{ orders.get_datetime }}</td>
+          <td>
+            <form action="{{url_for('collectOrder', id=orders.get_orderID)}}" method="POST" >
+              <input type="submit" value="Completed" class="btn btn-warning" onclick="return confirm('Are you sure you completed order {{orders.get_orderID}}');">
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

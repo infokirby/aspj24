@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}South Canteen - Order History{% endblock %}
+
+{% block content %}
+<h1 class="display-6 p-4 text-center text-success">View Order History</h1>
+<div>
+    {% if count == 0 %}
+    <p class="text-center">There are no previous orders.</p>
+    {% else %}
+    <div>
+        <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Order ID</th>
+                <th scope="col">Order time</th>
+                <th scope="col">Stall</th>
+                <th scope="col">Item</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Price</th>
+                <th scope="col">Total</th>
+                <th scope="col">Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.get_orderID }}</td>
+                <td>{{ order.get_datetime }}</td>
+                <td>{{ order.get_stallName }}</td>
+                <td>{{ order.get_item }}</td>
+                <td>{{ order.get_itemQuantity }}</td>
+                <td>${{ order.get_price }}</td>
+                <td>${{ order.get_total }}</td>
+                <td>{{ order.get_remarks }}</td>
+            </tr>
+            </tbody>
+            {% endfor %}
+        </table>
+    </div>
+    
+    <div class="row">
+        <div class="col text-right fixed-bottom pb-5" style="margin-bottom: 10vh;">
+          <h1>Monthly total spent: ${{ monthlyTotal }}</h1>
+        </div>
+      </div>
+    {% endif %}
+</div>
+
+  
+{% endblock %}

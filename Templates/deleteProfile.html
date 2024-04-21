@@ -1,0 +1,51 @@
+<style>
+    /* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+</style>
+
+{% extends 'base.html' %}
+{% block title %}South Caneteen - Profile{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+  {% if messages %}
+
+    {% for category, message in messages %}
+        <div class="alert bg-{{ category }} alert-dismissible text-center w-50 container p-1" aria-hidden="true" role="alert">
+            <p class="display-6 text-white">{{message}}</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+  {% endif %}
+{% endwith %}
+
+
+<h1 class="display-6 p-4 text-center container bg-light sticky-top text-danger">Confirm Delete Profile</h1>
+
+<div class="bg-light rounded container" style="width: 30%; height: auto;">
+<form method="POST" action=""> 
+
+    <div class="container text-left p-3">
+        <input type="submit" value="Delete" class="btn btn-danger w-100 h-25" name="Delete"/>
+    </div>
+
+    <div class="container text-right p-3">
+        <input type="submit" value="Cancel" class="btn bg-white w-100 h-25" name="Cancel"/>
+    </div>
+    
+</form>
+</div>
+{% endblock %}
