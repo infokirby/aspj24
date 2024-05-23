@@ -4,81 +4,86 @@
 
 {% block content %}
 <h1 class="display-6 p-4 text-center text-success">View your order</h1>
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Order ID</th>
-            <th scope="col">Order time</th>
-            <th scope="col">Stall</th>
-            <th scope="col">Item</th>
-            <th scope="col">Quantity</th>
-            <th scope="col">Price</th>
-            <th scope="col">Total</th>
-            <th scope="col">Remarks</th>
-            <th scope="col">Status</th>
-            <th scope="col">Edit</th>
-            <th scope="col">Delete</th>
-            <th scope="col">Collected</th>
-        </tr>
-            </thead>
-            <tbody>
-                {% for order in orders %}
-                <tr>
-                    <td>{{ order.get_orderID }}</td>
-                    <td>{{ order.get_datetime }}</td>
-                    <td>{{ order.get_stallName }}</td>
-                    <td>{{ order.get_item }}</td>
-                    <td>{{ order.get_itemQuantity }}</td>
-                    <td>${{ "%0.2f" | format(order.get_price | float) }}</td>
-                    <td>${{ "%0.2f" | format(order.get_total | float) }}</td>
-                    <td>{{ order.get_remarks }}</td>
-                    <td>{{ order.get_status }}</td>
-                    <td><button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#{{ order.get_item.replace(' ', '_') }}Modal">Edit</button></td>
-                        <!-- Modal -->
-                        <div class="modal fade" id="{{ order.get_item.replace(' ', '_') }}Modal" tabindex="-1" role="dialog" aria-labelledby="{{ order.get_item.replace(' ', '_') }}ModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="{{ order.get_item.replace(' ', '_') }}ModalLabel">{{ order.get_item }}</h5>
-                                    </div>
-                                    <div class="modal-body">
-                                        <!-- Product image-->
-                                        <img class="card-img-top" src="{{url_for('static', filename='menu-items/' + order.get_item.replace(' ', '_') + '.jpg' )}}" alt="{{ order.get_name }}" />
-                                        <!-- Order Form -->
-                                        <form method="POST" action="{{ url_for('editOrder', id=order.get_orderID)}}">
-                                            {{ form.csrf_token }}
-                                            {{ form.phoneNumber }}
-                                            {{ form.datetime }}
-                                            {{ form.stallName }}
-                                            {{ form.orderID }}
-                                            {{ form.item(value = order.get_item)}}
-                                            {{ render_field( form.itemQuantity, class="form-control")}}
-                                            {{ form.price(value = order.get_price) }}
-                                            {{ form.total }}
-                                            {{ render_field( form.remarks )}}
-                                            {{ form.status }}
-                                            <button type="submit" class="btn btn-primary">Update</button>
-                                        </form>
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-md-3">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Order ID</th>
+                        <th scope="col">Order time</th>
+                        <th scope="col">Stall</th>
+                        <th scope="col">Item</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Remarks</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Edit</th>
+                        <th scope="col">Delete</th>
+                        <th scope="col">Collected</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.get_orderID }}</td>
+                        <td>{{ order.get_datetime }}</td>
+                        <td>{{ order.get_stallName }}</td>
+                        <td>{{ order.get_item }}</td>
+                        <td>{{ order.get_itemQuantity }}</td>
+                        <td>${{ "%0.2f" | format(order.get_price | float) }}</td>
+                        <td>${{ "%0.2f" | format(order.get_total | float) }}</td>
+                        <td>{{ order.get_remarks }}</td>
+                        <td>{{ order.get_status }}</td>
+                        <td><button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#{{ order.get_item.replace(' ', '_') }}Modal">Edit</button></td>
+                            <!-- Modal -->
+                            <div class="modal fade" id="{{ order.get_item.replace(' ', '_') }}Modal" tabindex="-1" role="dialog" aria-labelledby="{{ order.get_item.replace(' ', '_') }}ModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="{{ order.get_item.replace(' ', '_') }}ModalLabel">{{ order.get_item }}</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            <!-- Product image-->
+                                            <img class="card-img-top" src="{{url_for('static', filename='menu-items/' + order.get_item.replace(' ', '_') + '.jpg' )}}" alt="{{ order.get_name }}" />
+                                            <!-- Order Form -->
+                                            <form method="POST" action="{{ url_for('editOrder', id=order.get_orderID)}}">
+                                                {{ form.csrf_token }}
+                                                {{ form.phoneNumber }}
+                                                {{ form.datetime }}
+                                                {{ form.stallName }}
+                                                {{ form.orderID }}
+                                                {{ form.item(value = order.get_item)}}
+                                                {{ render_field( form.itemQuantity, class="form-control")}}
+                                                {{ form.price(value = order.get_price) }}
+                                                {{ form.total }}
+                                                {{ render_field( form.remarks )}}
+                                                {{ form.status }}
+                                                <button type="submit" class="btn btn-primary">Update</button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    <td><a href="{{ url_for('deleteOrder', id=order.get_orderID)}}" class="btn btn-danger" onclick="return confirm('Confirm Delete');">Delete</button></td>
-                    <td><a href="{{ url_for('completeOrder', id=order.get_orderID)}}" class="btn btn-info" onclick="return confirm('Confirm food for order {{order.get_orderID}} collected');">Collected</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-
-
-<div class="row container-fluid">
-  <div class="col text-right fixed-bottom pb-5" style="margin-bottom: 10vh;">
-    <h1>Total to be paid: ${{ total }}</h1>
-  </div>
-  <div class="col text-center fixed-bottom pb-5" style="margin-bottom: 10vh;">
-    <a href="/checkout" class="btn btn-primary">Checkout</a>
-  </div>
+                        <td><a href="{{ url_for('deleteOrder', id=order.get_orderID)}}" class="btn btn-danger" onclick="return confirm('Confirm Delete');">Delete</button></td>
+                        <td><a href="{{ url_for('completeOrder', id=order.get_orderID)}}" class="btn btn-info" onclick="return confirm('Confirm food for order {{order.get_orderID}} collected');">Collected</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p class="text-danger mb-0">Note: No refunds are allowed.</p>
+        </div>
+    </div>
+    <div class="row justify-content-starts">
+        <div class="col-12 col-md-3">
+            <h3>Total to be paid: ${{ total }}</h3>
+            <a href="/checkout" class="btn btn-primary btn-round mt-3">
+                <i class="fas fa-shopping-cart"></i> Checkout
+            </a>
+        </div>
+    </div>
 </div>
+
 
 {% endblock %}
