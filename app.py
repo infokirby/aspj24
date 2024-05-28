@@ -3,7 +3,7 @@ from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm,
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
 from customer import Customer
-from flask_login import LoginManager, current_user, login_required, login_user, logout_user
+from flask_login import LoginManager, current_user, login_required, login_user, logout_user, UserMixin
 from flask_bcrypt import Bcrypt
 from io import BytesIO
 from store_owner import StoreOwner
@@ -11,17 +11,26 @@ from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
 import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser
 from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+import sqlalchemy.orm as so
 
 
 
 app = Flask(__name__)
 
-stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
-bcrypt = Bcrypt(app)
 
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Password@123@localhost/users'
 app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
+app.config['SECURITY_REGISTERABLE'] = True
+
+stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
+
+
+db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
 login_manager = LoginManager()
+
+
 
 
 #SuperUser account
@@ -576,8 +585,8 @@ def downloadExcelApi():
 def createApiResponse():
     bufferFile = writeBufferExcelFile()
     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    return send_file(bufferFile,mimetype=mimetype)
-    return response
+    # return send_file(bufferFile,mimetype=mimetype)
+    # return response
 
 def writeBufferExcelFile():
     buffer = BytesIO()
@@ -669,4 +678,5 @@ def unknown_error(error):
 #         return render_template('error.html', error_code = AttributeError)
 
 if __name__ == '__main__':
+    db.create_all()
     app.run(debug = True)
