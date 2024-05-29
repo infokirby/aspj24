@@ -9,7 +9,7 @@ from io import BytesIO
 from store_owner import StoreOwner
 from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
-import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser
+import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, os, vonage
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy.orm as so
@@ -18,6 +18,9 @@ import sqlalchemy.orm as so
 
 app = Flask(__name__)
 
+os.environ["VONAGE_SECRET_KEY"] = "mcMGYJoWTE6C8Rjx"
+os.environ["VONAGE_API_KEY"] = "d8b5ed18"
+os.environ["VONAGE_BRAND"] = "South Canteen Webapp"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Password@123@localhost/users'
 app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
@@ -34,8 +37,8 @@ login_manager = LoginManager()
 
 
 #SuperUser account
-hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
-superUser = RegisterAdmin(90288065, hashed_password)
+# hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
+# superUser = RegisterAdmin(90288065, hashed_password)
 
 
 @login_manager.user_loader
@@ -46,8 +49,8 @@ def load_user(id):
                 if keys == id:
                     return userdb[id]
             
-        elif id == superUser.get_id():
-            return superUser
+        # elif id == superUser.get_id():
+        #     return superUser
 
         else:
             with shelve.open('SOdb', 'r') as SOdb:
@@ -70,24 +73,24 @@ def storeOwnerHome():
     return render_template('storeOwnerHome.html')
 
 
-@app.route('/admin', methods=['GET', 'POST'])
-def adminLogin():
-    form = LoginForm(request.form)
-    if request.method == 'POST' and form.validate():
-        if form.phoneNumber.data == 90288065:
-            admin = RegisterAdmin(69, form.password.data)
-            if isinstance(admin, Customer):
-                if bcrypt.check_password_hash(superUser.get_password(), form.password.data):
-                    login_user(admin)
-                    session['id'] = admin.get_id()
-                    with shelve.open("userdb", 'c') as userdb:
-                        customerCount = len(userdb)
-                        return render_template('adminPage.html',  logined = True, customerCount=customerCount)
+# @app.route('/admin', methods=['GET', 'POST'])
+# def adminLogin():
+#     form = LoginForm(request.form)
+#     if request.method == 'POST' and form.validate():
+#         if form.phoneNumber.data == 90288065:
+#             admin = RegisterAdmin(69, form.password.data)
+#             if isinstance(admin, Customer):
+#                 if bcrypt.check_password_hash(superUser.get_password(), form.password.data):
+#                     login_user(admin)
+#                     session['id'] = admin.get_id()
+#                     with shelve.open("userdb", 'c') as userdb:
+#                         customerCount = len(userdb)
+#                         return render_template('adminPage.html',  logined = True, customerCount=customerCount)
 
-                else:
-                    flash("For Admins only. Unauthorised access forbiddened.", 'Danger')
-                    return redirect(url_for('home'))
-    return render_template('adminLogin.html', form=form)
+#                 else:
+#                     flash("For Admins only. Unauthorised access forbiddened.", 'Danger')
+#                     return redirect(url_for('home'))
+#     return render_template('adminLogin.html', form=form)
 
 # @app.route('/adminPage')
 # @login_required
@@ -99,6 +102,7 @@ def adminLogin():
 
 
 @app.route('/createStoreOwner', methods=['GET', 'POST'])
+@login_required
 def createStoreOwner():
     form = StoreOwnerRegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
