@@ -9,10 +9,11 @@ from io import BytesIO
 from store_owner import StoreOwner
 from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
-import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, os, vonage
+import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, os
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy.orm as so
+from flask_security import roles_accepted
 
 
 
@@ -22,7 +23,8 @@ os.environ["VONAGE_SECRET_KEY"] = "mcMGYJoWTE6C8Rjx"
 os.environ["VONAGE_API_KEY"] = "d8b5ed18"
 os.environ["VONAGE_BRAND"] = "South Canteen Webapp"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Password@123@localhost/users'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:Password123@database-1.cr0sk8kqijy4.ap-southeast-1.rds.amazonaws.com'
 app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
 app.config['SECURITY_REGISTERABLE'] = True
 
@@ -36,7 +38,7 @@ login_manager = LoginManager()
 
 
 
-#SuperUser account
+# #SuperUser account
 # hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
 # superUser = RegisterAdmin(90288065, hashed_password)
 
