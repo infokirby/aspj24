@@ -14,5 +14,4 @@ class Users(db.Model):
     def __repr__(self):
         return f"User: {self.name}"
 
-class Order(db.model):
-    item: so.WriteOnlyMapped['Menu'] = 
+
