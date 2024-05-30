@@ -1,4 +1,5 @@
 from flask import Flask, render_template, url_for, request, redirect, flash, session, send_file
+from flask_talisman import Talisman
 from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
@@ -15,6 +16,42 @@ from datetime import datetime
 
 
 app = Flask(__name__)
+
+csp = {
+    'default-src': [
+        '\'self\'',
+        'cdnjs.cloudflare.com',
+        'fonts.googleapis.com',
+        'fonts.gstatic.com',
+        'use.fontawesome.com',
+        'cdn.jsdelivr.net',
+        'kit.fontawesome.com',
+        'ka-f.fontawesome.com'
+    ],
+    'img-src': ['\'self\''],
+    'style-src': [
+        '\'self\'',
+        '\'unsafe-inline\'',  
+        'fonts.googleapis.com',
+        'use.fontawesome.com',
+        'cdn.jsdelivr.net',
+        'kit.fontawesome.com'
+    ],
+    'font-src': [
+        '\'self\'',
+        'fonts.gstatic.com',
+        'use.fontawesome.com',
+        'cdn.jsdelivr.net',
+        'kit.fontawesome.com',
+        'ka-f.fontawesome.com'  
+    ],
+    'connect-src': [  
+        '\'self\'',
+        'ka-f.fontawesome.com'
+    ]
+}
+
+Talisman(app, content_security_policy=csp)
 
 stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
 bcrypt = Bcrypt(app)
