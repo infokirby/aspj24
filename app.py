@@ -19,13 +19,15 @@ from flask_security import roles_accepted
 
 app = Flask(__name__)
 
+
+os.environ['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
 os.environ["VONAGE_SECRET_KEY"] = "mcMGYJoWTE6C8Rjx"
 os.environ["VONAGE_API_KEY"] = "d8b5ed18"
 os.environ["VONAGE_BRAND"] = "South Canteen Webapp"
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:Password123@database-1.cr0sk8kqijy4.ap-southeast-1.rds.amazonaws.com'
-app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
+app.config['SECRET_KEY'] =  os.environ.get("SECRET_KEY")
 app.config['SECURITY_REGISTERABLE'] = True
 
 stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
