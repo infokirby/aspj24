@@ -10,8 +10,10 @@ from io import BytesIO
 from store_owner import StoreOwner
 from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
-import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser
+import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, os
 from datetime import datetime
+from dotenv import load_dotenv
+
 
 
 
@@ -53,16 +55,19 @@ csp = {
 
 Talisman(app, content_security_policy=csp)
 
-stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
+load_dotenv()
+
+stripe.api_key = os.getenv("STRIPE_API_KEY")
 bcrypt = Bcrypt(app)
 
 
-app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 login_manager = LoginManager()
 
 
 #SuperUser account
-hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
+superuser_password = os.getenv("SUPERUSER_PASSWORD")
+hashed_password = bcrypt.generate_password_hash(superuser_password).decode('utf-8')
 superUser = RegisterAdmin(90288065, hashed_password)
 
 
