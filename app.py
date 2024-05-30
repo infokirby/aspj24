@@ -11,13 +11,19 @@ from store_owner import StoreOwner
 from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
 import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, os
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 
 
 
 app = Flask(__name__)
+
+app.config.update(
+    SESSION_COOKIE_SECURE=False,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+)
 
 csp = {
     'default-src': [
@@ -64,11 +70,19 @@ bcrypt = Bcrypt(app)
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 login_manager = LoginManager()
 
+#Session Timeout
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes = 5)
+
 
 #SuperUser account
 superuser_password = os.getenv("SUPERUSER_PASSWORD")
 hashed_password = bcrypt.generate_password_hash(superuser_password).decode('utf-8')
 superUser = RegisterAdmin(90288065, hashed_password)
+
+@app.route('/session_data')
+def session_data():
+    print(session)  # print the entire session data
+    return "Check the console for session data"
 
 
 @login_manager.user_loader
