@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}South Canteen - Login{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+  {% if messages %}
+    {% for category, message in messages %}
+        <div class="alert bg-{{ category }} alert-dismissible text-center w-50 container p-1" aria-hidden="true" role="alert">
+            <p class="display-6 text-white">{{message}}</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<h3 class="display-6 p-4 text-center">Login Page</h3>
+
+
+<div class=" bg-body rounded container shadow-sm" style="width: 30%; height: 60%;">
+<form method="POST" action="" id="loginForm"> 
+</br>
+    <div class="form-group p-3">
+        {{ render_field(form.phoneNumber, class="form-control", placeholder="91234567") }}
+    </div>
+
+    
+    <div class="form-group p-3">
+        {{ render_field(form.password, class="form-control", placeholder="Password" ) }}
+    </div>
+
+
+    <div class="form-group p-3">
+        {{ render_field(form.remember, class="form-checkbox") }}
+    </div>
+
+    <button class="g-recaptcha btn btn-primary justify-content-center p-2 w-100" data-sitekey="6Lcgw3ApAAAAAA05GM_5LTqjeLkeHEVyADm3ULAZ" data-callback='onSubmit' data-action='submit'>Login</button>
+
+    <p class="text-center p-2"><a href="/forgotPassword">Forgot your password</a></p>
+
+    <p class="text-center p-2">Storeowners, <a href="/storeOwnerLogin">log in here.</a></p>
+
+    <p class="text-center p-2 mt-2">Not a memeber? <a href="/register">Sign up now</a></p>
+
+</form>
+</div>
+{% endblock %}

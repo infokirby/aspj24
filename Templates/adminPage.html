@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}South Canteen System - Home{% endblock %}
+
+
+{% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+  {% if messages %}
+    {% for category, message in messages %}
+        <div class="alert bg-{{ category }} alert-dismissible text-center w-50 container p-1" aria-hidden="true" role="alert">
+            <p class="display-6 text-white">{{message}}</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+{% if current_user.is_authenticated %}
+    <h3 class="display-4 text-center">Welcome, Admin</h3> 
+
+    <div class="container-fluid">
+        <div class="container text-center p-3">
+            <a class="btn btn-success  w-50 h-25" href="/createStoreOwner"><span class="display-5 align-middle">Create Store Owner </span></a>
+        </div>
+    
+        <div class="container text-center p-3">
+            <a class="btn btn-primary w-50 h-25"><span class="display-5 align-middle">Customer Count = {{ customerCount }}</span></a>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}

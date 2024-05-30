@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}South Canteen System - Home{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid" style="min-height: 100vh;  background-image: url({{ url_for('static', filename='Background image.webp') }})">
+{% with messages = get_flashed_messages(with_categories=true) %}
+  <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+  {% if messages %}
+    {% for category, message in messages %}
+        <div class="alert bg-{{ category }} alert-dismissible text-center w-50 container p-1" aria-hidden="true" role="alert">
+            <p class="display-6 text-white">{{message}}</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+{% if current_user.is_authenticated %}
+    <h3 class="display-4 text-center text-success">Welcome, {{current_user.get_name()}}</h3> 
+    <h6 class="display-6 text- text-center text-success">From farm to table get your favourite dishes with local produce <a href="/Drinks" class="text-success text-decoration-none">here.</a></h6>
+
+{% else %}
+    <h3 class="display-1 text-center text-success">Explore Green. South Canteen.</h3>    
+    <h6 class="text-dark text-center"><a href="/register">Join us today, a sustainable cause.</a></h6>
+
+{% endif %}  
+
+
+{% endblock %}
+
+<div class="fixed-bottom">
+  {% block footer %}
+      {% include 'includes/_footer.html' %}
+  {% endblock %}
+  </div>

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}South Canteen Store Owners - Past Orders{% endblock %}
+
+{% block content %}
+<h1 class="display-5 text-center text-primary">Past Orders</h1>
+<div class="text-center">
+  {% if count == 0 %}
+  <p>There are no orders.</p>
+  {% elif count == 1 %}
+  <p>There is 1 order.</p>
+  {% else %}
+  <p>you have {{ count }} orders.</p>
+  {% endif %}
+</div>
+<div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Food</th>
+        <th>Quantity</th>
+        <th>Remarks</th>
+        <th>Total</th>
+        <th>Time Ordered</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for orders in orders %}
+        <tr>
+          <td>{{ orders.get_orderID }}</td>
+          <td>{{ orders.get_item }}</td>
+          <td>{{ orders.get_itemQuantity }}</td>
+          <td>{{ orders.get_remark }}</td>
+          <td>{{ "%0.2f" | format(orders.get_total | float) }}</td>
+          <td>{{ orders.get_datetime }}</td>
+        </tr>
+      </tbody>
+    <Button class="btnExport" onclick="return confirm('Are you sure you want to export past orders');">Export</Button>
+      <script>
+        attachEventToBtnExport()
+
+        function attachEventToBtnExport() {
+            const bntExportElement = document.querySelector( '.btnExport' )
+            bntExportElement.addEventListener( 'click', exportExcel )
+        }
+
+        async function exportExcel() {
+            let response = await fetch( '/download_excel_api' )
+            let blobResponse = await response.blob()
+            const fileName = 'PastOrders_excel.xlsx'
+            downloadExcelSilently( blobResponse, fileName )
+        }
+        function downloadExcelSilently( blobExcelFile, filename ) {
+            const url = window.URL.createObjectURL( blobExcelFile );
+            const hiddenAnchor = document.createElement( "a" );
+            hiddenAnchor.style.display = "none";
+            hiddenAnchor.href = url;
+            hiddenAnchor.download = filename;
+            document.body.appendChild( hiddenAnchor );
+            hiddenAnchor.click();
+            window.URL.revokeObjectURL( url );
+        }
+      </script>
+      {% endfor %}
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% from "includes/_formHelper.html" import render_field %}
+<div class="row">
+    {% for item, price in menu[stall_name].items() %}
+    <div class="col-md-3 mb-5">
+        <div class="card h-100">
+            <!-- Product image-->
+            <img class="card-img-top" src="{{url_for('static', filename='menu-items/' + item.replace(' ', '_') + '.jpg' )}}" alt="{{ item.name }}" style="min-width: 300px; min-height: 300px; max-width: 450; max-height: 300;" />
+            <!-- Product details-->
+            <div class="card-body p-4">
+                <div class="text-center">
+                    <!-- Product name-->
+                    <a href="#{{ item.replace(' ', '_') }}Modal" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#{{ item.replace(' ', '_') }}Modal">
+                    <p class="fw-bolder">{{ item }}</p>
+                    </a>
+                    <!-- Product price-->
+                    ${{ price }}
+                    <!-- Modal -->
+                    <div class="modal fade" id="{{ item.replace(' ', '_') }}Modal" tabindex="-1" role="dialog" aria-labelledby="{{ item.replace(' ', '_') }}ModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="{{ item }}ModalLabel">{{ item }}</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <!-- Product image-->
+                                    <img class="card-img-top" src="{{url_for('static', filename='menu-items/' + item.replace(' ', '_') + '.jpg' )}}" alt="{{ item.name }}" />
+                                    <!-- Order Form -->
+                                    <form method="POST">
+                                        {{ form.csrf_token }}
+                                        {{ form.datetime }}
+                                        {{ form.phoneNumber }}
+                                        {{ form.stallName }}
+                                        {{ form.orderID }}
+                                        {{ form.item(value = item)}}
+                                        {{ render_field( form.itemQuantity, class="form-control")}}
+                                        {{ form.price(value = price) }}
+                                        {{ form.total }}
+                                        {{ render_field( form.remarks )}}
+                                        {{ form.status }}
+                                        <button type="submit" class="btn btn-primary">Add to cart</button>
+                                    </form>
+        
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endfor %}
+</div>
