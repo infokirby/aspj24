@@ -14,7 +14,7 @@ from datetime import datetime
 
 
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='Templates', static_folder='Static')
 
 stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
 bcrypt = Bcrypt(app)
@@ -53,7 +53,7 @@ login_manager.init_app(app)
 #home page
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('Templates/home.html')
 
 #storeownder home page
 @app.route('/storeOwnerHome')

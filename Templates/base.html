@@ -18,10 +18,10 @@
 <body>
     {% block navbar %}
         {% if current_user.get_storeName %}
-        {% include 'includes/_StoreOwnerNavbar.html' %}
+        {% include 'Templates/includes/_StoreOwnerNavbar.html' %}
 
         {% else %}
-        {% include 'includes/_navbar.html' %}
+        {% include 'Templates/includes/_navbar.html' %}
         {% endif %}
     {% endblock %}
 
@@ -41,7 +41,7 @@
 
     <div class="containter-fluid sticky-bottom">
     {% block footer %}
-        {% include 'includes/_footer.html' %}
+        {% include 'Templates/includes/_footer.html' %}
     {% endblock %}
     </div>
 
