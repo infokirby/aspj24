@@ -18,10 +18,10 @@
 <body>
     {% block navbar %}
         {% if current_user.get_storeName %}
-        {% include 'Templates/includes/_StoreOwnerNavbar.html' %}
+        {% include 'includes/_StoreOwnerNavbar.html' %}
 
         {% else %}
-        {% include 'Templates/includes/_navbar.html' %}
+        {% include 'includes/_navbar.html' %}
         {% endif %}
     {% endblock %}
 
@@ -37,11 +37,14 @@
     
     <!-- font awesome scripts -->
     <script src="https://kit.fontawesome.com/b3710d768e.js" crossorigin="anonymous"></script>
+
+    <!-- reCaptcha Integration -->
+    <script src='https://www.google.com/recaptcha/api.js' async defer></script>
     {% endblock %}
 
     <div class="containter-fluid sticky-bottom">
     {% block footer %}
-        {% include 'Templates/includes/_footer.html' %}
+        {% include 'includes/_footer.html' %}
     {% endblock %}
     </div>
 

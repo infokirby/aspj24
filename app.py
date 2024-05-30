@@ -11,8 +11,11 @@ from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
 import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser
 from datetime import datetime
+from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
+import requests
 
 
+GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
 app = Flask(__name__, template_folder='Templates', static_folder='Static')
 
@@ -22,7 +25,6 @@ bcrypt = Bcrypt(app)
 
 app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
 login_manager = LoginManager()
-
 
 #SuperUser account
 hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
@@ -41,7 +43,7 @@ def load_user(id):
             return superUser
 
         else:
-            with shelve.open('SOdb', 'r') as SOdb:
+            with shelve.open('SOdb', 'c') as SOdb:
                 for keys in SOdb:
                     if keys == id:
                         return SOdb[id]
@@ -53,7 +55,7 @@ login_manager.init_app(app)
 #home page
 @app.route('/')
 def home():
-    return render_template('Templates/home.html')
+    return render_template('home.html')
 
 #storeownder home page
 @app.route('/storeOwnerHome')
@@ -313,13 +315,14 @@ def deleteProfile():
 @app.route('/Drinks', methods=['GET', 'POST'])
 @login_required
 def stalls():
+    global GOOGLE_RECAPTCHA_SECRET_KEY 
+    global GOOGLE_VERIFY_URL
     path = request.path
     stall_name = path.lstrip('/')
     form = CustOrderForm(request.form)
-    now = datetime.now()
-    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    now = datetime.now()    
+    dt_string = now.strftime("%Y-%m-%dT%H:%M:%S%z")
     if request.method == 'POST' and form.validate():
-        #form.stallName.data = stall_name
         form.orderID.data = str(newOrderID())
         form.phoneNumber.data = current_user.get_id()
         form.itemQuantity.data = request.form.get('itemQuantity')
@@ -331,7 +334,7 @@ def stalls():
         order.set_stallName(stall_name)
         order.set_orderID(form.orderID.data)
         order.set_item(form.item.data)
-        order.set_itemQuantity(form.itemQuantity.data)
+        order.set_itemQuantity(int(form.itemQuantity.data))
         order.set_price(form.price.data)
         order.set_total(total)
         order.set_remarks(form.remarks.data)
@@ -340,7 +343,24 @@ def stalls():
             orderdb[order.get_orderID] = order
 
 
-    return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form)
+        secret_response = request.form.get('g-recaptcha-response')
+        verify_response = requests.post(
+            url=f'{GOOGLE_VERIFY_URL}?secret={GOOGLE_RECAPTCHA_SECRET_KEY}&response={secret_response}').json()
+        print("Form validated")
+        print(verify_response)
+        print(secret_response)
+        print(GOOGLE_RECAPTCHA_SECRET_KEY)
+        print(str(secret_response))
+    else:
+        print("Form not validated")
+
+        # response = requests.post('https://www.google.com/recaptcha/api/siteverify', data=json.dumps(data), headers={'Content-Type': 'application/json'})
+
+
+
+
+
+    return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form, site_key=GOOGLE_RECAPTCHA_SITE_KEY)
 
 
 #Cart

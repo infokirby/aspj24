@@ -5,6 +5,7 @@ from wtforms import Form, validators, SelectField, RadioField, BooleanField, Str
 from datetime import datetime
 
 
+
 class RegistrationForm(Form):
     name = StringField('Name:', [validators.InputRequired()])
     phoneNumber = IntegerField('Phone Number:', [validators.InputRequired(), validators.NumberRange(6000000, 99999999)])
@@ -33,6 +34,7 @@ class CustOrderForm(Form):
     total = HiddenField()
     remarks = StringField('Remarks:')
     status = HiddenField(default='Pending')
+    g_recaptcha_response = StringField('Recaptcha')
 
 
 
