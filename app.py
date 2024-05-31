@@ -3,21 +3,24 @@ from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm,
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
 from customer import Customer
-from flask_login import LoginManager, current_user, login_required, login_user, logout_user, UserMixin
+from flask_login import LoginManager, current_user, login_required, login_user, logout_user
 from flask_bcrypt import Bcrypt
 from io import BytesIO
 from store_owner import StoreOwner
 from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
-import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, os
+import shelve, xlsxwriter, stripe, webbrowser, os, pyotp, vonage
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy.orm as so
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 # from flask_security import roles_accepted
 
 
-
+#configuring flask app
 app = Flask(__name__)
+
 
 
 os.environ['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
@@ -26,12 +29,26 @@ os.environ["VONAGE_API_KEY"] = "d8b5ed18"
 os.environ["VONAGE_BRAND"] = "South Canteen Webapp"
 
 
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:Password123@database-1.cr0sk8kqijy4.ap-southeast-1.rds.amazonaws.com'
 app.config['SECRET_KEY'] =  os.environ.get("SECRET_KEY")
 app.config['SECURITY_REGISTERABLE'] = True
 
 stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
 
+
+#configuring flask limiter
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    storage_uri="memory://"
+)
+
+#Configuring pyotp
+totp = pyotp.TOTP(pyotp.random_base32, interval=60)
+
+#config vonage sms api
+client = vonage.Client(key=os.environ.get("VONAGE_API_KEY"), secret=os.environ.get("VONAGE_API_SECRET"))
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
@@ -138,6 +155,7 @@ def contactUs():
 
 #Login Page
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("15/hour;5/minute")
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -147,7 +165,15 @@ def login():
                 for keys in userdb:
                     if user.get_id() == keys:
                         if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
-                            
+                            totpToSend = totp.now()
+                            responseData = client.sms.send_message(
+                                {
+                                    "from" : os.environ.get("VONAGE_BRAND_NAME"),
+                                    "to" : os.environ.get(f"{65}{user.get_id()}"),
+                                    "text" : f"Your OTP is: {totpToSend}. \nValid for the next 1 minute"
+                                }
+                            )
+
                             if form.remember.data == True:
                                 login_user(userdb[keys], remember=True)
                             else:
@@ -162,6 +188,7 @@ def login():
 
 
 @app.route('/2fa', methods = ["POST", "GET"])
+@limiter.limit("15/hour;5/minute")
 def authentication():
     form = Authorisation(request.form)
     if request.method == 'POST' and form.validate():
@@ -264,6 +291,7 @@ def register():
 #profile page
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
+#@roles_accepted("Admin", "User", "Storeowner")
 def profile():
     shownGender = str(current_user.get_gender())
     form = EditUserForm(request.form, gender = shownGender)
@@ -286,6 +314,7 @@ def profile():
 #change password page
 @app.route('/changePassword', methods=['GET', 'POST'])
 @login_required
+#@roles_accepted("Admin", "User", "Storeowner")
 def changePassword():
     form = ChangePasswordForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -311,6 +340,7 @@ def changePassword():
 
 @app.route('/deleteProfile', methods = ["POST", "GET"])
 @login_required
+#@roles_accepted("Admin", "User", "Storeowner")
 def deleteProfile():
     form = request.form
     if request.method == "POST":
@@ -353,6 +383,7 @@ def deleteProfile():
 @app.route('/Waffle', methods=['GET', 'POST'])
 @app.route('/Drinks', methods=['GET', 'POST'])
 @login_required
+#@roles_accepted("Admin", "User", "Storeowner")
 def stalls():
     path = request.path
     stall_name = path.lstrip('/')
