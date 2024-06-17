@@ -1,15 +1,18 @@
 #import User
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import declarative_base, relationship
 
+Base = declarative_base()
 
+class Customer(Base):
+    __tablename__ = "customers"
 
-class Customer():
-    def __init__(self, phoneNumber):
-        self.__phoneNumber = str(phoneNumber)
+    phoneNumber = Column(Integer, primary_key=True)
+    name = Column(String)
+    passwordHash = Column(String)
+    role = relationship("Role", backref="customers")
 
     # accessor methods
-    def get_customer_id(self):
-        return self.__customer_id
-    
     @property
     def get_datetime(self):
         return self.__datetime
@@ -54,29 +57,21 @@ class Customer():
     def get_status(self):
         return self.__status
     
+    @property
     def get_name(self):
-        return self.__name
+        return self.name
     
+    @property
     def get_id(self):
-        return str(self.__phoneNumber)
+        return str(self.phoneNumber)
     
+    @property
     def get_password(self):
-        return self.__password
+        return self.passwordHash
     
-    def get_gender(self):
-        return self.__gender
-    
-    def get_membership(self):
-        return self.__membership
-    
+    @property
     def get_role(self):
-        return self.__role
-    
-    def get_securityQuestion(self):
-        return self.__securityQuestion
-    
-    def get_securityAnswer(self):
-        return self.__securityAnswer
+        return self.role
 
     # mutator methods
     def set_customer_id(self, customer_id):
@@ -136,9 +131,6 @@ class Customer():
     def set_password(self, password):
         self.__password = password
 
-    def set_gender(self, gender):
-        self.__gender = gender
-
     def set_role(self, role):
         self.__role = role
 
@@ -164,3 +156,10 @@ class Customer():
 #__str__ function
     def __str__(self):
         return f"User {self.get_name()} with phone number {self.get_id()}"
+    
+
+class Role(Base):
+    __tablename__ = "role"
+
+    id = Column(Integer, primary_key=True)
+    role = Column(String, unique=True)

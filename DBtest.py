@@ -2,21 +2,31 @@ from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
 import pymysql
 
 conf ={
-    'host' : "database-1.cr0sk8kqijy4.ap-southeast-1.rds.amazonaws.com",
+    'host' : "sql12.freemysqlhosting.net",
     'port' : '3306',
-    'user' : 'admin',
-    'password' : 'Password123',
-    'database' : 'database-1',
+    'user' : 'sql12713553',
+    'password' : 'HlXAIRZVFy',
+    'database' : 'sql12713553',
 }
 
-connection_string = ("mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}".format(**conf))
-engine = create_engine(connection_string)
+
+
+
+if __name__ == '__main__':
+ 
+    try:
+        # GET THE CONNECTION OBJECT (ENGINE) FOR THE DATABASE
+        connection_string = ("mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}".format(**conf))
+        engine = create_engine(connection_string)
+        print("Connection to the {host} for user {user} created successfully.".format(**conf))
+    except Exception as ex:
+        print("Connection could not be made due to the following error: \n", ex)
 
 #create table
 metadataObj = MetaData()
 
-metadataObj.create_all(engine)
-print(metadataObj)
+# metadataObj.create_all(engine)
+# print(metadataObj)
 
 # user_table = Table(
 #     "Users",
