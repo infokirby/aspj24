@@ -1,9 +1,9 @@
 {% from "includes/_formHelper.html" import render_field %}
 <script>
     function onSubmit(token) {
-        document.getElementById("order-form").submit();
+      document.getElementById("order-form").submit();
     }
-</script>
+  </script>
 <div class="row">
     {% for item, price in menu[stall_name].items() %}
     <div class="col-md-3 mb-5">
@@ -30,7 +30,7 @@
                                     <!-- Product image-->
                                     <img class="card-img-top" src="{{url_for('static', filename='menu-items/' + item.replace(' ', '_') + '.jpg' )}}" alt="{{ item.name }}" />
                                     <!-- Order Form -->
-                                    <form method="POST" id="order-form" class="g-recaptcha">
+                                    <form method="POST" id="order-form">
                                         {{ form.csrf_token }}
                                         {{ form.datetime }}
                                         {{ form.phoneNumber }}
@@ -42,11 +42,11 @@
                                         {{ form.total }}
                                         {{ render_field( form.remarks )}}
                                         {{ form.status }}
+                                        <div class="g-recaptcha" data-sitekey='6LcFrfQpAAAAAJxfMJOamyJdlWIccnkQZAaQQyea'></div></form>div>
                                         
-                                        <div class="g-recaptcha" data-sitekey='6LcdnuwpAAAAAPFfXUEABUAu1wA-RtmK5e0b5vBj'></div>
-                                        <button type="submit" class="btn btn-primary" id="order-form">Add to cart</button>
+                                        <button type="submit" class="btn btn-primary" >Add to cart</button>
                                     </form>
-
+                                    <script src='https://www.google.com/recaptcha/api.js'></script>
 
                                 </div>
                             </div>

@@ -22,6 +22,7 @@
 
 <div class=" bg-body rounded container shadow-sm" style="width: 30%; height: 60%;">
 <form method="POST" action=""> 
+    {{ form.csrf_token }}
 </br>
     <div class="form-group p-3">
         {{ render_field(form.phoneNumber, class="form-control", placeholder="91234567") }}

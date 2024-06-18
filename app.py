@@ -9,11 +9,11 @@ from io import BytesIO
 from store_owner import StoreOwner
 from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
-import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser
+import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re
 from datetime import datetime
 from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
 import requests
-
+from flask.sessions import SecureCookieSessionInterface
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
@@ -30,6 +30,11 @@ login_manager = LoginManager()
 hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
 superUser = RegisterAdmin(90288065, hashed_password)
 
+@app.after_request
+def apply_caching(response):
+    response.headers["Set-Cookie"] = SecureCookieSessionInterface().get_signing_serializer(app).dumps(dict(session))
+    response.headers.add('Set-Cookie','SameSite=None; Secure')
+    return response
 
 @login_manager.user_loader
 def load_user(id):
@@ -296,6 +301,13 @@ def deleteProfile():
 
     return render_template('deleteProfile.html')
 
+def sanitize_input(input_string):
+    # This pattern matches any character that is not a word character or a space
+    pattern = re.compile(r'[^\w\s]')
+    sanitized_string = re.sub(pattern, '', input_string)
+    return sanitized_string
+
+
 
 #order
 @app.route('/Vegetarian', methods=['GET', 'POST'])
@@ -315,6 +327,7 @@ def deleteProfile():
 @app.route('/Drinks', methods=['GET', 'POST'])
 @login_required
 def stalls():
+    global GOOGLE_RECAPTCHA_SITE_KEY
     global GOOGLE_RECAPTCHA_SECRET_KEY 
     global GOOGLE_VERIFY_URL
     path = request.path
@@ -322,6 +335,21 @@ def stalls():
     form = CustOrderForm(request.form)
     now = datetime.now()    
     dt_string = now.strftime("%Y-%m-%dT%H:%M:%S%z")
+
+    def orderSuccess():
+        captcha_response = request.form['g-recaptcha-response']
+        print(captcha_response)
+        if is_human(captcha_response):
+            stalls()
+        else:
+            flash("Please verify that you are not a robot", "warning")
+            stalls()
+    def is_human(captcha_response):
+        payload = {'response': captcha_response, 'secret': GOOGLE_RECAPTCHA_SECRET_KEY}
+        response = requests.post("https://www.google.com/recaptcha/api/siteverify", data=payload)
+        response_text = json.loads(response.text)
+        return response_text['success']
+
     if request.method == 'POST' and form.validate():
         form.orderID.data = str(newOrderID())
         form.phoneNumber.data = current_user.get_id()
@@ -337,30 +365,32 @@ def stalls():
         order.set_itemQuantity(int(form.itemQuantity.data))
         order.set_price(form.price.data)
         order.set_total(total)
-        order.set_remarks(form.remarks.data)
+        #regex to remove special characters
+        if form.remarks.data != "":
+            sanitized_remarks = sanitize_input(form.remarks.data)
+            order.set_remarks(sanitized_remarks)
         order.set_status(form.status.data)
         with shelve.open('order.db', 'c') as orderdb:
             orderdb[order.get_orderID] = order
+    
+    
+        orderSuccess()
 
-
-        secret_response = request.form.get('g-recaptcha-response')
-        verify_response = requests.post(
-            url=f'{GOOGLE_VERIFY_URL}?secret={GOOGLE_RECAPTCHA_SECRET_KEY}&response={secret_response}').json()
-        print("Form validated")
-        print(verify_response)
-        print(secret_response)
-        print(GOOGLE_RECAPTCHA_SECRET_KEY)
-        print(str(secret_response))
+        # secret_response = request.form.get('g-recaptcha-response')
+        # verify_response = requests.post(
+        #     url=f'"https://www.google.com/recaptcha/api/siteverify"?secret="6LcdnuwpAAAAAJlXp2bDRvWguu5VSQulzn8wPri7"&response={secret_response}').json()
+        # print("Form validated")
+        # print(verify_response)
+        # print(secret_response)
     else:
         print("Form not validated")
+        print(request.form)
+        print(request.form.get('g-recaptcha-response'))
 
         # response = requests.post('https://www.google.com/recaptcha/api/siteverify', data=json.dumps(data), headers={'Content-Type': 'application/json'})
 
-
-
-
-
     return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form, site_key=GOOGLE_RECAPTCHA_SITE_KEY)
+
 
 
 #Cart
@@ -689,4 +719,4 @@ def unknown_error(error):
 #         return render_template('error.html', error_code = AttributeError)
 
 if __name__ == '__main__':
-    app.run(debug = True)
+    app.run(debug = True, ssl_context='adhoc')

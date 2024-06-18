@@ -34,6 +34,7 @@
           <td>{{ orders.get_datetime }}</td>
           <td>
             <form action="{{url_for('collectOrder', id=orders.get_orderID)}}" method="POST" >
+              {{ form.csrf_token() }}
               <input type="submit" value="Completed" class="btn btn-warning" onclick="return confirm('Are you sure you completed order {{orders.get_orderID}}');">
             </form>
           </td>
