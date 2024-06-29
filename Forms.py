@@ -15,6 +15,8 @@ class RegistrationForm(Form):
     securityQuestion = SelectField('Security Question:', [validators.InputRequired()], choices=[(1, securityQuestions[1]), (2, securityQuestions[2]),(3, securityQuestions[3]),(4, securityQuestions[4])])
     securityAnswer = StringField('Answer to security question:', [validators.InputRequired()])
 
+class Authorisation(Form):
+    OTP = IntegerField("OTP: ", [validators.InputRequired(), validators.NumberRange(0, 999999)])
 
 class LoginForm(Form):
     phoneNumber = IntegerField('Phone Number:', [validators.InputRequired(), validators.NumberRange(6000000, 99999999)])
