@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, request, redirect, flash, session
-from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm, Authorisation
+from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
 from customer import Customer
@@ -9,61 +9,26 @@ from io import BytesIO
 from store_owner import StoreOwner
 from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
-import shelve, xlsxwriter, stripe, webbrowser, re, os, pyotp, vonage
+import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re
 from datetime import datetime
 from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
 import requests
 from flask.sessions import SecureCookieSessionInterface
-from flask_sqlalchemy import SQLAlchemy
-import sqlalchemy.orm as so
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-# from flask_security import roles_accepted
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
 app = Flask(__name__, template_folder='Templates', static_folder='Static')
-#configuring flask app
-app = Flask(__name__)
-
-
-
-os.environ['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
-os.environ["VONAGE_SECRET_KEY"] = "mcMGYJoWTE6C8Rjx"
-os.environ["VONAGE_API_KEY"] = "d8b5ed18"
-os.environ["VONAGE_BRAND"] = "South Canteen Webapp"
-
-
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:Password123@database-1.cr0sk8kqijy4.ap-southeast-1.rds.amazonaws.com'
-app.config['SECRET_KEY'] =  os.environ.get("SECRET_KEY")
-app.config['SECURITY_REGISTERABLE'] = True
 
 stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
-
-
-#configuring flask limiter
-limiter = Limiter(
-    get_remote_address,
-    app=app,
-    storage_uri="memory://"
-)
-
-#Configuring pyotp
-totp = pyotp.TOTP(pyotp.random_base32, interval=60)
-
-#config vonage sms api
-client = vonage.Client(key=os.environ.get("VONAGE_API_KEY"), secret=os.environ.get("VONAGE_API_SECRET"))
-
-db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+
+
+app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
 login_manager = LoginManager()
 
-
-
-# #SuperUser account
-# hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
-# superUser = RegisterAdmin(90288065, hashed_password)
+#SuperUser account
+hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
+superUser = RegisterAdmin(90288065, hashed_password)
 
 @app.after_request
 def apply_caching(response):
@@ -79,8 +44,8 @@ def load_user(id):
                 if keys == id:
                     return userdb[id]
             
-        # elif id == superUser.get_id():
-        #     return superUser
+        elif id == superUser.get_id():
+            return superUser
 
         else:
             with shelve.open('SOdb', 'c') as SOdb:
@@ -103,24 +68,24 @@ def storeOwnerHome():
     return render_template('storeOwnerHome.html')
 
 
-# @app.route('/admin', methods=['GET', 'POST'])
-# def adminLogin():
-#     form = LoginForm(request.form)
-#     if request.method == 'POST' and form.validate():
-#         if form.phoneNumber.data == 90288065:
-#             admin = RegisterAdmin(69, form.password.data)
-#             if isinstance(admin, Customer):
-#                 if bcrypt.check_password_hash(superUser.get_password(), form.password.data):
-#                     login_user(admin)
-#                     session['id'] = admin.get_id()
-#                     with shelve.open("userdb", 'c') as userdb:
-#                         customerCount = len(userdb)
-#                         return render_template('adminPage.html',  logined = True, customerCount=customerCount)
+@app.route('/admin', methods=['GET', 'POST'])
+def adminLogin():
+    form = LoginForm(request.form)
+    if request.method == 'POST' and form.validate():
+        if form.phoneNumber.data == 90288065:
+            admin = RegisterAdmin(69, form.password.data)
+            if isinstance(admin, Customer):
+                if bcrypt.check_password_hash(superUser.get_password(), form.password.data):
+                    login_user(admin)
+                    session['id'] = admin.get_id()
+                    with shelve.open("userdb", 'c') as userdb:
+                        customerCount = len(userdb)
+                        return render_template('adminPage.html',  logined = True, customerCount=customerCount)
 
-#                 else:
-#                     flash("For Admins only. Unauthorised access forbiddened.", 'Danger')
-#                     return redirect(url_for('home'))
-#     return render_template('adminLogin.html', form=form)
+                else:
+                    flash("For Admins only. Unauthorised access forbiddened.", 'Danger')
+                    return redirect(url_for('home'))
+    return render_template('adminLogin.html', form=form)
 
 # @app.route('/adminPage')
 # @login_required
@@ -132,7 +97,6 @@ def storeOwnerHome():
 
 
 @app.route('/createStoreOwner', methods=['GET', 'POST'])
-@login_required
 def createStoreOwner():
     form = StoreOwnerRegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -164,42 +128,8 @@ def contactUs():
 
 #Login Page
 @app.route('/login', methods=['GET', 'POST'])
-@limiter.limit("15/hour;5/minute")
 def login():
     form = LoginForm(request.form)
-    if request.method == 'POST' and form.validate():
-        with shelve.open('userdb', 'c') as userdb:
-            user = CustomerLogin(form.phoneNumber.data, form.password.data)
-            if isinstance(user, Customer):
-                for keys in userdb:
-                    if user.get_id() == keys:
-                        if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
-                            totpToSend = totp.now()
-                            responseData = client.sms.send_message(
-                                {
-                                    "from" : os.environ.get("VONAGE_BRAND_NAME"),
-                                    "to" : os.environ.get(f"{65}{user.get_id()}"),
-                                    "text" : f"Your OTP is: {totpToSend}. \nValid for the next 1 minute"
-                                }
-                            )
-
-                            if form.remember.data == True:
-                                login_user(userdb[keys], remember=True)
-                            else:
-                                login_user(userdb[keys])
-                            session['id'] =int(user.get_id())
-                            return render_template('home.html', logined = True)
-
-            else:
-                flash("wrong username/password. please try again")
-                return redirect(url_for('login'))
-    return render_template('login.html', form=form)
-
-
-@app.route('/2fa', methods = ["POST", "GET"])
-@limiter.limit("15/hour;5/minute")
-def authentication():
-    form = Authorisation(request.form)
     if request.method == 'POST' and form.validate():
         with shelve.open('userdb', 'c') as userdb:
             user = CustomerLogin(form.phoneNumber.data, form.password.data)
@@ -300,7 +230,6 @@ def register():
 #profile page
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
-#@roles_accepted("Admin", "User", "Storeowner")
 def profile():
     shownGender = str(current_user.get_gender())
     form = EditUserForm(request.form, gender = shownGender)
@@ -323,7 +252,6 @@ def profile():
 #change password page
 @app.route('/changePassword', methods=['GET', 'POST'])
 @login_required
-#@roles_accepted("Admin", "User", "Storeowner")
 def changePassword():
     form = ChangePasswordForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -349,7 +277,6 @@ def changePassword():
 
 @app.route('/deleteProfile', methods = ["POST", "GET"])
 @login_required
-#@roles_accepted("Admin", "User", "Storeowner")
 def deleteProfile():
     form = request.form
     if request.method == "POST":
@@ -399,7 +326,6 @@ def sanitize_input(input_string):
 @app.route('/Waffle', methods=['GET', 'POST'])
 @app.route('/Drinks', methods=['GET', 'POST'])
 @login_required
-#@roles_accepted("Admin", "User", "Storeowner")
 def stalls():
     global GOOGLE_RECAPTCHA_SITE_KEY
     global GOOGLE_RECAPTCHA_SECRET_KEY 
@@ -700,8 +626,8 @@ def downloadExcelApi():
 def createApiResponse():
     bufferFile = writeBufferExcelFile()
     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    # return send_file(bufferFile,mimetype=mimetype)
-    # return response
+    return send_file(bufferFile,mimetype=mimetype)
+    return response
 
 def writeBufferExcelFile():
     buffer = BytesIO()
@@ -793,6 +719,4 @@ def unknown_error(error):
 #         return render_template('error.html', error_code = AttributeError)
 
 if __name__ == '__main__':
-    # db.create_all()
-    app.run(debug = True)
     app.run(debug = True, ssl_context='adhoc')
