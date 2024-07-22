@@ -1,9 +1,4 @@
 {% from "includes/_formHelper.html" import render_field %}
-<script>
-    function onSubmit(token) {
-      document.getElementById("order-form").submit();
-    }
-  </script>
 <div class="row">
     {% for item, price in menu[stall_name].items() %}
     <div class="col-md-3 mb-5">
@@ -32,7 +27,7 @@
                                     <!-- Order Form -->
                                     <form method="POST" id="order-form">
                                         {{ form.csrf_token }}
-                                        {{ form.datetime }}
+                                        {{ form.orderDatetime }}
                                         {{ form.phoneNumber }}
                                         {{ form.stallName }}
                                         {{ form.orderID }}
@@ -41,12 +36,13 @@
                                         {{ form.price(value = price) }}
                                         {{ form.total }}
                                         {{ render_field( form.remarks )}}
+                                        {{ render_field(form.recaptcha) }}
                                         {{ form.status }}
-                                        <div class="g-recaptcha" data-sitekey='6LcFrfQpAAAAAJxfMJOamyJdlWIccnkQZAaQQyea'></div></form>div>
+                                        <!-- </form> -->
                                         
-                                        <button type="submit" class="btn btn-primary" >Add to cart</button>
+                                        <button type="submit" class="btn btn-primary">Add to cart</button>
                                     </form>
-                                    <script src='https://www.google.com/recaptcha/api.js'></script>
+
 
                                 </div>
                             </div>

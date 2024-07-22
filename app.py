@@ -14,16 +14,22 @@ from datetime import datetime
 from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
 import requests
 from flask.sessions import SecureCookieSessionInterface
+from create_recaptcha_assessment import create_assessment
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
+
+
 app = Flask(__name__, template_folder='Templates', static_folder='Static')
+
 
 stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
 bcrypt = Bcrypt(app)
 
 
 app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
+app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdcmxUqAAAAAGVF_1zJ26DFEs61J2oJ8cQ3eM-4' 
+app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdcmxUqAAAAAHUKANmhqXNRcY8ZvRjiTl-Uzjmm'
 login_manager = LoginManager()
 
 #SuperUser account
@@ -324,41 +330,28 @@ def sanitize_input(input_string):
 @app.route('/Takoyaki', methods=['GET', 'POST'])
 @app.route('/Snack', methods=['GET', 'POST'])
 @app.route('/Waffle', methods=['GET', 'POST'])
-@app.route('/Drinks', methods=['GET', 'POST'])
+@app.route('/Drinks', methods=['GET', "POST"])
 @login_required
 def stalls():
-    global GOOGLE_RECAPTCHA_SITE_KEY
-    global GOOGLE_RECAPTCHA_SECRET_KEY 
-    global GOOGLE_VERIFY_URL
+    # global GOOGLE_RECAPTCHA_SITE_KEY
+    # global GOOGLE_RECAPTCHA_SECRET_KEY 
+    # global GOOGLE_VERIFY_URL
     path = request.path
     stall_name = path.lstrip('/')
     form = CustOrderForm(request.form)
     now = datetime.now()    
     dt_string = now.strftime("%Y-%m-%dT%H:%M:%S%z")
 
-    def orderSuccess():
-        captcha_response = request.form['g-recaptcha-response']
-        print(captcha_response)
-        if is_human(captcha_response):
-            stalls()
-        else:
-            flash("Please verify that you are not a robot", "warning")
-            stalls()
-    def is_human(captcha_response):
-        payload = {'response': captcha_response, 'secret': GOOGLE_RECAPTCHA_SECRET_KEY}
-        response = requests.post("https://www.google.com/recaptcha/api/siteverify", data=payload)
-        response_text = json.loads(response.text)
-        return response_text['success']
 
-    if request.method == 'POST' and form.validate():
+    if request.method == 'POST' and form.validate_on_submit():
         form.orderID.data = str(newOrderID())
         form.phoneNumber.data = current_user.get_id()
         form.itemQuantity.data = request.form.get('itemQuantity')
         total = float(request.form.get('price')) * float(request.form.get('itemQuantity'))
         order = CustomerOrder(form.phoneNumber.data)
         order.set_id(current_user.get_id())
-        order.set_datetime(dt_string)
-        order.set_dateTimeData(now)
+        order.set_datetime(form.orderDatetime.data)
+        order.set_dateTimeData(form.orderDatetime.data)
         order.set_stallName(stall_name)
         order.set_orderID(form.orderID.data)
         order.set_item(form.item.data)
@@ -374,7 +367,7 @@ def stalls():
             orderdb[order.get_orderID] = order
     
     
-        orderSuccess()
+        # orderSuccess()
 
         # secret_response = request.form.get('g-recaptcha-response')
         # verify_response = requests.post(
@@ -385,11 +378,11 @@ def stalls():
     else:
         print("Form not validated")
         print(request.form)
-        print(request.form.get('g-recaptcha-response'))
+        
 
         # response = requests.post('https://www.google.com/recaptcha/api/siteverify', data=json.dumps(data), headers={'Content-Type': 'application/json'})
 
-    return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form, site_key=GOOGLE_RECAPTCHA_SITE_KEY)
+    return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form)
 
 
 
