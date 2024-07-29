@@ -252,7 +252,7 @@ def register():
                 if 'profilePicture' in request.files and request.files['profilePicture'].filename != '':
                     profilePicture = save_picture(request.files['profilePicture'])
                 else:
-                    profilePicture = 'default.jpg'  # Use a default picture if none is uploaded
+                    profilePicture = 'default.jpeg'  # Use a default picture if none is uploaded
 
                 user = RegisterCustomer(
                     form.name.data,
@@ -293,7 +293,7 @@ def profile():
 
                         if 'profilePicture' in request.files and request.files['profilePicture'].filename != '':
                             profilePicture = save_picture(request.files['profilePicture'])
-                            user.set_profile_picture(profilePicture)
+                            user.set_profilePicture(profilePicture)
 
                         userdb[key] = user
             flash('Successfully edited', 'success')

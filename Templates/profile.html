@@ -36,7 +36,12 @@ input[type=number] {
 <h1 class="display-6 p-4 text-center bg-light">{{current_user.get_name()}}'s Profile</h1>
 
 <div class="bg-light rounded container" style="width: 30%; height: auto;">
-<form method="POST" action="">
+<form method="POST" action="" enctype="multipart/form-data">
+    <div class="form-group text-center p-3">
+        <!-- Display current profile picture -->
+        <img src="{{ url_for('static', filename='profile_pics/' + (current_user.get_profilePicture() if current_user.get_profilePicture() else 'default.jpeg')) }}" alt="Profile Picture" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+    </div>
+
     <div class="form-group text-muted bg-white rounded shadow-lg m-2 p-1">
         {{ render_field(form.name, class="form-control text-dark p-2", style="border: none", value= current_user.get_name() ) }}
     </div>
@@ -47,6 +52,11 @@ input[type=number] {
 
     <div class="form-group text-muted bg-white rounded shadow-lg m-2 p-1">
         {{ render_field(form.gender, class="form-control text-dark p-2", style="border: none") }}
+    </div>
+
+    <div class="form-group text-muted bg-white rounded shadow-lg m-2 p-1">
+        <!-- File input field for profile picture -->
+        {{ render_field(form.profilePicture, class="form-control-file text-dark p-2") }}
     </div>
 
     <div class="container-fluid text-center p-3">
