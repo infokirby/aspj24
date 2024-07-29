@@ -3,6 +3,7 @@
 class Customer():
     def __init__(self, phoneNumber):
         self.__phoneNumber = str(phoneNumber)
+        self.profilePicture = None
 
     # accessor methods
     def get_customer_id(self):
@@ -152,7 +153,13 @@ class Customer():
     
     def is_authenticated(self):
         return True
-    
+
+    def set_profilePicture(self, profilePicture):
+        self.profilePicture = profilePicture
+
+    def get_profilePicture(self):
+        return self.profilePicture
+
 #__str__ function
     def __str__(self):
         return f"User {self.get_name()} with phone number {self.get_id()}"
