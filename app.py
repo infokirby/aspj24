@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect, flash, session
+from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify
 from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
@@ -12,16 +12,18 @@ from menu import menu as menu
 import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re
 from datetime import datetime
 from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
-import requests
+import requests, logging
 from flask.sessions import SecureCookieSessionInterface
 from create_recaptcha_assessment import create_assessment
+from logs_config import CREATE_ORDER_LEVEL, UPDATE_ORDER_LEVEL, DELETE_ORDER_LEVEL
+# from flask_ngrok import run_with_ngrok 
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
 
 
 app = Flask(__name__, template_folder='Templates', static_folder='Static')
-
+# run_with_ngrok(app)
 
 stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
 bcrypt = Bcrypt(app)
@@ -36,6 +38,9 @@ login_manager = LoginManager()
 hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
 superUser = RegisterAdmin(90288065, hashed_password)
 
+#all logs
+logging.basicConfig(filename='app.log', level=logging.INFO,
+                    format='%(asctime)s:%(levelname)s:%(message)s')
 @app.after_request
 def apply_caching(response):
     response.headers["Set-Cookie"] = SecureCookieSessionInterface().get_signing_serializer(app).dumps(dict(session))
@@ -148,7 +153,9 @@ def login():
                             else:
                                 login_user(userdb[keys])
                             session['id'] =int(user.get_id())
+                            flash({'ip': request.environ['REMOTE_ADDR']})
                             return render_template('home.html', logined = True)
+                            
 
             else:
                 flash("wrong username/password. please try again")
@@ -363,6 +370,10 @@ def stalls():
             sanitized_remarks = sanitize_input(form.remarks.data)
             order.set_remarks(sanitized_remarks)
         order.set_status(form.status.data)
+
+        # order create log
+        logging.log(CREATE_ORDER_LEVEL, f"Order {form.orderID.data} created by {current_user.get_id()} at {form.orderDatetime.data}")
+
         with shelve.open('order.db', 'c') as orderdb:
             orderdb[order.get_orderID] = order
     
@@ -377,10 +388,9 @@ def stalls():
         # print(secret_response)
     else:
         print("Form not validated")
-        print(request.form)
+        print(form.errors)
         
 
-        # response = requests.post('https://www.google.com/recaptcha/api/siteverify', data=json.dumps(data), headers={'Content-Type': 'application/json'})
 
     return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form)
 
@@ -396,26 +406,22 @@ def cart():
         orders = []
         for order in orderdb:
             if orderdb[order].get_id() == current_user.get_id():
-                if orderdb[order].get_status == "Pending" or orderdb[order].get_status == "Ready for Collection":
+                if orderdb[order].get_status == "Pending":
                     orders.append(orderdb[order])
                     total = total + orderdb[order].get_total
     return render_template('cart.html', menu=menu, orders=orders, form=form, total=f'{total:.2f}')
-
-
-
-
-
 
 #mark complete
 @app.route('/completeOrder/<string:id>', methods=['GET', 'POST'])
 @login_required
 def completeOrder(id):
+    # order complete log
+    logging.info(f"Order {id} completed by {current_user.get_id()}")
     with shelve.open('order.db', 'c') as orderdb:
         order = orderdb[id]
         order.set_status("Completed")
         orderdb[id] = order
     return redirect(url_for('cart'))
-
 
 #edit
 @app.route('/editOrder/<string:id>', methods=['GET', 'POST'])
@@ -423,26 +429,47 @@ def completeOrder(id):
 def editOrder(id):
     form = CustOrderForm(request.form)
     if request.method == 'POST' and form.validate():
+        # order updated log
+        logging.log(UPDATE_ORDER_LEVEL, f"Order {id} updated by {current_user.get_id()}")
         with shelve.open('order.db', 'c') as orderdb:
             order = orderdb[id]
             order.set_itemQuantity(form.itemQuantity.data)
             order.set_total(float(form.itemQuantity.data) * float(form.price.data))
-            if form.remarks.data != "":
-                order.set_remarks(form.remarks.data)
+            order.set_remarks(form.remarks.data)
 
-            else:
-                order.set_remarks("")
+            # if form.remarks.data != "":
+            #     order.set_remarks(form.remarks.data)
+
+            # else:
+            #     order.set_remarks("")
             orderdb[id] = order
     
-    form=form
+    # form=form
     return redirect(url_for('cart'))
 
 #delete
 @app.route('/deleteOrder/<string:id>', methods=['GET', 'POST'])
 @login_required
 def deleteOrder(id):
+    # order delete log
+    logging.log(DELETE_ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
     with shelve.open('order.db', 'c') as orderdb:
         orderdb.pop(id)
+    return redirect(url_for('cart'))
+
+# delete all
+@app.route('/deleteAllOrder', methods=['GET', 'POST'])
+@login_required
+def deleteAllOrder():
+    count = 0
+    with shelve.open('order.db', 'c') as orderdb:
+        for order in orderdb:
+            if orderdb[order].get_id() == current_user.get_id() and orderdb[order].get_status == "Pending":
+                del orderdb[order]
+                count += 1
+        # order delete log
+    logging.info(f"{count} orders deleted by {current_user.get_id()}")
+
     return redirect(url_for('cart'))
 
 #Customer Order History
