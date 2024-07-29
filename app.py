@@ -11,7 +11,10 @@ from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
 import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser
 from datetime import datetime
-
+import os
+from werkzeug.utils import secure_filename
+from flask import Flask, render_template, redirect, url_for, flash, request, redirect, send_from_directory
+from flask_login import current_user, login_required
 
 
 app = Flask(__name__)
@@ -23,11 +26,47 @@ bcrypt = Bcrypt(app)
 app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
 login_manager = LoginManager()
 
+app.config['UPLOAD_FOLDER'] = 'Static/profile_pics'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max size for uploads
+
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part', 'danger')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file', 'danger')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            flash('File successfully uploaded', 'success')
+            return redirect(url_for('uploaded_file', filename=filename))
+    return render_template('upload.html')
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 #SuperUser account
 hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
 superUser = RegisterAdmin(90288065, hashed_password)
 
+def save_picture(form_picture):
+    filename = secure_filename(form_picture.filename)
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    form_picture.save(filepath)
+    return filename
 
 @login_manager.user_loader
 def load_user(id):
@@ -209,7 +248,21 @@ def register():
             if str(form.phoneNumber.data) not in userdb:
                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
                 formattedSecurityQuestionAnswer = form.securityAnswer.data.strip().title()
-                user = RegisterCustomer(form.name.data, form.phoneNumber.data, hashed_password, form.gender.data, form.securityQuestion.data, formattedSecurityQuestionAnswer)
+
+                if 'profilePicture' in request.files and request.files['profilePicture'].filename != '':
+                    profilePicture = save_picture(request.files['profilePicture'])
+                else:
+                    profilePicture = 'default.jpg'  # Use a default picture if none is uploaded
+
+                user = RegisterCustomer(
+                    form.name.data,
+                    form.phoneNumber.data,
+                    hashed_password,
+                    form.gender.data,
+                    form.securityQuestion.data,
+                    formattedSecurityQuestionAnswer,
+                    form.profilePicture)
+
                 if isinstance(user, Customer):
                     userdb[user.get_id()] = user
                     flash('Registration Successful!', "success")
@@ -218,6 +271,7 @@ def register():
             else:
                 flash("Already registered please login instead" , 'success')
                 return redirect(url_for('login'))
+
     return render_template('register.html', form=form)
 
 #profile page
@@ -236,6 +290,11 @@ def profile():
                         user.set_name(form.name.data)
                         user.set_id(form.phoneNumber.data)
                         user.set_gender(form.gender.data)
+
+                        if 'profilePicture' in request.files and request.files['profilePicture'].filename != '':
+                            profilePicture = save_picture(request.files['profilePicture'])
+                            user.set_profile_picture(profilePicture)
+
                         userdb[key] = user
             flash('Successfully edited', 'success')
             return redirect(url_for('profile'))

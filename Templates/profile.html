@@ -13,7 +13,7 @@ input[type=number] {
 </style>
 
 {% extends 'base.html' %}
-{% block title %}South Caneteen - Profile{% endblock %}
+{% block title %}South Canteen - Profile{% endblock %}
 
 {% block content %}
 {% from "includes/_formHelper.html" import render_field %}
@@ -36,7 +36,7 @@ input[type=number] {
 <h1 class="display-6 p-4 text-center bg-light">{{current_user.get_name()}}'s Profile</h1>
 
 <div class="bg-light rounded container" style="width: 30%; height: auto;">
-<form method="POST" action=""> 
+<form method="POST" action="">
     <div class="form-group text-muted bg-white rounded shadow-lg m-2 p-1">
         {{ render_field(form.name, class="form-control text-dark p-2", style="border: none", value= current_user.get_name() ) }}
     </div>

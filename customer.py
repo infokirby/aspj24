@@ -1,9 +1,9 @@
 #import User
 
 class Customer():
-    def __init__(self, phoneNumber):
+    def __init__(self, phoneNumber, profilePicture = 'default.jpg'):
         self.__phoneNumber = str(phoneNumber)
-        self.profilePicture = None
+        self.__profilePicture = profilePicture
 
     # accessor methods
     def get_customer_id(self):

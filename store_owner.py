@@ -1,6 +1,6 @@
 class StoreOwner:
-    def __init__(self):
-        None
+    def __init__(self, profilePicture = 'default.jpg'):
+        self.__profilePicture = profilePicture
 
     def set_storeName(self, storeName):
         self.__storeName = str(storeName)
@@ -13,6 +13,12 @@ class StoreOwner:
 
     def set_password(self, password):
         self.__password = password
+
+    def set_profilePicture(self, profilePicture):
+        self.__profilePicture = profilePicture
+
+    def get_profilePicture(self):
+        return self.__profilePicture
 
     def get_storeName(self):
         return self.__storeName
