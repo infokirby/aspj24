@@ -1,4 +1,5 @@
 from flask import Flask, render_template, url_for, request, redirect, flash, session, send_file, jsonify
+from flask_talisman import Talisman
 from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
@@ -9,8 +10,10 @@ from io import BytesIO
 from store_owner import StoreOwner
 from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
-import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re, os
-from datetime import datetime
+import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re, os, os
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
+
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, redirect, url_for, flash, request, redirect, send_from_directory
 from flask_login import current_user, login_required
@@ -30,14 +33,61 @@ GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 app = Flask(__name__, template_folder='Templates', static_folder='Static')
 # run_with_ngrok(app)
 
-stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
+app.config.update(
+    SESSION_COOKIE_SECURE=False,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+)
+
+csp = {
+    'default-src': [
+        '\'self\'',
+        'cdnjs.cloudflare.com',
+        'fonts.googleapis.com',
+        'fonts.gstatic.com',
+        'use.fontawesome.com',
+        'cdn.jsdelivr.net',
+        'kit.fontawesome.com',
+        'ka-f.fontawesome.com'
+    ],
+    'img-src': ['\'self\''],
+    'style-src': [
+        '\'self\'',
+        '\'unsafe-inline\'',  
+        'fonts.googleapis.com',
+        'use.fontawesome.com',
+        'cdn.jsdelivr.net',
+        'kit.fontawesome.com'
+    ],
+    'font-src': [
+        '\'self\'',
+        'fonts.gstatic.com',
+        'use.fontawesome.com',
+        'cdn.jsdelivr.net',
+        'kit.fontawesome.com',
+        'ka-f.fontawesome.com'  
+    ],
+    'connect-src': [  
+        '\'self\'',
+        'ka-f.fontawesome.com'
+    ]
+}
+
+Talisman(app, content_security_policy=csp)
+
+load_dotenv()
+
+stripe.api_key = os.getenv("STRIPE_API_KEY")
 bcrypt = Bcrypt(app)
 
 
-app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdcmxUqAAAAAGVF_1zJ26DFEs61J2oJ8cQ3eM-4' 
 app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdcmxUqAAAAAHUKANmhqXNRcY8ZvRjiTl-Uzjmm'
 login_manager = LoginManager()
+
+#Session Timeout
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes = 5)
 
 app.config['UPLOAD_FOLDER'] = 'Static/profile_pics'
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB max size for uploads
@@ -75,8 +125,14 @@ def uploaded_file(filename):
 
 
 # #SuperUser account
-# hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
+# superuser_password = os.getenv("SUPERUSER_PASSWORD")
+hashed_password = bcrypt.generate_password_hash(superuser_password).decode('utf-8')
 # superUser = RegisterAdmin(90288065, hashed_password)
+
+@app.route('/session_data')
+def session_data():
+    print(session)  # print the entire session data
+    return "Check the console for session data"
 
 #all logs
 logging.basicConfig(filename='app.log', level=logging.INFO,
