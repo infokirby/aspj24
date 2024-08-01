@@ -28,7 +28,7 @@ class CustOrderForm(Form):
     item = HiddenField()
     #ingredient = BooleanField('Include Ingredient')
     #ingredientQuantity = IntegerField('Quantity:', [validators.optional(), validators.NumberRange(1, 10)], default=0)
-    itemQuantity = IntegerField('Quantity:', [validators.InputRequired(), validators.NumberRange(1, 10)], default=1)
+    itemQuantity = IntegerField('Quantity:', [validators.InputRequired(), validators.NumberRange(min=1)], default=1)
     price = HiddenField()
     total = HiddenField()
     remarks = StringField('Remarks:')

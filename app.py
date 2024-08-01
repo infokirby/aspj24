@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect, flash, session, send_file
+from flask import Flask, render_template, url_for, request, redirect, flash, session, send_file, get_flashed_messages
 from flask_talisman import Talisman
 from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
@@ -13,7 +13,8 @@ from menu import menu as menu
 import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-
+import csv
+from utils import is_fraudulent_order
 
 
 
@@ -375,7 +376,6 @@ def stalls():
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     if request.method == 'POST' and form.validate():
-        #form.stallName.data = stall_name
         form.orderID.data = str(newOrderID())
         form.phoneNumber.data = current_user.get_id()
         form.itemQuantity.data = request.form.get('itemQuantity')
@@ -392,12 +392,34 @@ def stalls():
         order.set_total(total)
         order.set_remarks(form.remarks.data)
         order.set_status(form.status.data)
+
+        # Fetch user's past orders
+        past_orders = []
+        with shelve.open('order.db', 'r') as orderdb:
+            for key in orderdb:
+                past_order = orderdb[key]
+                if past_order.get_id() == current_user.get_id():
+                    past_orders.append({
+                        'Quantity': past_order.get_itemQuantity,
+                        'Price': past_order.get_price,
+                        'Total': past_order.get_total
+                    })
+
+        # Check if the order is fraudulent
+        current_order_data = {
+            'Quantity': form.itemQuantity.data,
+            'Price': form.price.data,
+            'Total': total
+        }
+        if is_fraudulent_order(current_order_data, past_orders):
+            flash('Order is fraudulent and has been canceled. If error, contact us', 'danger')
+            return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form)
+
+        # Save the order if not fraudulent
         with shelve.open('order.db', 'c') as orderdb:
             orderdb[order.get_orderID] = order
 
-
     return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form)
-
 
 #Cart
 @app.route('/cart', methods=['GET', 'POST'])
@@ -531,7 +553,7 @@ def payment():
 @login_required
 def logout():
     logout_user()
-    session.pop('id')
+    session.pop('id', None)
     flash("User successfully logged out." , 'success')
     return redirect(url_for("home"))
 

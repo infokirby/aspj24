@@ -4,6 +4,19 @@
 
 {% block content %}
 {% from "includes/_formHelper.html" import render_field %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+  {% if messages %}
+  {% for category, message in messages %}
+    <div class="alert bg-{{ category }} alert-dismissible text-center position-fixed top-0 start-50 translate-middle-x w-25 p-2" aria-hidden="true" role="alert" style="z-index: 1050;">
+      <p class="text-white mb-0">{{message}}</p>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
+
 <div class="container-fluid">
     <div class="row">
         {% include 'includes/_sidebar.html' %}
