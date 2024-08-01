@@ -1,3 +1,14 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+  {% if messages %}
+    {% for category, message in messages %}
+        <div class="alert bg-{{ category }} alert-dismissible text-center w-50 container p-1" aria-hidden="true" role="alert">
+            <p class="display-6 text-white">{{message}}</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 {% from "includes/_formHelper.html" import render_field %}
 <div class="row">
     {% for item, price in menu[stall_name].items() %}
@@ -36,7 +47,7 @@
                                         {{ form.price(value = price) }}
                                         {{ form.total }}
                                         {{ render_field( form.remarks )}}
-                                        <div class="g-recaptcha" data-sitekey='6LdcmxUqAAAAAGVF_1zJ26DFEs61J2oJ8cQ3eM-4'></div>
+                                        {{ render_field(form.recaptcha) }}
                                         {{ form.status }}
                                         <!-- </form> -->
                                         

@@ -12,6 +12,7 @@
 2024-08-02 00:14:24,881:WARNING: * Debugger is active!
 2024-08-02 00:30:26,374:WARNING: * Debugger is active!
 2024-08-02 00:31:29,287:WARNING: * Debugger is active!
+<<<<<<< HEAD
 2024-08-02 06:30:59,695:WARNING: * Debugger is active!
 2024-08-02 06:31:12,872:WARNING: * Debugger is active!
 2024-08-02 06:31:14,989:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:14] code 400, message Bad request version ('HcÊ|«\x00\x00*ÚÚ\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
@@ -50,3 +51,71 @@
 2024-08-02 06:44:52,919:WARNING: * Debugger is active!
 2024-08-02 06:44:56,186:ORDER:Order 47 updated by 90288065
 2024-08-02 06:46:58,358:WARNING: * Debugger is active!
+=======
+2024-08-02 05:24:50,029:WARNING: * Debugger is active!
+2024-08-02 05:25:51,312:WARNING: * Debugger is active!
+2024-08-02 05:27:39,312:WARNING: * Debugger is active!
+2024-08-02 05:27:51,228:WARNING: * Debugger is active!
+2024-08-02 05:27:53,785:WARNING: * Debugger is active!
+2024-08-02 05:28:53,119:WARNING: * Debugger is active!
+2024-08-02 05:29:45,271:WARNING: * Debugger is active!
+2024-08-02 05:38:02,421:WARNING: * Debugger is active!
+2024-08-02 05:38:17,261:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 05:38:20,265:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 05:38:57,914:WARNING: * Debugger is active!
+2024-08-02 05:52:35,538:WARNING: * Debugger is active!
+2024-08-02 05:52:46,573:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 05:52:49,576:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 05:56:39,531:WARNING: * Debugger is active!
+2024-08-02 05:57:52,157:WARNING: * Debugger is active!
+2024-08-02 05:57:57,454:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 05:58:00,458:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 06:02:24,473:WARNING: * Debugger is active!
+2024-08-02 06:02:39,389:WARNING: * Debugger is active!
+2024-08-02 06:02:49,419:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 06:02:52,425:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 06:05:58,994:WARNING: * Debugger is active!
+2024-08-02 06:06:09,717:WARNING: * Debugger is active!
+2024-08-02 06:06:19,390:WARNING: * Debugger is active!
+2024-08-02 06:07:45,134:WARNING: * Debugger is active!
+2024-08-02 06:14:50,529:WARNING: * Debugger is active!
+2024-08-02 06:15:25,905:WARNING: * Debugger is active!
+2024-08-02 06:15:35,067:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 06:15:38,076:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 06:17:51,420:WARNING: * Debugger is active!
+2024-08-02 06:19:05,854:WARNING: * Debugger is active!
+2024-08-02 06:19:28,814:WARNING: * Debugger is active!
+2024-08-02 06:19:41,165:WARNING: * Debugger is active!
+2024-08-02 06:19:53,738:WARNING: * Debugger is active!
+2024-08-02 06:20:12,527:WARNING: * Debugger is active!
+2024-08-02 06:20:24,805:WARNING: * Debugger is active!
+2024-08-02 06:22:07,270:WARNING: * Debugger is active!
+2024-08-02 06:22:24,073:WARNING: * Debugger is active!
+2024-08-02 06:22:53,406:WARNING: * Debugger is active!
+2024-08-02 06:51:07,725:WARNING: * Debugger is active!
+2024-08-02 06:51:34,154:ORDER:Order 46 created by 90288065
+2024-08-02 06:52:39,739:ORDER:Order 47 created by 90288065
+>>>>>>> Lucian
+2024-08-02 06:58:24,324:WARNING: * Debugger is active!
+2024-08-02 06:58:35,297:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 06:58:38,303:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 06:59:24,925:WARNING: * Debugger is active!
+2024-08-02 06:59:27,732:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 06:59:30,737:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 06:59:37,688:ORDER:Order 48 created by 90288065
+2024-08-02 06:59:42,733:ORDER:Order 49 created by 90288065
+2024-08-02 07:00:22,300:WARNING: * Debugger is active!
+2024-08-02 07:09:55,596:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 07:09:58,605:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 07:10:02,486:ORDER:Order 50 created by 90288065
+2024-08-02 07:10:33,279:ORDER:Order 51 created by 90288065
+2024-08-02 07:10:38,652:WARNING: * Debugger is active!
+2024-08-02 07:10:41,453:ORDER:Order 52 created by 90288065
+2024-08-02 07:11:38,323:ORDER:Order 53 created by 90288065
+2024-08-02 07:11:53,378:WARNING: * Debugger is active!
+2024-08-02 07:11:55,415:ORDER:Order 54 created by 90288065
+2024-08-02 07:17:07,252:WARNING: * Debugger is active!
+2024-08-02 07:17:21,282:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 07:17:24,284:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-02 07:20:30,549:WARNING: * Debugger is active!
+2024-08-02 07:23:19,525:WARNING: * Debugger is active!

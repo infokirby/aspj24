@@ -10,7 +10,7 @@ from io import BytesIO
 from store_owner import StoreOwner
 from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
-import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re, os, os
+import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re, os, os, pandas, numpy
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
@@ -18,15 +18,21 @@ from flask import Flask, render_template, redirect, url_for, flash, request, red
 from flask_login import current_user, login_required
 import uuid
 from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
-import requests, logging
+import requests, logging, joblib
 from flask.sessions import SecureCookieSessionInterface
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from logs_config import ORDER_LEVEL
+from iptest import geolocate
+from sklearn.preprocessing import StandardScaler
 # from flask_ngrok import run_with_ngrok 
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
+#Login ML
+iso_forest = joblib.load('iso_forest_model.pkl')
+scaler = joblib.load('scaler.pkl')
+feature_names = ['hour', 'day', 'month', 'year'] + [f'location_{loc}' for loc in ['SG']]
 
 
 app = Flask(__name__, template_folder='Templates', static_folder='Static')
@@ -288,13 +294,57 @@ def login():
                 for keys in userdb:
                     if user.get_id() == keys:
                         if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
-                            if form.remember.data:
-                                login_user(userdb[keys], remember=True)
+                            print(feature_names)
+                             #extract data here
+                            currentDT = datetime.now().timetuple()
+                            hour = currentDT[3]
+                            day = currentDT[2]
+                            month = currentDT[1]
+                            year = currentDT[0]
+
+                            new_data = pandas.DataFrame({
+                                'hour': [hour],
+                                'day' : [day],
+                                'month' : [month],
+                                'year' : [year],
+                            })
+
+                            location_dummies = pandas.get_dummies(geolocate('219.74.99.238'), prefix='location')
+                            for col in location_dummies.columns:
+                                new_data[col] = location_dummies[col]
+    
+                                # Ensure all location columns are present
+                                for col in feature_names:
+                                    if col not in new_data.columns:
+                                        new_data[col] = 0
+
+                            for col in new_data.columns:
+                                pandas.concat
+                            
+                            # Extract features for prediction
+                            X_new = new_data[feature_names].values
+                            
+                            print(X_new)
+
+                            # Standardize the features
+                            X_new_scaled = scaler.transform(X_new)
+                            
+                            # Predict if the login data is an anomaly
+                            prediction = iso_forest.predict(X_new_scaled)
+                                
+
+                            if prediction[0] == 0: #anomaly
+                                flash("Login not authorised. Please leave site.", "danger")
+                                return render_template('login.html', form=form)
+                            
                             else:
-                                login_user(userdb[keys])
+                                if form.remember.data:
+                                    login_user(userdb[keys], remember=True)
+                                else:
+                                    login_user(userdb[keys])
                             session['id'] = user.get_id()
                             return render_template('home.html', logined=True)
-            flash("wrong username/password. please try again")
+            flash("wrong username/password. please try again", "warning")
             return redirect(url_for('login'))
     return render_template('login.html', form=form)
 
@@ -317,7 +367,7 @@ def authentication():
                             return render_template('home.html', logined = True)
 
             else:
-                flash("wrong username/password. please try again")
+                flash("wrong username/password. please try again", "warning")
                 return redirect(url_for('login'))
     return render_template('login.html', form=form)
 
@@ -579,7 +629,6 @@ def stalls():
         total = float(request.form.get('price')) * float(request.form.get('itemQuantity'))
         order = CustomerOrder(form.phoneNumber.data)
         order.set_id(current_user.get_id())
-        order.set_datetime(form.orderDatetime.data)
         order.set_dateTimeData(form.orderDatetime.data)
         order.set_stallName(stall_name)
         order.set_orderID(form.orderID.data)
@@ -601,7 +650,6 @@ def stalls():
     
     else:
         print("Form not validated")
-        flash('Please complete the reCAPTCHA challenge.', 'danger')
         print(form.errors)
         
     return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form)
@@ -941,19 +989,14 @@ def not_authorised(error):
 @app.errorhandler(404)
 def not_found(error):
         return render_template('error.html', error_code = 404, message = 'Page not found. Sorry for the inconvinience caused.')
-    
-@app.errorhandler(500)
-def unknown_error(error):
-        return render_template('error.html', error_code = 500, message='Unknown error occured')
 
 @app.errorhandler(413)
 def request_entitiy_too_large(error):
     flash('File is too large. Maximum file size is 5 MB', 'danger')
     return redirect(request.url)
-    
-# @app.errorhandler(AttributeError)
-# def attribute_error(error):
-#         return render_template('error.html', error_code = AttributeError)
 
+# @app.errorhandler(Exception)
+# def handle_exception(error):
+#     return render_template('error.html', error_code = 500, message='Unknown error occured, please try again later.')
 if __name__ == '__main__':
     app.run(debug = True)
