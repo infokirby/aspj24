@@ -12,3 +12,41 @@
 2024-08-02 00:14:24,881:WARNING: * Debugger is active!
 2024-08-02 00:30:26,374:WARNING: * Debugger is active!
 2024-08-02 00:31:29,287:WARNING: * Debugger is active!
+2024-08-02 06:30:59,695:WARNING: * Debugger is active!
+2024-08-02 06:31:12,872:WARNING: * Debugger is active!
+2024-08-02 06:31:14,989:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:14] code 400, message Bad request version ('HcÊ|«\x00\x00*ÚÚ\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
+2024-08-02 06:31:15,001:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad request version ('öÆhBå\x1b\x0fk\x00,\x1a\x1a\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
+2024-08-02 06:31:15,002:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad request syntax ('\x16\x03\x01\x00}\x01\x00\x00y\x03\x01Rýl4\x0e5"\x16Hs·F_Ví)m\x92¿BBh§Ã\x9e\x81\x862z\x12\x05~\x00\x00\x14À')
+2024-08-02 06:31:15,124:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad request version ('\x07Ohéøaöø\x81ø\x9b¨ú[¢\x19¸yÍ²\x00*ZZ\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
+2024-08-02 06:31:15,125:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad request version ('}')
+2024-08-02 06:31:15,126:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad request syntax ('\x16\x03\x01\x00}\x01\x00\x00y\x03\x01\x04¡\x84ÒÑ¸gÝÿÞìF\x13ô\x95h¡¯"¼÷Ao\x15\'¯JDê\x93Wú\x00\x00\x14À')
+2024-08-02 06:31:15,127:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad request version ('½Ô\x00*zz\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
+2024-08-02 06:31:15,128:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad request version ('¹h]f²!`&¸ÒE_\x00,')
+2024-08-02 06:31:15,129:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00}\x01\x00\x00y\x03\x01U¢ý÷fWÜº\x9eçþê\x93')
+2024-08-02 06:31:19,394:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad request version ('Å3Ú"§\\\x0fø\x08wüå\x14\x8bN\x89Å×[\x00*\x1a\x1a\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
+2024-08-02 06:31:19,396:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad request version ('çF!)O\x14#EÜ\x02\x8f\x86')
+2024-08-02 06:31:19,398:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad request syntax ('\x16\x03\x01\x00}\x01\x00\x00y\x03\x01\x9f£èS\x07HØe!¢ä8Ú°`hs\x97&\x16¸re3p\x90ÅW#Êá\x95\x00\x00\x14À')
+2024-08-02 06:31:19,440:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad request version ('Â\x08·\x9aÄe\x90\x83àKòû\x83dè\x05^&\x00*JJ\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
+2024-08-02 06:31:19,442:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad request version ('Ðñ0¿¨Ù\x99Ù¥0;_ðD\x0eöÿù\x86I[Î\x00¹.Q&u\x14G·Ã\x00,\x8a\x8a\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
+2024-08-02 06:31:19,443:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00}\x01\x00\x00y\x03\x01\x97Qxäª\x915\xadl')
+2024-08-02 06:31:19,444:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad request version ('¤ÕÂs\x93\x80w"â\x83s^À\x16\x00*êê\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
+2024-08-02 06:31:19,445:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad request version ('Ãä=ÖdÝX\x11ÿZ¤õýªëÖnOÌZSí<\x99¹m\x90ÌÁ_R÷\x00,\x9a\x9a\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
+2024-08-02 06:31:19,446:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad HTTP/0.9 request type ("\x16\x03\x01\x00}\x01\x00\x00y\x03\x01@_ªG'Çÿ°½7")
+2024-08-02 06:31:38,220:WARNING: * Debugger is active!
+2024-08-02 06:37:10,158:WARNING: * Debugger is active!
+2024-08-02 06:37:34,870:WARNING: * Debugger is active!
+2024-08-02 06:39:06,387:WARNING: * Debugger is active!
+2024-08-02 06:39:10,383:ORDER:Order 46 created by 90288065
+2024-08-02 06:40:54,289:WARNING: * Debugger is active!
+2024-08-02 06:41:36,931:ORDER:Order 47 created by 90288065
+2024-08-02 06:42:13,337:ORDER:Order 46 deleted by 90288065
+2024-08-02 06:42:18,479:ORDER:Order 47 updated by 90288065
+2024-08-02 06:43:21,695:WARNING: * Debugger is active!
+2024-08-02 06:43:35,629:ORDER:Order 47 updated by 90288065
+2024-08-02 06:43:46,250:WARNING: * Debugger is active!
+2024-08-02 06:43:48,222:ORDER:Order 47 updated by 90288065
+2024-08-02 06:43:54,151:WARNING: * Debugger is active!
+2024-08-02 06:43:56,146:ORDER:Order 47 updated by 90288065
+2024-08-02 06:44:52,919:WARNING: * Debugger is active!
+2024-08-02 06:44:56,186:ORDER:Order 47 updated by 90288065
+2024-08-02 06:46:58,358:WARNING: * Debugger is active!

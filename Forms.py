@@ -24,7 +24,7 @@ class LoginForm(Form):
     remember = BooleanField('Remember me:', default=True)
 
 class CustOrderForm(FlaskForm):
-    recaptcha = RecaptchaField()	 
+	 
     phoneNumber = HiddenField()
     orderDatetime = HiddenField(default=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     stallName = HiddenField()

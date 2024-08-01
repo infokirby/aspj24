@@ -13,7 +13,6 @@ from menu import menu as menu
 import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re, os, os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, redirect, url_for, flash, request, redirect, send_from_directory
 from flask_login import current_user, login_required
@@ -126,7 +125,7 @@ def uploaded_file(filename):
 
 # #SuperUser account
 # superuser_password = os.getenv("SUPERUSER_PASSWORD")
-hashed_password = bcrypt.generate_password_hash(superuser_password).decode('utf-8')
+# hashed_password = bcrypt.generate_password_hash(superuser_password).decode('utf-8')
 # superUser = RegisterAdmin(90288065, hashed_password)
 
 @app.route('/session_data')
@@ -647,7 +646,7 @@ def editOrder(id):
         with shelve.open('order.db', 'c') as orderdb:
             order = orderdb[id]
             order.set_itemQuantity(form.itemQuantity.data)
-            order.set_total(float(form.itemQuantity.data) * float(form.price.data))
+            order.set_total(int(form.itemQuantity.data) * float(form.price.data))
             order.set_remarks(form.remarks.data)
 
             # if form.remarks.data != "":
@@ -957,4 +956,4 @@ def request_entitiy_too_large(error):
 #         return render_template('error.html', error_code = AttributeError)
 
 if __name__ == '__main__':
-    app.run(debug = True, ssl_context='adhoc')
+    app.run(debug = True)
