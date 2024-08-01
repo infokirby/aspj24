@@ -45,10 +45,6 @@ input[type=number] {
         {{ render_field(form.phoneNumber, class="form-control text-dark p-2", style="border: none", value= current_user.get_id() ) }}
     </div>
 
-    <div class="form-group text-muted bg-white rounded shadow-lg m-2 p-1">
-        {{ render_field(form.gender, class="form-control text-dark p-2", style="border: none") }}
-    </div>
-
     <div class="container-fluid text-center p-3">
     <input type="submit" value="Edit profile" class="btn btn-primary w-100"/>
     </div>

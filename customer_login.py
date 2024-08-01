@@ -1,4 +1,4 @@
-from customer import Customer as C
+from DBcreateTables import Customer as C
 from re import compile
 
 class CustomerLogin(C):

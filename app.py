@@ -2,7 +2,7 @@ from flask import Flask, render_template, url_for, request, redirect, flash, ses
 from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm, Authorisation
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
-from customer import Customer
+from DBcreateTables import Customer
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
 from flask_bcrypt import Bcrypt
 from io import BytesIO
@@ -11,30 +11,58 @@ from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
 import shelve, xlsxwriter, stripe, webbrowser, os, pyotp, vonage
 from datetime import datetime
+
+from flask_security import roles_accepted
+
+#for database
 from flask_sqlalchemy import SQLAlchemy
-import sqlalchemy.orm as so
+from DBcreateTables import Customer, Role
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, URL, Insert, Result, Boolean, text
+from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.schema import CreateSchema
+
+
+#for rate-limiter
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 # from flask_security import roles_accepted
-
-
-#configuring flask app
-app = Flask(__name__)
-
-
 
 os.environ['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
 os.environ["VONAGE_SECRET_KEY"] = "mcMGYJoWTE6C8Rjx"
 os.environ["VONAGE_API_KEY"] = "d8b5ed18"
 os.environ["VONAGE_BRAND"] = "South Canteen Webapp"
 
-
-
+#configuring flask app
+app = Flask(__name__)
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SECURE=True,
+)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:Password123@database-1.cr0sk8kqijy4.ap-southeast-1.rds.amazonaws.com'
 app.config['SECRET_KEY'] =  os.environ.get("SECRET_KEY")
 app.config['SECURITY_REGISTERABLE'] = True
-
 stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
+
+
+#Database Connection things
+url_object = URL.create(
+    "mysql+pymysql",
+    username="root",
+    password="mysqlpassword",
+    host="localhost",
+    database="customer",
+)
+
+engine = create_engine(url_object)
+metadata = MetaData(schema="ASPJ_DB")
+with engine.connect() as conn:
+    if not conn.dialect.has_schema(conn, "ASPJ_DB"): 
+        conn.execute(CreateSchema("ASPJ_DB"))
+Base = declarative_base(metadata=metadata)
+conn = engine.connect()
+Session = sessionmaker(bind=engine)
+dbSession = Session()
+
 
 
 #configuring flask limiter
@@ -53,6 +81,8 @@ client = vonage.Client(key=os.environ.get("VONAGE_API_KEY"), secret=os.environ.g
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager()
+login_manager.init_app(app)
+
 
 
 
@@ -64,25 +94,8 @@ login_manager = LoginManager()
 
 @login_manager.user_loader
 def load_user(id):
-    with shelve.open('userdb', 'c') as userdb:
-        if id in userdb:
-            for keys in userdb:
-                if keys == id:
-                    return userdb[id]
-            
-        # elif id == superUser.get_id():
-        #     return superUser
-
-        else:
-            with shelve.open('SOdb', 'r') as SOdb:
-                for keys in SOdb:
-                    if keys == id:
-                        return SOdb[id]
+    return dbSession.query(Customer).get(id)
         
-
-login_manager.init_app(app)
-
-
 #home page
 @app.route('/')
 def home():
@@ -122,23 +135,23 @@ def storeOwnerHome():
     
 
 
-@app.route('/createStoreOwner', methods=['GET', 'POST'])
-@login_required
-def createStoreOwner():
-    form = StoreOwnerRegistrationForm(request.form)
-    if request.method == 'POST' and form.validate():
-        with shelve.open('SOdb', 'c') as SOdb:
-            if str(form.storeName.data) not in SOdb:
-                hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-                storeOwner = CreateStoreOwner(form.storeName.data, form.name.data, form.phoneNumber.data, hashed_password)
-                if isinstance(storeOwner, StoreOwner):
-                    SOdb[storeOwner.get_storeName()] = storeOwner
-                    flash('Registration Successful!', "success")
-                    return redirect(url_for('login'))
-            else:
-                flash("Creation unsuccessful" , 'warning')
-                return redirect(url_for('createStoreOwner'))
-    return render_template('createStoreOwner.html', form=form)
+# @app.route('/createStoreOwner', methods=['GET', 'POST'])
+# @login_required
+# def createStoreOwner():
+#     form = StoreOwnerRegistrationForm(request.form)
+#     if request.method == 'POST' and form.validate():
+#         with shelve.open('SOdb', 'c') as SOdb:
+#             if str(form.storeName.data) not in SOdb:
+#                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+#                 storeOwner = CreateStoreOwner(form.storeName.data, form.name.data, form.phoneNumber.data, hashed_password)
+#                 if isinstance(storeOwner, StoreOwner):
+#                     SOdb[storeOwner.get_storeName()] = storeOwner
+#                     flash('Registration Successful!', "success")
+#                     return redirect(url_for('login'))
+#             else:
+#                 flash("Creation unsuccessful" , 'warning')
+#                 return redirect(url_for('createStoreOwner'))
+#     return render_template('createStoreOwner.html', form=form)
 
 #About us pages
 @app.route('/openingHours')
@@ -159,34 +172,51 @@ def contactUs():
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
-        with shelve.open('userdb', 'c') as userdb:
-            user = CustomerLogin(form.phoneNumber.data, form.password.data)
-            if isinstance(user, Customer):
-                for keys in userdb:
-                    if user.get_id() == keys:
-                        if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
-                            totpToSend = totp.now()
-                            responseData = client.sms.send_message(
-                                {
-                                    "from" : os.environ.get("VONAGE_BRAND_NAME"),
-                                    "to" : os.environ.get(f"{65}{user.get_id()}"),
-                                    "text" : f"Your OTP is: {totpToSend}. \nValid for the next 1 minute"
-                                }
-                            )
-
-                            if form.remember.data == True:
-                                login_user(userdb[keys], remember=True)
-                            else:
-                                login_user(userdb[keys])
-                            session['id'] =int(user.get_id())
-                            return render_template('home.html', logined = True)
-
+        try:
+            user = dbSession.query(Customer).filter(Customer.phoneNumber == form.phoneNumber.data).first()
+            if isinstance(user, Customer) and bcrypt.check_password_hash(user.hashedPW, form.password.data):
+                remember = form.remember.data
+                login_user(user, remember=remember)
+                session['id'] = int(user.get_id())
+                return render_template('home.html')
+            
             else:
-                flash("wrong username/password. please try again")
-                return redirect(url_for('login'))
+                flash("Wrong Username/Password.\n Please try again", 'danger')
+
+        except Exception as e:
+            flash("An error occured. Please try again.", "Critical")
+
+        finally:
+            dbSession.close()
     return render_template('login.html', form=form)
 
+#Register Page
+@app.route('/register', methods=['GET', 'POST'])
+@limiter.limit("15/hour;5/minute")
+def register():
+    form = RegistrationForm(request.form)
+    if request.method == 'POST' and form.validate():
+        user = dbSession.query(Customer).filter(Customer.phoneNumber == form.phoneNumber.data).first()
+        if not user:
+            hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+            new_user = Customer(phoneNumber = form.phoneNumber.data, name = form.name.data, hashedPW = hashed_password) 
+            role = dbSession.query(Role).filter(Role.roleName == "user").first()
+            new_user.roles.append(role)
+            if isinstance(new_user, Customer):
+                dbSession.add(new_user)
+                dbSession.commit()
+                flash('Registration Successful!', "success")
+                return redirect(url_for('login'))
+        else:
+            flash("Already registered please login instead" , 'success')
+            return redirect(url_for('login'))
+        
+    dbSession.close()
+    return render_template('register.html', form=form)
 
+
+#2fa page should the value be True
+#TODO
 @app.route('/2fa', methods = ["POST", "GET"])
 @limiter.limit("15/hour;5/minute")
 def authentication():
@@ -206,7 +236,7 @@ def authentication():
                             return render_template('home.html', logined = True)
 
             else:
-                flash("wrong username/password. please try again")
+                flash("wrong username/password. please try again", "warning")
                 return redirect(url_for('login'))
     return render_template('login.html', form=form)
 
@@ -234,6 +264,7 @@ def storeOwnerLogin():
                 return redirect(url_for('storeOwnerLogin'))
     return render_template('storeOwnerLogin.html', form=form)
 
+#TODO
 @app.route('/forgotPassword', methods=["Get", "POST"])
 def forgotPassword():
         
@@ -268,53 +299,30 @@ def forgotPassword():
                         return redirect(url_for('forgotPassword'))
     return render_template("forgotPassword.html", form=form, secQn = secQn)
 
-#Register Page
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegistrationForm(request.form)
-    if request.method == 'POST' and form.validate():
-        with shelve.open('userdb', 'c') as userdb:
-            if str(form.phoneNumber.data) not in userdb:
-                hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-                formattedSecurityQuestionAnswer = form.securityAnswer.data.strip().title()
-                user = RegisterCustomer(form.name.data, form.phoneNumber.data, hashed_password, form.gender.data, form.securityQuestion.data, formattedSecurityQuestionAnswer)
-                if isinstance(user, Customer):
-                    userdb[user.get_id()] = user
-                    flash('Registration Successful!', "success")
-                    return redirect(url_for('login'))
 
-            else:
-                flash("Already registered please login instead" , 'success')
-                return redirect(url_for('login'))
-    return render_template('register.html', form=form)
 
 #profile page
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
-#@roles_accepted("Admin", "User", "Storeowner")
+#@roles_accepted('user')
 def profile():
-    shownGender = str(current_user.get_gender())
-    form = EditUserForm(request.form, gender = shownGender)
+    
+    form = EditUserForm(request.form)
     if request.method == 'POST' and form.validate():
-        with shelve.open('userdb', 'c') as userdb:
-            user = EditDetails(form.phoneNumber.data, form.name.data, form.gender.data)
-            if isinstance(user, Customer):
-                for key in userdb:
-                    if user.get_id() == key:
-                        user = userdb[key]
-                        user.set_name(form.name.data)
-                        user.set_id(form.phoneNumber.data)
-                        user.set_gender(form.gender.data)
-                        userdb[key] = user
-            flash('Successfully edited', 'success')
-            return redirect(url_for('profile'))
+        user = dbSession.query(Customer).filter(Customer.phoneNumber == current_user.get_id()).first()
+        if isinstance(user, Customer):       
+            user.set_name(form.name.data)
+            user.set_id(form.phoneNumber.data)
+            #TODO
+        flash('Successfully edited', 'success')
+        return redirect(url_for('profile'))
         
     return render_template('profile.html', form=form)
 
 #change password page
 @app.route('/changePassword', methods=['GET', 'POST'])
 @login_required
-#@roles_accepted("Admin", "User", "Storeowner")
+# @roles_accepted("Admin", "User", "Storeowner")
 def changePassword():
     form = ChangePasswordForm(request.form)
     if request.method == 'POST' and form.validate():
