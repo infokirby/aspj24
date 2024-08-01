@@ -9,3 +9,10 @@ stripe==8.2.0
 vonage==3.14.0
 WTForms==3.1.2
 XlsxWriter==3.1.9
+flash == 3.0.3
+stripe == 9.8.0
+flask_talisman = 1.1.0
+xlsxwriter = 3.2.0
+flask_login == 0.6.3
+flask_bcrypt == 1.0.1
+wtforms = 3.1.2

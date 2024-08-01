@@ -7,24 +7,30 @@ class CustomerLogin(C):
         self.set_password(password)
 
 class RegisterAdmin(C):
-    def __init__(self, phoneNumber, password):
+    def __init__(self, phoneNumber, password, profilePicture = 'default.jpeg'):
         super().__init__(phoneNumber)
         self.set_password(password)
+        if profilePicture:
+            self.set_profilePicture(profilePicture)
 
 class RegisterCustomer(C):
-    def __init__(self, name, phoneNumber, password, gender, securityQuestion, securityAnswer):
+    def __init__(self, name, phoneNumber, password, gender, securityQuestion, securityAnswer, profilePicture = 'default.jpeg'):
         super().__init__(phoneNumber)
         self.set_password(password)
         self.set_name(name)
         self.set_gender(gender)
         self.set_securityQuestion(securityQuestion)
         self.set_securityAnswer(securityAnswer)
+        if profilePicture:
+            self.set_profilePicture(profilePicture)
 
 class EditDetails(C):
-    def __init__(self, phoneNumber, name, gender):
+    def __init__(self, phoneNumber, name, gender, profilePicture = 'default.jpeg'):
         super().__init__(phoneNumber)
         self.set_name(name)
         self.set_gender(gender)
+        if profilePicture:
+            self.set_profilePicture(profilePicture)
 
 class ChangePassword(C):
     def __init__(self, phoneNumber, password):

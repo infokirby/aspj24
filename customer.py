@@ -4,13 +4,10 @@ from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
-class Customer(Base):
-    __tablename__ = "customers"
-
-    phoneNumber = Column(Integer, primary_key=True)
-    name = Column(String)
-    passwordHash = Column(String)
-    role = relationship("Role", backref="customers")
+class Customer():
+    def __init__(self, phoneNumber, profilePicture = 'default.jpeg'):
+        self.__phoneNumber = str(phoneNumber)
+        self.__profilePicture = profilePicture
 
     # accessor methods
     @property
@@ -152,7 +149,13 @@ class Customer(Base):
     
     def is_authenticated(self):
         return True
-    
+
+    def set_profilePicture(self, profilePicture):
+        self.profilePicture = profilePicture
+
+    def get_profilePicture(self):
+        return self.profilePicture
+
 #__str__ function
     def __str__(self):
         return f"User {self.get_name()} with phone number {self.get_id()}"

@@ -21,7 +21,7 @@ input[type=number] {
 <h1 class="display-6 p-4 text-center">Register Account</h1>
 
 <div class="bg-body rounded container shadow-sm" style="width: 30%; height: auto;">
-<form method="POST" action=""> 
+<form method="POST" action="" enctype="multipart/form-data">
     <div class="form-group p-2">
         {{ render_field(form.name, class="form-control", placeholder="Eg. Aaron Tan") }}
     </div>
@@ -48,6 +48,13 @@ input[type=number] {
 
     <div class="form-group p-2">
         {{ render_field(form.securityAnswer, class="form-control") }} 
+    </div>
+
+    <div class="form-group p-2">
+        {{ render_field(form.profilePicture, class="form-control") }}
+        {% for error in form.profilePicture.errors %}
+            <span class="text-danger small">{{ error }}</span>
+        {% endfor %}
     </div>
 
     <div class="container-fluid text-center p-3">
