@@ -1,7 +1,7 @@
 #import User
 
 class Customer():
-    def __init__(self, phoneNumber, profilePicture = 'default.jpg'):
+    def __init__(self, phoneNumber, profilePicture = 'default.jpeg'):
         self.__phoneNumber = str(phoneNumber)
         self.__profilePicture = profilePicture
 

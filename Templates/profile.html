@@ -57,6 +57,9 @@ input[type=number] {
     <div class="form-group text-muted bg-white rounded shadow-lg m-2 p-1">
         <!-- File input field for profile picture -->
         {{ render_field(form.profilePicture, class="form-control-file text-dark p-2") }}
+        {% for error in form.profilePicture.errors %}
+            <span class="text-danger small">{{ error }}</span>
+        {% endfor %}
     </div>
 
     <div class="container-fluid text-center p-3">

@@ -15,6 +15,7 @@ import os
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, redirect, url_for, flash, request, redirect, send_from_directory
 from flask_login import current_user, login_required
+import uuid
 
 
 app = Flask(__name__)
@@ -27,14 +28,15 @@ app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHu
 login_manager = LoginManager()
 
 app.config['UPLOAD_FOLDER'] = 'Static/profile_pics'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max size for uploads
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB max size for uploads
 
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 def allowed_file(filename):
+    print(f"Checking file: {filename}")
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -59,12 +61,14 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 #SuperUser account
+profilePicture = 'default.jpeg'
 hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
-superUser = RegisterAdmin(90288065, hashed_password)
+superUser = RegisterAdmin(90288065, hashed_password, profilePicture='')
 
 def save_picture(form_picture):
-    filename = secure_filename(form_picture.filename)
+    filename = str(uuid.uuid4()) + '_' + secure_filename(form_picture.filename)
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    print(f"Saving picture to: {filepath}")
     form_picture.save(filepath)
     return filename
 
@@ -249,10 +253,14 @@ def register():
                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
                 formattedSecurityQuestionAnswer = form.securityAnswer.data.strip().title()
 
-                if 'profilePicture' in request.files and request.files['profilePicture'].filename != '':
-                    profilePicture = save_picture(request.files['profilePicture'])
-                else:
-                    profilePicture = 'default.jpeg'  # Use a default picture if none is uploaded
+                profile_picture_filename = 'default.jpeg'
+                if 'profilePicture' in request.files:
+                    profile_picture_file = request.files['profilePicture']
+                    if profile_picture_file and profile_picture_file.filename != '':
+                        if allowed_file(profile_picture_file.filename):
+                            profile_picture_filename = save_picture(profile_picture_file)
+                        else:
+                            return redirect(url_for('register'))
 
                 user = RegisterCustomer(
                     form.name.data,
@@ -261,7 +269,7 @@ def register():
                     form.gender.data,
                     form.securityQuestion.data,
                     formattedSecurityQuestionAnswer,
-                    form.profilePicture)
+                    profile_picture_filename)
 
                 if isinstance(user, Customer):
                     userdb[user.get_id()] = user
@@ -291,13 +299,19 @@ def profile():
                         user.set_id(form.phoneNumber.data)
                         user.set_gender(form.gender.data)
 
-                        if 'profilePicture' in request.files and request.files['profilePicture'].filename != '':
-                            profilePicture = save_picture(request.files['profilePicture'])
-                            user.set_profilePicture(profilePicture)
+                        if 'profilePicture' in request.files:
+                            profile_picture_file = request.files['profilePicture']
+                            if profile_picture_file and profile_picture_file.filename != '':
+                                if allowed_file(profile_picture_file.filename):
+                                    profile_picture_filename = save_picture(profile_picture_file)
+                                    user.set_profilePicture(profile_picture_filename)
+                                else:
+                                    flash('Allowed file types are - png, jpg, jpeg', 'danger')
+                                    return redirect(url_for('profile'))
 
                         userdb[key] = user
-            flash('Successfully edited', 'success')
-            return redirect(url_for('profile'))
+                        flash('Successfully edited', 'success')
+                        return redirect(url_for('profile'))
         
     return render_template('profile.html', form=form)
 
@@ -722,6 +736,11 @@ def not_found(error):
 @app.errorhandler(500)
 def unknown_error(error):
         return render_template('error.html', error_code = 500, message='Unknown error occured')
+
+@app.errorhandler(413)
+def request_entitiy_too_large(error):
+    flash('File is too large. Maximum file size is 5 MB', 'danger')
+    return redirect(request.url)
     
 # @app.errorhandler(AttributeError)
 # def attribute_error(error):
