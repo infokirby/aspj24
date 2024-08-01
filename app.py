@@ -936,16 +936,17 @@ def not_authorised(error):
 @app.errorhandler(404)
 def not_found(error):
         return render_template('error.html', error_code = 404, message = 'Page not found. Sorry for the inconvinience caused.')
-    
-@app.errorhandler(500)
-def unknown_error(error):
-        return render_template('error.html', error_code = 500, message='Unknown error occured')
 
 @app.errorhandler(413)
 def request_entitiy_too_large(error):
     flash('File is too large. Maximum file size is 5 MB', 'danger')
     return redirect(request.url)
-    
+
+@app.errorhandler(Exception)
+def handle_exception(error):
+    return render_template('error.html', error_code = 500, message='Unknown error occured, please try again later.')
+
+
 # @app.errorhandler(AttributeError)
 # def attribute_error(error):
 #         return render_template('error.html', error_code = AttributeError)
