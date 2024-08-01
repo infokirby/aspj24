@@ -25,9 +25,9 @@
                                     <!-- Product image-->
                                     <img class="card-img-top" src="{{url_for('static', filename='menu-items/' + item.replace(' ', '_') + '.jpg' )}}" alt="{{ item.name }}" />
                                     <!-- Order Form -->
-                                    <form method="POST">
+                                    <form method="POST" id="order-form">
                                         {{ form.csrf_token }}
-                                        {{ form.datetime }}
+                                        {{ form.orderDatetime }}
                                         {{ form.phoneNumber }}
                                         {{ form.stallName }}
                                         {{ form.orderID }}
@@ -36,10 +36,14 @@
                                         {{ form.price(value = price) }}
                                         {{ form.total }}
                                         {{ render_field( form.remarks )}}
+                                        {{ render_field(form.recaptcha) }}
                                         {{ form.status }}
+                                        <!-- </form> -->
+                                        
                                         <button type="submit" class="btn btn-primary">Add to cart</button>
                                     </form>
-        
+
+
                                 </div>
                             </div>
                         </div>

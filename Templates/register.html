@@ -21,7 +21,8 @@ input[type=number] {
 <h1 class="display-6 p-4 text-center">Register Account</h1>
 
 <div class="bg-body rounded container shadow-sm" style="width: 30%; height: auto;">
-<form method="POST" action="" enctype="multipart/form-data">
+<form method="POST" action=""> 
+    {{ form.csrf_token }}
     <div class="form-group p-2">
         {{ render_field(form.name, class="form-control", placeholder="Eg. Aaron Tan") }}
     </div>

@@ -1,9 +1,11 @@
 from customer_login import securityQuestions
-from wtforms import Form, validators, SelectField, RadioField, BooleanField, StringField, PasswordField, IntegerField, HiddenField
+from flask_wtf import FlaskForm, RecaptchaField
 from customer_login import securityQuestions
-from wtforms import Form, validators, SelectField, RadioField, BooleanField, StringField, PasswordField, IntegerField, DateField, EmailField, TextAreaField, DateTimeField
+from wtforms import Form, validators, SelectField, RadioField, BooleanField, StringField, PasswordField, IntegerField, DateField, EmailField, TextAreaField, DateTimeField, HiddenField
+from wtforms.validators import InputRequired, NumberRange, Regexp, EqualTo
 from datetime import datetime
 from flask_wtf.file import FileAllowed, FileField
+
 
 class RegistrationForm(Form):
     name = StringField('Name:', [validators.InputRequired()])
@@ -15,26 +17,23 @@ class RegistrationForm(Form):
     securityAnswer = StringField('Answer to security question:', [validators.InputRequired()])
     profilePicture = FileField('Profile Picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
 
-class Authorisation(Form):
-    OTP = IntegerField("OTP: ", [validators.InputRequired(), validators.NumberRange(0, 999999)])
 
 class LoginForm(Form):
     phoneNumber = IntegerField('Phone Number:', [validators.InputRequired(), validators.NumberRange(6000000, 99999999)])
     password = PasswordField('Password:', [validators.InputRequired()])
     remember = BooleanField('Remember me:', default=True)
 
-class CustOrderForm(Form):
+class CustOrderForm(FlaskForm):
+    recaptcha = RecaptchaField()	 
     phoneNumber = HiddenField()
-    datetime = HiddenField()
+    orderDatetime = HiddenField(default=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     stallName = HiddenField()
     orderID = HiddenField()
     item = HiddenField()
-    #ingredient = BooleanField('Include Ingredient')
-    #ingredientQuantity = IntegerField('Quantity:', [validators.optional(), validators.NumberRange(1, 10)], default=0)
-    itemQuantity = IntegerField('Quantity:', [validators.InputRequired(), validators.NumberRange(1, 10)], default=1)
+    itemQuantity = IntegerField('Quantity:', [validators.InputRequired()], default=1)
     price = HiddenField()
     total = HiddenField()
-    remarks = StringField('Remarks:')
+    remarks = StringField('Remarks:', default='No Remarks')
     status = HiddenField(default='Pending')
 
 

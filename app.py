@@ -1,5 +1,5 @@
-from flask import Flask, render_template, url_for, request, redirect, flash, session, send_file
-from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
+from flask import Flask, render_template, url_for, request, redirect, flash, session, send_file, jsonify
+from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm, Authorisation
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
 from customer import Customer
@@ -9,53 +9,32 @@ from io import BytesIO
 from store_owner import StoreOwner
 from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
-import shelve, xlsxwriter, stripe, webbrowser, os, pyotp, vonage
+import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, redirect, url_for, flash, request, redirect, send_from_directory
 from flask_login import current_user, login_required
 import uuid
-from flask_sqlalchemy import SQLAlchemy
-import sqlalchemy.orm as so
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-# from flask_security import roles_accepted
+from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
+import requests, logging
+from flask.sessions import SecureCookieSessionInterface
+from logs_config import ORDER_LEVEL
+# from flask_ngrok import run_with_ngrok 
 
-
-#configuring flask app
-app = Flask(__name__)
-
-
-
-os.environ['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
-os.environ["VONAGE_SECRET_KEY"] = "mcMGYJoWTE6C8Rjx"
-os.environ["VONAGE_API_KEY"] = "d8b5ed18"
-os.environ["VONAGE_BRAND"] = "South Canteen Webapp"
+GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:Password123@database-1.cr0sk8kqijy4.ap-southeast-1.rds.amazonaws.com'
-app.config['SECRET_KEY'] =  os.environ.get("SECRET_KEY")
-app.config['SECURITY_REGISTERABLE'] = True
+app = Flask(__name__, template_folder='Templates', static_folder='Static')
+# run_with_ngrok(app)
 
 stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
-
-
-#configuring flask limiter
-limiter = Limiter(
-    get_remote_address,
-    app=app,
-    storage_uri="memory://"
-)
-
-#Configuring pyotp
-totp = pyotp.TOTP(pyotp.random_base32, interval=60)
-
-#config vonage sms api
-client = vonage.Client(key=os.environ.get("VONAGE_API_KEY"), secret=os.environ.get("VONAGE_API_SECRET"))
-
-db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+
+
+app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
+app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdcmxUqAAAAAGVF_1zJ26DFEs61J2oJ8cQ3eM-4' 
+app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdcmxUqAAAAAHUKANmhqXNRcY8ZvRjiTl-Uzjmm'
 login_manager = LoginManager()
 
 app.config['UPLOAD_FOLDER'] = 'Static/profile_pics'
@@ -97,6 +76,14 @@ def uploaded_file(filename):
 # hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
 # superUser = RegisterAdmin(90288065, hashed_password)
 
+#all logs
+logging.basicConfig(filename='app.log', level=logging.INFO,
+                    format='%(asctime)s:%(levelname)s:%(message)s')
+@app.after_request
+def apply_caching(response):
+    response.headers["Set-Cookie"] = SecureCookieSessionInterface().get_signing_serializer(app).dumps(dict(session))
+    response.headers.add('Set-Cookie','SameSite=None; Secure')
+    return response
 def save_picture(form_picture):
     filename = str(uuid.uuid4()) + '_' + secure_filename(form_picture.filename)
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -112,11 +99,11 @@ def load_user(id):
                 if keys == id:
                     return userdb[id]
             
-        # elif id == superUser.get_id():
-        #     return superUser
+        elif id == superUser.get_id():
+            return superUser
 
         else:
-            with shelve.open('SOdb', 'r') as SOdb:
+            with shelve.open('SOdb', 'c') as SOdb:
                 for keys in SOdb:
                     if keys == id:
                         return SOdb[id]
@@ -136,24 +123,24 @@ def storeOwnerHome():
     return render_template('storeOwnerHome.html')
 
 
-# @app.route('/admin', methods=['GET', 'POST'])
-# def adminLogin():
-#     form = LoginForm(request.form)
-#     if request.method == 'POST' and form.validate():
-#         if form.phoneNumber.data == 90288065:
-#             admin = RegisterAdmin(69, form.password.data)
-#             if isinstance(admin, Customer):
-#                 if bcrypt.check_password_hash(superUser.get_password(), form.password.data):
-#                     login_user(admin)
-#                     session['id'] = admin.get_id()
-#                     with shelve.open("userdb", 'c') as userdb:
-#                         customerCount = len(userdb)
-#                         return render_template('adminPage.html',  logined = True, customerCount=customerCount)
+@app.route('/admin', methods=['GET', 'POST'])
+def adminLogin():
+    form = LoginForm(request.form)
+    if request.method == 'POST' and form.validate():
+        if form.phoneNumber.data == 90288065:
+            admin = RegisterAdmin(69, form.password.data)
+            if isinstance(admin, Customer):
+                if bcrypt.check_password_hash(superUser.get_password(), form.password.data):
+                    login_user(admin)
+                    session['id'] = admin.get_id()
+                    with shelve.open("userdb", 'c') as userdb:
+                        customerCount = len(userdb)
+                        return render_template('adminPage.html',  logined = True, customerCount=customerCount)
 
-#                 else:
-#                     flash("For Admins only. Unauthorised access forbiddened.", 'Danger')
-#                     return redirect(url_for('home'))
-#     return render_template('adminLogin.html', form=form)
+                else:
+                    flash("For Admins only. Unauthorised access forbiddened.", 'Danger')
+                    return redirect(url_for('home'))
+    return render_template('adminLogin.html', form=form)
 
 # @app.route('/adminPage')
 # @login_required
@@ -165,7 +152,6 @@ def storeOwnerHome():
 
 
 @app.route('/createStoreOwner', methods=['GET', 'POST'])
-@login_required
 def createStoreOwner():
     form = StoreOwnerRegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -230,7 +216,6 @@ def contactUs():
 #     return render_template('login.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
-@limiter.limit("15/hour;5/minute")
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -410,7 +395,6 @@ def register():
 #profile page
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
-#@roles_accepted("Admin", "User", "Storeowner")
 def profile():
     shownGender = str(current_user.get_gender())
     form = EditUserForm(request.form, gender = shownGender)
@@ -444,7 +428,6 @@ def profile():
 #change password page
 @app.route('/changePassword', methods=['GET', 'POST'])
 @login_required
-#@roles_accepted("Admin", "User", "Storeowner")
 def changePassword():
     form = ChangePasswordForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -470,7 +453,6 @@ def changePassword():
 
 @app.route('/deleteProfile', methods = ["POST", "GET"])
 @login_required
-#@roles_accepted("Admin", "User", "Storeowner")
 def deleteProfile():
     form = request.form
     if request.method == "POST":
@@ -495,6 +477,13 @@ def deleteProfile():
 
     return render_template('deleteProfile.html')
 
+def sanitize_input(input_string):
+    # This pattern matches any character that is not a word character or a space
+    pattern = re.compile(r'[^\w\s]')
+    sanitized_string = re.sub(pattern, '', input_string)
+    return sanitized_string
+
+
 
 #order
 @app.route('/Vegetarian', methods=['GET', 'POST'])
@@ -511,38 +500,48 @@ def deleteProfile():
 @app.route('/Takoyaki', methods=['GET', 'POST'])
 @app.route('/Snack', methods=['GET', 'POST'])
 @app.route('/Waffle', methods=['GET', 'POST'])
-@app.route('/Drinks', methods=['GET', 'POST'])
+@app.route('/Drinks', methods=['GET', "POST"])
 @login_required
-#@roles_accepted("Admin", "User", "Storeowner")
 def stalls():
     path = request.path
     stall_name = path.lstrip('/')
     form = CustOrderForm(request.form)
-    now = datetime.now()
-    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-    if request.method == 'POST' and form.validate():
-        #form.stallName.data = stall_name
+    now = datetime.now()    
+
+    if request.method == 'POST' and form.validate_on_submit():
         form.orderID.data = str(newOrderID())
         form.phoneNumber.data = current_user.get_id()
         form.itemQuantity.data = request.form.get('itemQuantity')
         total = float(request.form.get('price')) * float(request.form.get('itemQuantity'))
         order = CustomerOrder(form.phoneNumber.data)
         order.set_id(current_user.get_id())
-        order.set_datetime(dt_string)
-        order.set_dateTimeData(now)
+        order.set_datetime(form.orderDatetime.data)
+        order.set_dateTimeData(form.orderDatetime.data)
         order.set_stallName(stall_name)
         order.set_orderID(form.orderID.data)
         order.set_item(form.item.data)
-        order.set_itemQuantity(form.itemQuantity.data)
+        order.set_itemQuantity(int(form.itemQuantity.data))
         order.set_price(form.price.data)
         order.set_total(total)
-        order.set_remarks(form.remarks.data)
+        #regex to remove special characters
+        if form.remarks.data != "":
+            sanitized_remarks = sanitize_input(form.remarks.data)
+            order.set_remarks(sanitized_remarks)
         order.set_status(form.status.data)
+
+        # order create log
+        logging.log(ORDER_LEVEL, f"Order {form.orderID.data} created by {current_user.get_id()}")
+
         with shelve.open('order.db', 'c') as orderdb:
             orderdb[order.get_orderID] = order
-
-
+    
+    else:
+        print("Form not validated")
+        flash('Please complete the reCAPTCHA challenge.', 'danger')
+        print(form.errors)
+        
     return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form)
+
 
 
 #Cart
@@ -555,26 +554,22 @@ def cart():
         orders = []
         for order in orderdb:
             if orderdb[order].get_id() == current_user.get_id():
-                if orderdb[order].get_status == "Pending" or orderdb[order].get_status == "Ready for Collection":
+                if orderdb[order].get_status == "Pending":
                     orders.append(orderdb[order])
                     total = total + orderdb[order].get_total
     return render_template('cart.html', menu=menu, orders=orders, form=form, total=f'{total:.2f}')
-
-
-
-
-
 
 #mark complete
 @app.route('/completeOrder/<string:id>', methods=['GET', 'POST'])
 @login_required
 def completeOrder(id):
+    # order complete log
     with shelve.open('order.db', 'c') as orderdb:
         order = orderdb[id]
         order.set_status("Completed")
         orderdb[id] = order
+        logging.log(ORDER_LEVEL, f"Order {id} completed by {current_user.get_id()}")
     return redirect(url_for('cart'))
-
 
 #edit
 @app.route('/editOrder/<string:id>', methods=['GET', 'POST'])
@@ -582,26 +577,47 @@ def completeOrder(id):
 def editOrder(id):
     form = CustOrderForm(request.form)
     if request.method == 'POST' and form.validate():
+        # order updated log
+        logging.log(ORDER_LEVEL, f"Order {id} updated by {current_user.get_id()}")
         with shelve.open('order.db', 'c') as orderdb:
             order = orderdb[id]
             order.set_itemQuantity(form.itemQuantity.data)
             order.set_total(float(form.itemQuantity.data) * float(form.price.data))
-            if form.remarks.data != "":
-                order.set_remarks(form.remarks.data)
+            order.set_remarks(form.remarks.data)
 
-            else:
-                order.set_remarks("")
+            # if form.remarks.data != "":
+            #     order.set_remarks(form.remarks.data)
+
+            # else:
+            #     order.set_remarks("")
             orderdb[id] = order
     
-    form=form
+    # form=form
     return redirect(url_for('cart'))
 
 #delete
 @app.route('/deleteOrder/<string:id>', methods=['GET', 'POST'])
 @login_required
 def deleteOrder(id):
+    # order delete log
+    logging.log(ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
     with shelve.open('order.db', 'c') as orderdb:
         orderdb.pop(id)
+    return redirect(url_for('cart'))
+
+# delete all
+@app.route('/deleteAllOrder', methods=['GET', 'POST'])
+@login_required
+def deleteAllOrder():
+    count = 0
+    with shelve.open('order.db', 'c') as orderdb:
+        for order in orderdb:
+            if orderdb[order].get_id() == current_user.get_id() and orderdb[order].get_status == "Pending":
+                del orderdb[order]
+                count += 1
+                # order delete log
+                logging.log(ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
+
     return redirect(url_for('cart'))
 
 #Customer Order History
@@ -778,8 +794,8 @@ def downloadExcelApi():
 def createApiResponse():
     bufferFile = writeBufferExcelFile()
     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    # return send_file(bufferFile,mimetype=mimetype)
-    # return response
+    return send_file(bufferFile,mimetype=mimetype)
+    return response
 
 def writeBufferExcelFile():
     buffer = BytesIO()
@@ -876,5 +892,4 @@ def request_entitiy_too_large(error):
 #         return render_template('error.html', error_code = AttributeError)
 
 if __name__ == '__main__':
-    # db.create_all()
-    app.run(debug = True)
+    app.run(debug = True, ssl_context='adhoc')
