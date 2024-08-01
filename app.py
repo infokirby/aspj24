@@ -9,22 +9,28 @@ from io import BytesIO
 from store_owner import StoreOwner
 from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
-import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re, os
+import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re, os, pandas, numpy
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, redirect, url_for, flash, request, redirect, send_from_directory
 from flask_login import current_user, login_required
 import uuid
 from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
-import requests, logging
+import requests, logging, joblib
 from flask.sessions import SecureCookieSessionInterface
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from logs_config import ORDER_LEVEL
+from iptest import geolocate
+from sklearn.preprocessing import StandardScaler
 # from flask_ngrok import run_with_ngrok 
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
+#Login ML
+iso_forest = joblib.load('iso_forest_model.pkl')
+scaler = joblib.load('scaler.pkl')
+feature_names = ['hour', 'day', 'month', 'year'] + [f'location_{loc}' for loc in ['SG']]
 
 
 app = Flask(__name__, template_folder='Templates', static_folder='Static')
@@ -233,13 +239,57 @@ def login():
                 for keys in userdb:
                     if user.get_id() == keys:
                         if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
-                            if form.remember.data:
-                                login_user(userdb[keys], remember=True)
+                            print(feature_names)
+                             #extract data here
+                            currentDT = datetime.now().timetuple()
+                            hour = currentDT[3]
+                            day = currentDT[2]
+                            month = currentDT[1]
+                            year = currentDT[0]
+
+                            new_data = pandas.DataFrame({
+                                'hour': [hour],
+                                'day' : [day],
+                                'month' : [month],
+                                'year' : [year],
+                            })
+
+                            location_dummies = pandas.get_dummies(geolocate('219.74.99.238'), prefix='location')
+                            for col in location_dummies.columns:
+                                new_data[col] = location_dummies[col]
+    
+                                # Ensure all location columns are present
+                                for col in feature_names:
+                                    if col not in new_data.columns:
+                                        new_data[col] = 0
+
+                            for col in new_data.columns:
+                                pandas.concat
+                            
+                            # Extract features for prediction
+                            X_new = new_data[feature_names].values
+                            
+                            print(X_new)
+
+                            # Standardize the features
+                            X_new_scaled = scaler.transform(X_new)
+                            
+                            # Predict if the login data is an anomaly
+                            prediction = iso_forest.predict(X_new_scaled)
+                                
+
+                            if prediction[0] == -1: #anomaly
+                                flash("Login not authorised. Please leave site.", "danger")
+                                return render_template('login.html', form=form)
+                            
                             else:
-                                login_user(userdb[keys])
+                                if form.remember.data:
+                                    login_user(userdb[keys], remember=True)
+                                else:
+                                    login_user(userdb[keys])
                             session['id'] = user.get_id()
                             return render_template('home.html', logined=True)
-            flash("wrong username/password. please try again")
+            flash("wrong username/password. please try again", "warning")
             return redirect(url_for('login'))
     return render_template('login.html', form=form)
 
@@ -262,7 +312,7 @@ def authentication():
                             return render_template('home.html', logined = True)
 
             else:
-                flash("wrong username/password. please try again")
+                flash("wrong username/password. please try again", "warning")
                 return redirect(url_for('login'))
     return render_template('login.html', form=form)
 
@@ -901,4 +951,4 @@ def request_entitiy_too_large(error):
 #         return render_template('error.html', error_code = AttributeError)
 
 if __name__ == '__main__':
-    app.run(debug = True, ssl_context='adhoc')
+    app.run(debug = True)
