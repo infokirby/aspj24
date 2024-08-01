@@ -11,7 +11,6 @@ from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
 import shelve, xlsxwriter, stripe, webbrowser, os, pyotp, vonage
 from datetime import datetime
-import os
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, redirect, url_for, flash, request, redirect, send_from_directory
 from flask_login import current_user, login_required
@@ -196,7 +195,40 @@ def findUs():
 def contactUs():
     return render_template('contactUs.html')
 
-#Login Page
+# #Login Page
+# @app.route('/login', methods=['GET', 'POST'])
+# @limiter.limit("15/hour;5/minute")
+# def login():
+#     form = LoginForm(request.form)
+#     if request.method == 'POST' and form.validate():
+#         with shelve.open('userdb', 'c') as userdb:
+#             user = CustomerLogin(form.phoneNumber.data, form.password.data)
+#             if isinstance(user, Customer):
+#                 for keys in userdb:
+#                     print(keys)
+#                     if user.get_id() == keys:
+#                         if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
+#                             # totpToSend = totp.now()
+#                             # responseData = client.sms.send_message(
+#                             #     {
+#                             #         "from" : os.environ.get("VONAGE_BRAND_NAME"),
+#                             #         "to" : os.environ.get(f"{65}{user.get_id()}"),
+#                             #         "text" : f"Your OTP is: {totpToSend}. \nValid for the next 1 minute"
+#                             #     }
+#                             # )
+
+#                             if form.remember.data == True:
+#                                 login_user(userdb[keys], remember=True)
+#                             else:
+#                                 login_user(userdb[keys])
+#                             session['id'] =int(user.get_id())
+#                             return render_template('home.html', logined = True)
+
+#             else:
+#                 flash("wrong username/password. please try again")
+#                 return redirect(url_for('login'))
+#     return render_template('login.html', form=form)
+
 @app.route('/login', methods=['GET', 'POST'])
 @limiter.limit("15/hour;5/minute")
 def login():
@@ -208,27 +240,15 @@ def login():
                 for keys in userdb:
                     if user.get_id() == keys:
                         if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
-                            totpToSend = totp.now()
-                            responseData = client.sms.send_message(
-                                {
-                                    "from" : os.environ.get("VONAGE_BRAND_NAME"),
-                                    "to" : os.environ.get(f"{65}{user.get_id()}"),
-                                    "text" : f"Your OTP is: {totpToSend}. \nValid for the next 1 minute"
-                                }
-                            )
-
-                            if form.remember.data == True:
+                            if form.remember.data:
                                 login_user(userdb[keys], remember=True)
                             else:
                                 login_user(userdb[keys])
-                            session['id'] =int(user.get_id())
-                            return render_template('home.html', logined = True)
-
-            else:
-                flash("wrong username/password. please try again")
-                return redirect(url_for('login'))
+                            session['id'] = user.get_id()
+                            return render_template('home.html', logined=True)
+            flash("wrong username/password. please try again")
+            return redirect(url_for('login'))
     return render_template('login.html', form=form)
-
 
 @app.route('/2fa', methods = ["POST", "GET"])
 @limiter.limit("15/hour;5/minute")
@@ -311,7 +331,46 @@ def forgotPassword():
                         return redirect(url_for('forgotPassword'))
     return render_template("forgotPassword.html", form=form, secQn = secQn)
 
-#Register Page
+# #Register Page
+# @app.route('/register', methods=['GET', 'POST'])
+# def register():
+#     form = RegistrationForm(request.form)
+#     if request.method == 'POST' and form.validate():
+#         with shelve.open('userdb', 'c') as userdb:
+#             if str(form.phoneNumber.data) not in userdb:
+#                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+#                 formattedSecurityQuestionAnswer = form.securityAnswer.data.strip().title()
+
+#                 profile_picture_filename = 'default.jpeg'
+#                 if 'profilePicture' in request.files:
+#                     profile_picture_file = request.files['profilePicture']
+#                     if profile_picture_file and profile_picture_file.filename != '':
+#                         if allowed_file(profile_picture_file.filename):
+#                             profile_picture_filename = save_picture(profile_picture_file)
+#                         else:
+#                             return redirect(url_for('register'))
+
+#                 user = RegisterCustomer(
+#                     form.name.data,
+#                     form.phoneNumber.data,
+#                     hashed_password,
+#                     form.gender.data,
+#                     form.securityQuestion.data,
+#                     formattedSecurityQuestionAnswer,
+#                     profile_picture_filename)
+
+#                 if isinstance(user, Customer):
+#                     userdb[user.get_id()] = user
+#                     flash('Registration Successful!', "success")
+#                     return redirect(url_for('login'))
+
+#             else:
+#                 flash("Already registered please login instead" , 'success')
+#                 return redirect(url_for('login'))
+
+#     return render_template('register.html', form=form)
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm(request.form)
@@ -343,11 +402,9 @@ def register():
                     userdb[user.get_id()] = user
                     flash('Registration Successful!', "success")
                     return redirect(url_for('login'))
-
             else:
-                flash("Already registered please login instead" , 'success')
+                flash("Already registered, please login instead" , 'success')
                 return redirect(url_for('login'))
-
     return render_template('register.html', form=form)
 
 #profile page

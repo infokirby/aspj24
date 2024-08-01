@@ -1,13 +1,15 @@
 #import User
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import declarative_base, relationship
+# from sqlalchemy import Column, Integer, String, ForeignKey
+# from sqlalchemy.orm import declarative_base, relationship
 
-Base = declarative_base()
+# Base = declarative_base()
 
 class Customer():
-    def __init__(self, phoneNumber, profilePicture = 'default.jpeg'):
+    def __init__(self, phoneNumber):
         self.__phoneNumber = str(phoneNumber)
-        self.__profilePicture = profilePicture
+
+    def get_customer_id(self):
+        return self.__customer_id
 
     # accessor methods
     @property
@@ -54,21 +56,24 @@ class Customer():
     def get_status(self):
         return self.__status
     
-    @property
+
     def get_name(self):
-        return self.name
+        return self.__name
     
-    @property
+   
     def get_id(self):
-        return str(self.phoneNumber)
+        return str(self.__phoneNumber)
     
-    @property
+
     def get_password(self):
-        return self.passwordHash
+        return self.__password
     
-    @property
+
     def get_role(self):
         return self.role
+    
+    def get_gender(self):
+        return self.__gender
 
     # mutator methods
     def set_customer_id(self, customer_id):
@@ -131,6 +136,9 @@ class Customer():
     def set_role(self, role):
         self.__role = role
 
+    def set_gender(self, gender):
+        self.__gender = gender
+
     def set_membership(self, membership):
         self.__membership = membership
 
@@ -150,6 +158,7 @@ class Customer():
     def is_authenticated(self):
         return True
 
+#pfp
     def set_profilePicture(self, profilePicture):
         self.profilePicture = profilePicture
 
@@ -161,8 +170,8 @@ class Customer():
         return f"User {self.get_name()} with phone number {self.get_id()}"
     
 
-class Role(Base):
-    __tablename__ = "role"
+# class Role(Base):
+#     __tablename__ = "role"
 
-    id = Column(Integer, primary_key=True)
-    role = Column(String, unique=True)
+#     id = Column(Integer, primary_key=True)
+#     role = Column(String, unique=True)

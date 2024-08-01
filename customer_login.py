@@ -16,6 +16,7 @@ class RegisterAdmin(C):
 class RegisterCustomer(C):
     def __init__(self, name, phoneNumber, password, gender, securityQuestion, securityAnswer, profilePicture = 'default.jpeg'):
         super().__init__(phoneNumber)
+        self.set_id(phoneNumber)
         self.set_password(password)
         self.set_name(name)
         self.set_gender(gender)
