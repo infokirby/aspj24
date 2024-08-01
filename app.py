@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, request, redirect, flash, session, send_file, jsonify
-from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm, Authorisation
+from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
 from customer import Customer
@@ -9,7 +9,7 @@ from io import BytesIO
 from store_owner import StoreOwner
 from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
-import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re
+import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re, os
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, redirect, url_for, flash, request, redirect, send_from_directory
@@ -18,6 +18,8 @@ import uuid
 from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
 import requests, logging
 from flask.sessions import SecureCookieSessionInterface
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from logs_config import ORDER_LEVEL
 # from flask_ngrok import run_with_ngrok 
 
@@ -99,8 +101,8 @@ def load_user(id):
                 if keys == id:
                     return userdb[id]
             
-        elif id == superUser.get_id():
-            return superUser
+        # elif id == superUser.get_id():
+        #     return superUser
 
         else:
             with shelve.open('SOdb', 'c') as SOdb:
@@ -110,6 +112,11 @@ def load_user(id):
         
 
 login_manager.init_app(app)
+limiter = Limiter(
+    get_remote_address, 
+    app = app,
+    storage_uri = "memory://"
+)
 
 
 #home page
@@ -216,6 +223,7 @@ def contactUs():
 #     return render_template('login.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("15/hour;5/minute")
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -357,6 +365,7 @@ def forgotPassword():
 
 
 @app.route('/register', methods=['GET', 'POST'])
+@limiter.limit("15/hour;5/minute")
 def register():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
