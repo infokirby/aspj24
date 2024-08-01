@@ -57,19 +57,15 @@ class Customer(Base):
     def get_status(self):
         return self.__status
     
-    @property
     def get_name(self):
         return self.name
     
-    @property
     def get_id(self):
         return str(self.phoneNumber)
     
-    @property
     def get_password(self):
         return self.passwordHash
     
-    @property
     def get_role(self):
         return self.role
 
