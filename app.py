@@ -14,8 +14,7 @@ from datetime import datetime
 from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
 import requests, logging
 from flask.sessions import SecureCookieSessionInterface
-from create_recaptcha_assessment import create_assessment
-from logs_config import CREATE_ORDER_LEVEL, UPDATE_ORDER_LEVEL, DELETE_ORDER_LEVEL
+from logs_config import ORDER_LEVEL
 # from flask_ngrok import run_with_ngrok 
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
@@ -340,15 +339,10 @@ def sanitize_input(input_string):
 @app.route('/Drinks', methods=['GET', "POST"])
 @login_required
 def stalls():
-    # global GOOGLE_RECAPTCHA_SITE_KEY
-    # global GOOGLE_RECAPTCHA_SECRET_KEY 
-    # global GOOGLE_VERIFY_URL
     path = request.path
     stall_name = path.lstrip('/')
     form = CustOrderForm(request.form)
     now = datetime.now()    
-    dt_string = now.strftime("%Y-%m-%dT%H:%M:%S%z")
-
 
     if request.method == 'POST' and form.validate_on_submit():
         form.orderID.data = str(newOrderID())
@@ -372,26 +366,16 @@ def stalls():
         order.set_status(form.status.data)
 
         # order create log
-        logging.log(CREATE_ORDER_LEVEL, f"Order {form.orderID.data} created by {current_user.get_id()} at {form.orderDatetime.data}")
+        logging.log(ORDER_LEVEL, f"Order {form.orderID.data} created by {current_user.get_id()}")
 
         with shelve.open('order.db', 'c') as orderdb:
             orderdb[order.get_orderID] = order
     
-    
-        # orderSuccess()
-
-        # secret_response = request.form.get('g-recaptcha-response')
-        # verify_response = requests.post(
-        #     url=f'"https://www.google.com/recaptcha/api/siteverify"?secret="6LcdnuwpAAAAAJlXp2bDRvWguu5VSQulzn8wPri7"&response={secret_response}').json()
-        # print("Form validated")
-        # print(verify_response)
-        # print(secret_response)
     else:
         print("Form not validated")
+        flash('Please complete the reCAPTCHA challenge.', 'danger')
         print(form.errors)
         
-
-
     return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form)
 
 
@@ -416,11 +400,11 @@ def cart():
 @login_required
 def completeOrder(id):
     # order complete log
-    logging.info(f"Order {id} completed by {current_user.get_id()}")
     with shelve.open('order.db', 'c') as orderdb:
         order = orderdb[id]
         order.set_status("Completed")
         orderdb[id] = order
+        logging.log(ORDER_LEVEL, f"Order {id} completed by {current_user.get_id()}")
     return redirect(url_for('cart'))
 
 #edit
@@ -430,7 +414,7 @@ def editOrder(id):
     form = CustOrderForm(request.form)
     if request.method == 'POST' and form.validate():
         # order updated log
-        logging.log(UPDATE_ORDER_LEVEL, f"Order {id} updated by {current_user.get_id()}")
+        logging.log(ORDER_LEVEL, f"Order {id} updated by {current_user.get_id()}")
         with shelve.open('order.db', 'c') as orderdb:
             order = orderdb[id]
             order.set_itemQuantity(form.itemQuantity.data)
@@ -452,7 +436,7 @@ def editOrder(id):
 @login_required
 def deleteOrder(id):
     # order delete log
-    logging.log(DELETE_ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
+    logging.log(ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
     with shelve.open('order.db', 'c') as orderdb:
         orderdb.pop(id)
     return redirect(url_for('cart'))
@@ -467,8 +451,8 @@ def deleteAllOrder():
             if orderdb[order].get_id() == current_user.get_id() and orderdb[order].get_status == "Pending":
                 del orderdb[order]
                 count += 1
-        # order delete log
-    logging.info(f"{count} orders deleted by {current_user.get_id()}")
+                # order delete log
+                logging.log(ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
 
     return redirect(url_for('cart'))
 
