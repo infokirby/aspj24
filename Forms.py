@@ -23,13 +23,12 @@ class LoginForm(Form):
     remember = BooleanField('Remember me:', default=True)
 
 class CustOrderForm(FlaskForm):
-    recaptcha = RecaptchaField()	 
     phoneNumber = HiddenField()
     orderDatetime = HiddenField(default=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     stallName = HiddenField()
     orderID = HiddenField()
     item = HiddenField()
-    itemQuantity = IntegerField('Quantity:', [validators.InputRequired()], default=1)
+    itemQuantity = IntegerField('Quantity:', default=1)
     price = HiddenField()
     total = HiddenField()
     remarks = StringField('Remarks:', default='No Remarks')

@@ -36,9 +36,9 @@
                                         {{ form.price(value = price) }}
                                         {{ form.total }}
                                         {{ render_field( form.remarks )}}
-                                        {{ render_field(form.recaptcha) }}
+                                        <div class="g-recaptcha" data-sitekey="{{ sitekey }}"></div>
                                         {{ form.status }}
-                                        <!-- </form> -->
+
                                         
                                         <button type="submit" class="btn btn-primary">Add to cart</button>
                                     </form>

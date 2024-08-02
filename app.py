@@ -1,4 +1,5 @@
 from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify
+from flask_wtf.csrf import CSRFProtect
 from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
@@ -29,17 +30,16 @@ bcrypt = Bcrypt(app)
 
 
 app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
-app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdcmxUqAAAAAGVF_1zJ26DFEs61J2oJ8cQ3eM-4' 
-app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdcmxUqAAAAAHUKANmhqXNRcY8ZvRjiTl-Uzjmm'
+app.config['GOOGLE_RECAPTCHA_SITE_KEY'] = GOOGLE_RECAPTCHA_SITE_KEY
+app.config['GOOGLE_RECAPTCHA_SECRET_KEY'] = GOOGLE_RECAPTCHA_SECRET_KEYlogin_manager = LoginManager()
 login_manager = LoginManager()
+csrf = CSRFProtect(app)
 
 #SuperUser account
 hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
 superUser = RegisterAdmin(90288065, hashed_password)
 
-#all logs
-logging.basicConfig(filename='app.log', level=logging.INFO,
-                    format='%(asctime)s:%(levelname)s:%(message)s')
+
 @app.after_request
 def apply_caching(response):
     response.headers["Set-Cookie"] = SecureCookieSessionInterface().get_signing_serializer(app).dumps(dict(session))
@@ -319,7 +319,20 @@ def sanitize_input(input_string):
     sanitized_string = re.sub(pattern, '', input_string)
     return sanitized_string
 
-
+# recaptcha verification
+def verify_recaptcha(response_token):
+    secret_key = '6LdcmxUqAAAAAHUKANmhqXNRcY8ZvRjiTl-Uzjmm'  # Replace with your actual secret key
+    url = 'https://www.google.com/recaptcha/api/siteverify'
+    data = {
+        'secret': secret_key,
+        'response': response_token
+    }
+    print(data)
+    response = requests.post(url, data=data)
+    print(response)
+    result = response.json()
+    print(result)
+    return result
 
 #order
 @app.route('/Vegetarian', methods=['GET', 'POST'])
@@ -336,7 +349,7 @@ def sanitize_input(input_string):
 @app.route('/Takoyaki', methods=['GET', 'POST'])
 @app.route('/Snack', methods=['GET', 'POST'])
 @app.route('/Waffle', methods=['GET', 'POST'])
-@app.route('/Drinks', methods=['GET', "POST"])
+@app.route('/Drinks', methods=['GET', 'POST'])
 @login_required
 def stalls():
     path = request.path
@@ -345,38 +358,45 @@ def stalls():
     now = datetime.now()    
 
     if request.method == 'POST' and form.validate_on_submit():
-        form.orderID.data = str(newOrderID())
-        form.phoneNumber.data = current_user.get_id()
-        form.itemQuantity.data = request.form.get('itemQuantity')
-        total = float(request.form.get('price')) * float(request.form.get('itemQuantity'))
-        order = CustomerOrder(form.phoneNumber.data)
-        order.set_id(current_user.get_id())
-        order.set_datetime(form.orderDatetime.data)
-        order.set_dateTimeData(form.orderDatetime.data)
-        order.set_stallName(stall_name)
-        order.set_orderID(form.orderID.data)
-        order.set_item(form.item.data)
-        order.set_itemQuantity(int(form.itemQuantity.data))
-        order.set_price(form.price.data)
-        order.set_total(total)
-        #regex to remove special characters
-        if form.remarks.data != "":
-            sanitized_remarks = sanitize_input(form.remarks.data)
-            order.set_remarks(sanitized_remarks)
-        order.set_status(form.status.data)
+    # if request.method == 'POST':
+        response_token = request.form['g-recaptcha-response']  # This should be the token you get from the client-side reCAPTCHA
+        print(response_token)
+        verification_result = verify_recaptcha(response_token)
+        print(verification_result)
+        if verification_result.get('success'):
+            form.orderID.data = str(newOrderID())
+            form.phoneNumber.data = current_user.get_id()
+            form.itemQuantity.data = request.form.get('itemQuantity')
+            total = float(request.form.get('price')) * float(request.form.get('itemQuantity'))
+            order = CustomerOrder(form.phoneNumber.data)
+            order.set_id(current_user.get_id())
+            order.set_dateTimeData(form.orderDatetime.data)
+            order.set_stallName(stall_name)
+            order.set_orderID(form.orderID.data)
+            order.set_item(form.item.data)
+            order.set_itemQuantity(int(form.itemQuantity.data))
+            order.set_price(form.price.data)
+            order.set_total(total)
+            #regex to remove special characters
+            if form.remarks.data != "":
+                sanitized_remarks = sanitize_input(form.remarks.data)
+                order.set_remarks(sanitized_remarks)
+            order.set_status(form.status.data)
 
-        # order create log
-        logging.log(ORDER_LEVEL, f"Order {form.orderID.data} created by {current_user.get_id()}")
+            with shelve.open('order.db', 'c') as orderdb:
+                orderdb[order.get_orderID] = order
 
-        with shelve.open('order.db', 'c') as orderdb:
-            orderdb[order.get_orderID] = order
+            # order create log
+            logging.log(ORDER_LEVEL, f"Order {form.orderID.data} created by {current_user.get_id()}")
+
+        else:
+            print("recaptcha not validated")
     
     else:
         print("Form not validated")
-        flash('Please complete the reCAPTCHA challenge.', 'danger')
         print(form.errors)
         
-    return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form)
+    return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form, sitekey=GOOGLE_RECAPTCHA_SITE_KEY)
 
 
 
@@ -384,16 +404,18 @@ def stalls():
 @app.route('/cart', methods=['GET', 'POST'])
 @login_required
 def cart():
+    
     total = 0
     form = CustOrderForm(request.form)
+    orders = []
     with shelve.open('order.db', 'c') as orderdb:
-        orders = []
         for order in orderdb:
-            if orderdb[order].get_id() == current_user.get_id():
-                if orderdb[order].get_status == "Pending":
-                    orders.append(orderdb[order])
-                    total = total + orderdb[order].get_total
-    return render_template('cart.html', menu=menu, orders=orders, form=form, total=f'{total:.2f}')
+            if orderdb[order].get_id() == current_user.get_id() and orderdb[order].get_status == "Pending":
+                orders.append(orderdb[order])
+                total = total + orderdb[order].get_total
+
+
+    return render_template('cart.html', orders=orders, form=form, total=f'{total:.2f}', sitekey=GOOGLE_RECAPTCHA_SITE_KEY)
 
 #mark complete
 @app.route('/completeOrder/<string:id>', methods=['GET', 'POST'])
@@ -407,36 +429,48 @@ def completeOrder(id):
         logging.log(ORDER_LEVEL, f"Order {id} completed by {current_user.get_id()}")
     return redirect(url_for('cart'))
 
+
+
 #edit
-@app.route('/editOrder/<string:id>', methods=['GET', 'POST'])
+@app.route('/editOrder/<string:id>', methods=["GET", "POST"])
 @login_required
 def editOrder(id):
+    print("moo")
     form = CustOrderForm(request.form)
-    if request.method == 'POST' and form.validate():
+    print("moo")
+
+    if form.validate():
+        print("moo")
+        price = 0.0
+        for i, j in menu.items():
+            for form.item.data in j:
+                price = j[form.item.data]
+                print(price)
         # order updated log
         logging.log(ORDER_LEVEL, f"Order {id} updated by {current_user.get_id()}")
         with shelve.open('order.db', 'c') as orderdb:
             order = orderdb[id]
             order.set_itemQuantity(form.itemQuantity.data)
-            order.set_total(float(form.itemQuantity.data) * float(form.price.data))
+                  
+            order.set_total(order.get_itemQuantity * price)
+            print(order.get_itemQuantity)
+            print(order.get_total)
             order.set_remarks(form.remarks.data)
-
-            # if form.remarks.data != "":
-            #     order.set_remarks(form.remarks.data)
-
-            # else:
-            #     order.set_remarks("")
             orderdb[id] = order
+            orderdb.sync()
+    else:
+        print(form.errors)
+
     
     # form=form
-    return redirect(url_for('cart'))
+    return redirect(url_for('cart', menu=menu, form=form))
 
 #delete
 @app.route('/deleteOrder/<string:id>', methods=['GET', 'POST'])
 @login_required
 def deleteOrder(id):
     # order delete log
-    logging.log(ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
+    logging.log(ORDER_LEVEL, f"Order {str(id)} deleted by {current_user.get_id()}")
     with shelve.open('order.db', 'c') as orderdb:
         orderdb.pop(id)
     return redirect(url_for('cart'))

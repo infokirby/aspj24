@@ -1,0 +1,4 @@
+2024-08-02 10:37:05,117 - simple_example - WARNING - warn message
+2024-08-02 10:37:05,117 - simple_example - ERROR - error message
+2024-08-02 10:37:05,118 - simple_example - CRITICAL - critical message
+2024-08-02 10:37:05,118 - simple_example - TRANSACTION - Transaction completed
