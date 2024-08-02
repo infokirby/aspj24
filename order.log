@@ -331,3 +331,23 @@
 2024-08-02 08:32:55,028:ORDER:Order 69 created by 89448485
 2024-08-02 08:33:09,156:ORDER:Order 69 updated by 89448485
 2024-08-02 08:34:04,185:ORDER:Order 69 deleted by 89448485
+2024-08-02 10:37:05,117 - simple_example - WARNING - warn message
+2024-08-02 10:37:05,117 - simple_example - ERROR - error message
+2024-08-02 10:37:05,118 - simple_example - CRITICAL - critical message
+2024-08-02 10:37:05,118 - simple_example - ORDER - Order created
+2024-08-02 10:37:05,118 - simple_example - LOGIN - User logged in
+2024-08-02 10:37:05,118 - simple_example - TRANSACTION - Transaction completed
+2024-08-02 10:41:09,740:WARNING: * Debugger is active!
+2024-08-02 10:41:45,682:WARNING: * Debugger is active!
+2024-08-02 10:41:58,590:WARNING: * Debugger is active!
+2024-08-02 10:42:46,567:WARNING: * Debugger is active!
+2024-08-02 10:43:24,496:WARNING: * Debugger is active!
+2024-08-02 10:43:40,378:WARNING: * Debugger is active!
+2024-08-02 10:44:39,353:WARNING: * Debugger is active!
+2024-08-02 10:48:30,738:WARNING: * Debugger is active!
+2024-08-02 10:50:31,726 - simple_example - WARNING - warn message
+2024-08-02 10:50:31,726 - simple_example - ERROR - error message
+2024-08-02 10:50:31,727 - simple_example - CRITICAL - critical message
+2024-08-02 10:50:31,727 - simple_example - ORDER - Order created
+2024-08-02 10:50:31,727 - simple_example - LOGIN - User logged in
+2024-08-02 10:50:31,727 - simple_example - TRANSACTION - Transaction completed
