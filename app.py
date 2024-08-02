@@ -995,8 +995,9 @@ def request_entitiy_too_large(error):
     flash('File is too large. Maximum file size is 5 MB', 'danger')
     return redirect(request.url)
 
-# @app.errorhandler(Exception)
-# def handle_exception(error):
-#     return render_template('error.html', error_code = 500, message='Unknown error occured, please try again later.')
+@app.errorhandler(Exception)
+def handle_exception(error):
+    return render_template('error.html', error_code = 500, message='Unknown error occured, please try again later.')
+
 if __name__ == '__main__':
     app.run(debug = True)
