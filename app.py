@@ -23,7 +23,15 @@ from flask_limiter.util import get_remote_address
 from logs_config import ORDER_LEVEL
 from iptest import geolocate
 from sklearn.preprocessing import StandardScaler
-# from flask_ngrok import run_with_ngrok 
+from extensionChecker import ALLOWED_EXTENSIONS, allowed_file
+
+#for database
+from flask_sqlalchemy import SQLAlchemy
+from DBcreateTables import Customer, Role
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, URL, Insert, Result, Boolean, text
+from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.schema import CreateSchema
+
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
@@ -34,55 +42,63 @@ feature_names = ['hour', 'day', 'month', 'year'] + [f'location_{loc}' for loc in
 
 
 app = Flask(__name__, template_folder='Templates', static_folder='Static')
-# run_with_ngrok(app)
-
 stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
 bcrypt = Bcrypt(app)
+db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+limiter = Limiter(
+    get_remote_address, 
+    app = app,
+    storage_uri = "memory://"
+)
 
-
+#API configs
 app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
 app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdcmxUqAAAAAGVF_1zJ26DFEs61J2oJ8cQ3eM-4' 
 app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdcmxUqAAAAAHUKANmhqXNRcY8ZvRjiTl-Uzjmm'
-login_manager = LoginManager()
-
 app.config['UPLOAD_FOLDER'] = 'Static/profile_pics'
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB max size for uploads
 
+
+
+#Database Connection things
+url_object = URL.create(
+    "mysql+pymysql",
+    username="root",
+    password="mysqlpassword",
+    host="localhost",
+    database="customer",
+)
+
+#DB engine config
+engine = create_engine(url_object)
+metadata = MetaData(schema="ASPJ_DB")
+with engine.connect() as conn:
+    if not conn.dialect.has_schema(conn, "ASPJ_DB"): 
+        conn.execute(CreateSchema("ASPJ_DB"))
+Base = declarative_base(metadata=metadata)
+conn = engine.connect()
+Session = sessionmaker(bind=engine)
+dbSession = Session()
+
+
+#configuring flask limiter
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    storage_uri="memory://"
+)
+
+#Creating pfp path if not avil
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-
-def allowed_file(filename):
-    print(f"Checking file: {filename}")
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            flash('No file part', 'danger')
-            return redirect(request.url)
-        file = request.files['file']
-        if file.filename == '':
-            flash('No selected file', 'danger')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            flash('File successfully uploaded', 'success')
-            return redirect(url_for('uploaded_file', filename=filename))
-    return render_template('upload.html')
-
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
-
-# #SuperUser account
-# hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
-# superUser = RegisterAdmin(90288065, hashed_password)
+#SuperUser account
+hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
+superUser = RegisterAdmin(90288065, hashed_password)
 
 #all logs
 logging.basicConfig(filename='app.log', level=logging.INFO,
@@ -101,28 +117,22 @@ def save_picture(form_picture):
 
 @login_manager.user_loader
 def load_user(id):
-    with shelve.open('userdb', 'c') as userdb:
-        if id in userdb:
-            for keys in userdb:
-                if keys == id:
-                    return userdb[id]
+    return dbSession.query(Customer).get(id)
+    # with shelve.open('userdb', 'c') as userdb:
+    #     if id in userdb:
+    #         for keys in userdb:
+    #             if keys == id:
+    #                 return userdb[id]
             
         # elif id == superUser.get_id():
         #     return superUser
 
-        else:
-            with shelve.open('SOdb', 'c') as SOdb:
-                for keys in SOdb:
-                    if keys == id:
-                        return SOdb[id]
+        # else:
+        #     with shelve.open('SOdb', 'c') as SOdb:
+        #         for keys in SOdb:
+        #             if keys == id:
+        #                 return SOdb[id]
         
-
-login_manager.init_app(app)
-limiter = Limiter(
-    get_remote_address, 
-    app = app,
-    storage_uri = "memory://"
-)
 
 
 #home page
@@ -194,40 +204,6 @@ def findUs():
 def contactUs():
     return render_template('contactUs.html')
 
-# #Login Page
-# @app.route('/login', methods=['GET', 'POST'])
-# @limiter.limit("15/hour;5/minute")
-# def login():
-#     form = LoginForm(request.form)
-#     if request.method == 'POST' and form.validate():
-#         with shelve.open('userdb', 'c') as userdb:
-#             user = CustomerLogin(form.phoneNumber.data, form.password.data)
-#             if isinstance(user, Customer):
-#                 for keys in userdb:
-#                     print(keys)
-#                     if user.get_id() == keys:
-#                         if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
-#                             # totpToSend = totp.now()
-#                             # responseData = client.sms.send_message(
-#                             #     {
-#                             #         "from" : os.environ.get("VONAGE_BRAND_NAME"),
-#                             #         "to" : os.environ.get(f"{65}{user.get_id()}"),
-#                             #         "text" : f"Your OTP is: {totpToSend}. \nValid for the next 1 minute"
-#                             #     }
-#                             # )
-
-#                             if form.remember.data == True:
-#                                 login_user(userdb[keys], remember=True)
-#                             else:
-#                                 login_user(userdb[keys])
-#                             session['id'] =int(user.get_id())
-#                             return render_template('home.html', logined = True)
-
-#             else:
-#                 flash("wrong username/password. please try again")
-#                 return redirect(url_for('login'))
-#     return render_template('login.html', form=form)
-
 @app.route('/login', methods=['GET', 'POST'])
 @limiter.limit("15/hour;5/minute")
 def login():
@@ -239,7 +215,6 @@ def login():
                 for keys in userdb:
                     if user.get_id() == keys:
                         if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
-                            print(feature_names)
                              #extract data here
                             currentDT = datetime.now().timetuple()
                             hour = currentDT[3]
@@ -268,8 +243,6 @@ def login():
                             
                             # Extract features for prediction
                             X_new = new_data[feature_names].values
-                            
-                            print(X_new)
 
                             # Standardize the features
                             X_new_scaled = scaler.transform(X_new)
@@ -374,46 +347,8 @@ def forgotPassword():
                         return redirect(url_for('forgotPassword'))
     return render_template("forgotPassword.html", form=form, secQn = secQn)
 
-# #Register Page
-# @app.route('/register', methods=['GET', 'POST'])
-# def register():
-#     form = RegistrationForm(request.form)
-#     if request.method == 'POST' and form.validate():
-#         with shelve.open('userdb', 'c') as userdb:
-#             if str(form.phoneNumber.data) not in userdb:
-#                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-#                 formattedSecurityQuestionAnswer = form.securityAnswer.data.strip().title()
 
-#                 profile_picture_filename = 'default.jpeg'
-#                 if 'profilePicture' in request.files:
-#                     profile_picture_file = request.files['profilePicture']
-#                     if profile_picture_file and profile_picture_file.filename != '':
-#                         if allowed_file(profile_picture_file.filename):
-#                             profile_picture_filename = save_picture(profile_picture_file)
-#                         else:
-#                             return redirect(url_for('register'))
-
-#                 user = RegisterCustomer(
-#                     form.name.data,
-#                     form.phoneNumber.data,
-#                     hashed_password,
-#                     form.gender.data,
-#                     form.securityQuestion.data,
-#                     formattedSecurityQuestionAnswer,
-#                     profile_picture_filename)
-
-#                 if isinstance(user, Customer):
-#                     userdb[user.get_id()] = user
-#                     flash('Registration Successful!', "success")
-#                     return redirect(url_for('login'))
-
-#             else:
-#                 flash("Already registered please login instead" , 'success')
-#                 return redirect(url_for('login'))
-
-#     return render_template('register.html', form=form)
-
-
+#Registration Route
 @app.route('/register', methods=['GET', 'POST'])
 @limiter.limit("15/hour;5/minute")
 def register():
@@ -483,6 +418,29 @@ def profile():
                         return redirect(url_for('profile'))
         
     return render_template('profile.html', form=form)
+
+#Upload PFP
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part', 'danger')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file', 'danger')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            flash('File successfully uploaded', 'success')
+            return redirect(url_for('uploaded_file', filename=filename))
+    return render_template('upload.html')
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 
 #change password page
 @app.route('/changePassword', methods=['GET', 'POST'])
@@ -945,11 +903,6 @@ def request_entitiy_too_large(error):
 @app.errorhandler(Exception)
 def handle_exception(error):
     return render_template('error.html', error_code = 500, message='Unknown error occured, please try again later.')
-
-
-# @app.errorhandler(AttributeError)
-# def attribute_error(error):
-#         return render_template('error.html', error_code = AttributeError)
 
 if __name__ == '__main__':
     app.run(debug = True)
