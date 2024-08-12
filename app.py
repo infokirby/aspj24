@@ -407,12 +407,13 @@ def stalls():
 
         # Check if the order is fraudulent
         current_order_data = {
+            "CustomerEmail": current_user.get_id(),
             'Quantity': form.itemQuantity.data,
             'Price': form.price.data,
             'Total': total
         }
         if is_fraudulent_order(current_order_data, past_orders):
-            flash('Order is fraudulent and has been canceled. If error, contact us', 'danger')
+            flash('Order is fraudulent and has been canceled. If error, complete otp', 'danger')
             return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form)
 
         # Save the order if not fraudulent
@@ -436,10 +437,22 @@ def cart():
                     total = total + orderdb[order].get_total
     return render_template('cart.html', menu=menu, orders=orders, form=form, total=f'{total:.2f}')
 
-
-
-
-
+@app.route('/verifyOrder/<string:order_id>', methods=['GET', 'POST'])
+@login_required
+def verify_order(order_id):
+    if request.method == 'POST':
+        entered_otp = request.form['otp']
+        with shelve.open('order.db', 'c') as orderdb:
+            order = orderdb[order_id]
+            if order.get('OTP') == entered_otp:
+                order.set_status("Verified")
+                orderdb[order_id] = order
+                flash("Order successfully verified.", "success")
+                return redirect(url_for('current_orders'))
+            else:
+                flash("Invalid OTP. Please try again.", "danger")
+    
+    return render_template('verifyOrder.html', order_id=order_id)
 
 #mark complete
 @app.route('/completeOrder/<string:id>', methods=['GET', 'POST'])
