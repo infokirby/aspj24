@@ -1,5 +1,5 @@
-from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify
-# from flask_wtf.csrf import CSRFProtect
+from flask import Flask, render_template, url_for, request, redirect, flash, session, send_file, jsonify
+from flask_talisman import Talisman
 from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
@@ -10,36 +10,137 @@ from io import BytesIO
 from store_owner import StoreOwner
 from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
-import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re
-from datetime import datetime
+import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re, os, os, pandas, numpy
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
+from werkzeug.utils import secure_filename
+from flask import Flask, render_template, redirect, url_for, flash, request, redirect, send_from_directory
+from flask_login import current_user, login_required
+import uuid
 from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
-import requests, logging
+import requests, logging, joblib
 from flask.sessions import SecureCookieSessionInterface
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from logs_config import write_csv_log, orderLog
+from iptest import geolocate
+from sklearn.preprocessing import StandardScaler
 # from flask_ngrok import run_with_ngrok 
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
 
 
+#Login ML
+iso_forest = joblib.load('iso_forest_model.pkl')
+scaler = joblib.load('scaler.pkl')
+feature_names = ['hour', 'day', 'month', 'year'] + [f'location_{loc}' for loc in ['SG']]
 
 
 app = Flask(__name__, template_folder='Templates', static_folder='Static')
 # run_with_ngrok(app)
 
-stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
+app.config.update(
+    SESSION_COOKIE_SECURE=False,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+)
+
+csp = {
+    'default-src': [
+        '\'self\'',
+        'cdnjs.cloudflare.com',
+        'fonts.googleapis.com',
+        'fonts.gstatic.com',
+        'use.fontawesome.com',
+        'cdn.jsdelivr.net',
+        'kit.fontawesome.com',
+        'ka-f.fontawesome.com'
+    ],
+    'img-src': ['\'self\''],
+    'style-src': [
+        '\'self\'',
+        '\'unsafe-inline\'',  
+        'fonts.googleapis.com',
+        'use.fontawesome.com',
+        'cdn.jsdelivr.net',
+        'kit.fontawesome.com'
+    ],
+    'font-src': [
+        '\'self\'',
+        'fonts.gstatic.com',
+        'use.fontawesome.com',
+        'cdn.jsdelivr.net',
+        'kit.fontawesome.com',
+        'ka-f.fontawesome.com'  
+    ],
+    'connect-src': [  
+        '\'self\'',
+        'ka-f.fontawesome.com'
+    ]
+}
+
+Talisman(app, content_security_policy=csp)
+
+load_dotenv()
+
+stripe.api_key = os.getenv("STRIPE_API_KEY")
 bcrypt = Bcrypt(app)
 
 
-app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
-app.config['GOOGLE_RECAPTCHA_SITE_KEY'] = GOOGLE_RECAPTCHA_SITE_KEY
-app.config['GOOGLE_RECAPTCHA_SECRET_KEY'] = GOOGLE_RECAPTCHA_SECRET_KEYlogin_manager = LoginManager()
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
+app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdcmxUqAAAAAGVF_1zJ26DFEs61J2oJ8cQ3eM-4' 
+app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdcmxUqAAAAAHUKANmhqXNRcY8ZvRjiTl-Uzjmm'
 login_manager = LoginManager()
 # csrf = CSRFProtect(app)
 
-#SuperUser account
-hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
-superUser = RegisterAdmin(90288065, hashed_password)
+#Session Timeout
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes = 5)
+
+app.config['UPLOAD_FOLDER'] = 'Static/profile_pics'
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB max size for uploads
+
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+def allowed_file(filename):
+    print(f"Checking file: {filename}")
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part', 'danger')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file', 'danger')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            flash('File successfully uploaded', 'success')
+            return redirect(url_for('uploaded_file', filename=filename))
+    return render_template('upload.html')
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+
+# #SuperUser account
+# superuser_password = os.getenv("SUPERUSER_PASSWORD")
+# hashed_password = bcrypt.generate_password_hash(superuser_password).decode('utf-8')
+# superUser = RegisterAdmin(90288065, hashed_password)
+
+@app.route('/session_data')
+def session_data():
+    print(session)  # print the entire session data
+    return "Check the console for session data"
 
 
 @app.after_request
@@ -47,6 +148,12 @@ def apply_caching(response):
     response.headers["Set-Cookie"] = SecureCookieSessionInterface().get_signing_serializer(app).dumps(dict(session))
     response.headers.add('Set-Cookie','SameSite=None; Secure')
     return response
+def save_picture(form_picture):
+    filename = str(uuid.uuid4()) + '_' + secure_filename(form_picture.filename)
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    print(f"Saving picture to: {filepath}")
+    form_picture.save(filepath)
+    return filename
 
 @login_manager.user_loader
 def load_user(id):
@@ -56,8 +163,8 @@ def load_user(id):
                 if keys == id:
                     return userdb[id]
             
-        elif id == superUser.get_id():
-            return superUser
+        # elif id == superUser.get_id():
+        #     return superUser
 
         else:
             with shelve.open('SOdb', 'c') as SOdb:
@@ -67,6 +174,11 @@ def load_user(id):
         
 
 login_manager.init_app(app)
+limiter = Limiter(
+    get_remote_address, 
+    app = app,
+    storage_uri = "memory://"
+)
 
 
 #home page
@@ -138,10 +250,109 @@ def findUs():
 def contactUs():
     return render_template('contactUs.html')
 
-#Login Page
+# #Login Page
+# @app.route('/login', methods=['GET', 'POST'])
+# @limiter.limit("15/hour;5/minute")
+# def login():
+#     form = LoginForm(request.form)
+#     if request.method == 'POST' and form.validate():
+#         with shelve.open('userdb', 'c') as userdb:
+#             user = CustomerLogin(form.phoneNumber.data, form.password.data)
+#             if isinstance(user, Customer):
+#                 for keys in userdb:
+#                     print(keys)
+#                     if user.get_id() == keys:
+#                         if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
+#                             # totpToSend = totp.now()
+#                             # responseData = client.sms.send_message(
+#                             #     {
+#                             #         "from" : os.environ.get("VONAGE_BRAND_NAME"),
+#                             #         "to" : os.environ.get(f"{65}{user.get_id()}"),
+#                             #         "text" : f"Your OTP is: {totpToSend}. \nValid for the next 1 minute"
+#                             #     }
+#                             # )
+
+#                             if form.remember.data == True:
+#                                 login_user(userdb[keys], remember=True)
+#                             else:
+#                                 login_user(userdb[keys])
+#                             session['id'] =int(user.get_id())
+#                             return render_template('home.html', logined = True)
+
+#             else:
+#                 flash("wrong username/password. please try again")
+#                 return redirect(url_for('login'))
+#     return render_template('login.html', form=form)
+
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("15/hour;5/minute")
 def login():
     form = LoginForm(request.form)
+    if request.method == 'POST' and form.validate():
+        with shelve.open('userdb', 'c') as userdb:
+            user = CustomerLogin(form.phoneNumber.data, form.password.data)
+            if isinstance(user, Customer):
+                for keys in userdb:
+                    if user.get_id() == keys:
+                        if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
+                            print(feature_names)
+                             #extract data here
+                            currentDT = datetime.now().timetuple()
+                            hour = currentDT[3]
+                            day = currentDT[2]
+                            month = currentDT[1]
+                            year = currentDT[0]
+
+                            new_data = pandas.DataFrame({
+                                'hour': [hour],
+                                'day' : [day],
+                                'month' : [month],
+                                'year' : [year],
+                            })
+
+                            location_dummies = pandas.get_dummies(geolocate('219.74.99.238'), prefix='location')
+                            for col in location_dummies.columns:
+                                new_data[col] = location_dummies[col]
+    
+                                # Ensure all location columns are present
+                                for col in feature_names:
+                                    if col not in new_data.columns:
+                                        new_data[col] = 0
+
+                            for col in new_data.columns:
+                                pandas.concat
+                            
+                            # Extract features for prediction
+                            X_new = new_data[feature_names].values
+                            
+                            print(X_new)
+
+                            # Standardize the features
+                            X_new_scaled = scaler.transform(X_new)
+                            
+                            # Predict if the login data is an anomaly
+                            prediction = iso_forest.predict(X_new_scaled)
+                                
+
+                            if prediction[0] == 0: #anomaly
+                                flash("Login not authorised. Please leave site.", "danger")
+                                return render_template('login.html', form=form)
+                            
+                            else:
+                                if form.remember.data:
+                                    login_user(userdb[keys], remember=True)
+                                else:
+                                    login_user(userdb[keys])
+                            session['id'] = user.get_id()
+                            return render_template('home.html', logined=True)
+            flash("wrong username/password. please try again", "warning")
+            return redirect(url_for('login'))
+    return render_template('login.html', form=form)
+
+@app.route('/2fa', methods = ["POST", "GET"])
+@limiter.limit("15/hour;5/minute")
+def authentication():
+    form = Authorisation(request.form)
     if request.method == 'POST' and form.validate():
         with shelve.open('userdb', 'c') as userdb:
             user = CustomerLogin(form.phoneNumber.data, form.password.data)
@@ -154,12 +365,10 @@ def login():
                             else:
                                 login_user(userdb[keys])
                             session['id'] =int(user.get_id())
-                            flash({'ip': request.environ['REMOTE_ADDR']})
                             return render_template('home.html', logined = True)
-                            
 
             else:
-                flash("wrong username/password. please try again")
+                flash("wrong username/password. please try again", "warning")
                 return redirect(url_for('login'))
     return render_template('login.html', form=form)
 
@@ -221,8 +430,48 @@ def forgotPassword():
                         return redirect(url_for('forgotPassword'))
     return render_template("forgotPassword.html", form=form, secQn = secQn)
 
-#Register Page
+# #Register Page
+# @app.route('/register', methods=['GET', 'POST'])
+# def register():
+#     form = RegistrationForm(request.form)
+#     if request.method == 'POST' and form.validate():
+#         with shelve.open('userdb', 'c') as userdb:
+#             if str(form.phoneNumber.data) not in userdb:
+#                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+#                 formattedSecurityQuestionAnswer = form.securityAnswer.data.strip().title()
+
+#                 profile_picture_filename = 'default.jpeg'
+#                 if 'profilePicture' in request.files:
+#                     profile_picture_file = request.files['profilePicture']
+#                     if profile_picture_file and profile_picture_file.filename != '':
+#                         if allowed_file(profile_picture_file.filename):
+#                             profile_picture_filename = save_picture(profile_picture_file)
+#                         else:
+#                             return redirect(url_for('register'))
+
+#                 user = RegisterCustomer(
+#                     form.name.data,
+#                     form.phoneNumber.data,
+#                     hashed_password,
+#                     form.gender.data,
+#                     form.securityQuestion.data,
+#                     formattedSecurityQuestionAnswer,
+#                     profile_picture_filename)
+
+#                 if isinstance(user, Customer):
+#                     userdb[user.get_id()] = user
+#                     flash('Registration Successful!', "success")
+#                     return redirect(url_for('login'))
+
+#             else:
+#                 flash("Already registered please login instead" , 'success')
+#                 return redirect(url_for('login'))
+
+#     return render_template('register.html', form=form)
+
+
 @app.route('/register', methods=['GET', 'POST'])
+@limiter.limit("15/hour;5/minute")
 def register():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -230,14 +479,31 @@ def register():
             if str(form.phoneNumber.data) not in userdb:
                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
                 formattedSecurityQuestionAnswer = form.securityAnswer.data.strip().title()
-                user = RegisterCustomer(form.name.data, form.phoneNumber.data, hashed_password, form.gender.data, form.securityQuestion.data, formattedSecurityQuestionAnswer)
+
+                profile_picture_filename = 'default.jpeg'
+                if 'profilePicture' in request.files:
+                    profile_picture_file = request.files['profilePicture']
+                    if profile_picture_file and profile_picture_file.filename != '':
+                        if allowed_file(profile_picture_file.filename):
+                            profile_picture_filename = save_picture(profile_picture_file)
+                        else:
+                            return redirect(url_for('register'))
+
+                user = RegisterCustomer(
+                    form.name.data,
+                    form.phoneNumber.data,
+                    hashed_password,
+                    form.gender.data,
+                    form.securityQuestion.data,
+                    formattedSecurityQuestionAnswer,
+                    profile_picture_filename)
+
                 if isinstance(user, Customer):
                     userdb[user.get_id()] = user
                     flash('Registration Successful!', "success")
                     return redirect(url_for('login'))
-
             else:
-                flash("Already registered please login instead" , 'success')
+                flash("Already registered, please login instead" , 'success')
                 return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
@@ -257,9 +523,20 @@ def profile():
                         user.set_name(form.name.data)
                         user.set_id(form.phoneNumber.data)
                         user.set_gender(form.gender.data)
+
+                        if 'profilePicture' in request.files:
+                            profile_picture_file = request.files['profilePicture']
+                            if profile_picture_file and profile_picture_file.filename != '':
+                                if allowed_file(profile_picture_file.filename):
+                                    profile_picture_filename = save_picture(profile_picture_file)
+                                    user.set_profilePicture(profile_picture_filename)
+                                else:
+                                    flash('Allowed file types are - png, jpg, jpeg', 'danger')
+                                    return redirect(url_for('profile'))
+
                         userdb[key] = user
-            flash('Successfully edited', 'success')
-            return redirect(url_for('profile'))
+                        flash('Successfully edited', 'success')
+                        return redirect(url_for('profile'))
         
     return render_template('profile.html', form=form)
 
@@ -742,14 +1019,15 @@ def not_authorised(error):
 @app.errorhandler(404)
 def not_found(error):
         return render_template('error.html', error_code = 404, message = 'Page not found. Sorry for the inconvinience caused.')
-    
-@app.errorhandler(500)
-def unknown_error(error):
-        return render_template('error.html', error_code = 500, message='Unknown error occured')
-    
-# @app.errorhandler(AttributeError)
-# def attribute_error(error):
-#         return render_template('error.html', error_code = AttributeError)
+
+@app.errorhandler(413)
+def request_entitiy_too_large(error):
+    flash('File is too large. Maximum file size is 5 MB', 'danger')
+    return redirect(request.url)
+
+@app.errorhandler(Exception)
+def handle_exception(error):
+    return render_template('error.html', error_code = 500, message='Unknown error occured, please try again later.')
 
 if __name__ == '__main__':
-    app.run(debug = True, ssl_context='adhoc')
+    app.run(debug = True)

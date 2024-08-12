@@ -134,6 +134,7 @@ class Customer():
     def set_gender(self, gender):
         self.__gender = gender
 
+
     def set_membership(self, membership):
         self.__membership = membership
 
@@ -152,7 +153,14 @@ class Customer():
     
     def is_authenticated(self):
         return True
-    
+
+#pfp
+    def set_profilePicture(self, profilePicture):
+        self.profilePicture = profilePicture
+
+    def get_profilePicture(self):
+        return self.profilePicture
+
 #__str__ function
     def __str__(self):
         return f"User {self.get_name()} with phone number {self.get_id()}"
