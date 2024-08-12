@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify
-from flask_wtf.csrf import CSRFProtect
+# from flask_wtf.csrf import CSRFProtect
 from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
@@ -15,10 +15,12 @@ from datetime import datetime
 from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
 import requests, logging
 from flask.sessions import SecureCookieSessionInterface
-from logs_config import ORDER_LEVEL
+from logs_config import write_csv_log, orderLog
 # from flask_ngrok import run_with_ngrok 
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
+
+
 
 
 
@@ -33,7 +35,7 @@ app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHu
 app.config['GOOGLE_RECAPTCHA_SITE_KEY'] = GOOGLE_RECAPTCHA_SITE_KEY
 app.config['GOOGLE_RECAPTCHA_SECRET_KEY'] = GOOGLE_RECAPTCHA_SECRET_KEYlogin_manager = LoginManager()
 login_manager = LoginManager()
-csrf = CSRFProtect(app)
+# csrf = CSRFProtect(app)
 
 #SuperUser account
 hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
@@ -386,9 +388,6 @@ def stalls():
             with shelve.open('order.db', 'c') as orderdb:
                 orderdb[order.get_orderID] = order
 
-            # order create log
-            logging.log(ORDER_LEVEL, f"Order {form.orderID.data} created by {current_user.get_id()}")
-
         else:
             print("recaptcha not validated")
     
@@ -413,6 +412,8 @@ def cart():
             if orderdb[order].get_id() == current_user.get_id() and orderdb[order].get_status == "Pending":
                 orders.append(orderdb[order])
                 total = total + orderdb[order].get_total
+    # order log
+    # orderLog.info(f"{order.get_id()}, {form.orderDatetime.data}, {form.orderID.data}, {stall_name}, {form.item.data}, {form.itemQuantity.data}, {form.price.data}, {total}, {form.remarks.data}")
 
 
     return render_template('cart.html', orders=orders, form=form, total=f'{total:.2f}', sitekey=GOOGLE_RECAPTCHA_SITE_KEY)
@@ -426,7 +427,6 @@ def completeOrder(id):
         order = orderdb[id]
         order.set_status("Completed")
         orderdb[id] = order
-        logging.log(ORDER_LEVEL, f"Order {id} completed by {current_user.get_id()}")
     return redirect(url_for('cart'))
 
 
@@ -446,12 +446,9 @@ def editOrder(id):
             for form.item.data in j:
                 price = j[form.item.data]
                 print(price)
-        # order updated log
-        logging.log(ORDER_LEVEL, f"Order {id} updated by {current_user.get_id()}")
         with shelve.open('order.db', 'c') as orderdb:
             order = orderdb[id]
             order.set_itemQuantity(form.itemQuantity.data)
-                  
             order.set_total(order.get_itemQuantity * price)
             print(order.get_itemQuantity)
             print(order.get_total)
@@ -469,8 +466,6 @@ def editOrder(id):
 @app.route('/deleteOrder/<string:id>', methods=['GET', 'POST'])
 @login_required
 def deleteOrder(id):
-    # order delete log
-    logging.log(ORDER_LEVEL, f"Order {str(id)} deleted by {current_user.get_id()}")
     with shelve.open('order.db', 'c') as orderdb:
         orderdb.pop(id)
     return redirect(url_for('cart'))
@@ -550,7 +545,7 @@ def payment():
         
         )
 
-
+    
     except stripe.error.StripeError as e:
         print(f"Error updating price: {e}")
     webbrowser.open_new_tab("https://buy.stripe.com/test_9AQ8wwfBibLX2Pe28e")
