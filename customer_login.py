@@ -12,18 +12,20 @@ class RegisterAdmin(C):
         self.set_password(password)
 
 class RegisterCustomer(C):
-    def __init__(self, name, phoneNumber, password, gender, securityQuestion, securityAnswer):
+    def __init__(self, name, phoneNumber, email, password, gender, securityQuestion, securityAnswer):
         super().__init__(phoneNumber)
         self.set_password(password)
         self.set_name(name)
+        self.set_email(email)
         self.set_gender(gender)
         self.set_securityQuestion(securityQuestion)
         self.set_securityAnswer(securityAnswer)
 
 class EditDetails(C):
-    def __init__(self, phoneNumber, name, gender):
+    def __init__(self, phoneNumber, name, email, gender):
         super().__init__(phoneNumber)
         self.set_name(name)
+        self.set_email(email)
         self.set_gender(gender)
 
 class ChangePassword(C):

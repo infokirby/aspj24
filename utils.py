@@ -6,7 +6,9 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 import os
-
+from flask import session
+from datetime import datetime, timedelta
+from customer_order import CustomerOrder
 
 model = joblib.load('fraud_detection_model.pkl')
 
@@ -50,7 +52,7 @@ def is_fraudulent_order(current_order, past_orders):
         otp = generate_otp()
         email_sent = send_otp_email(current_order['CustomerEmail'], otp)
         if email_sent:
-            current_order['OTP'] = otp
+            session['otp'] = otp
             return True
         else:
             return False

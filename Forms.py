@@ -40,6 +40,7 @@ class CustOrderForm(Form):
 class EditUserForm(Form):
     name = StringField('Name:', [validators.InputRequired()])
     phoneNumber = IntegerField('Phone Number:', [validators.InputRequired(), validators.NumberRange(6000000, 99999999)])
+    email = EmailField('Email:', [validators.InputRequired(), validators.Email()])
     gender = SelectField('Gender:', [validators.InputRequired()], choices=[('', 'Select'), ('F', 'Female'), ('M', 'Male'), ('O', "Other")], default='')
 
 class ChangePasswordForm(Form):

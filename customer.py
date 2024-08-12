@@ -1,9 +1,9 @@
 #import User
 
 class Customer():
-    def __init__(self, phoneNumber):
+    def __init__(self, phoneNumber, email=None):
         self.__phoneNumber = str(phoneNumber)
-
+    
     # accessor methods
     def get_customer_id(self):
         return self.__customer_id
@@ -72,6 +72,9 @@ class Customer():
     
     def get_securityAnswer(self):
         return self.__securityAnswer
+    
+    def get_email(self):
+        return self.__email
 
     # mutator methods
     def set_customer_id(self, customer_id):
@@ -142,6 +145,9 @@ class Customer():
 
     def set_securityAnswer(self, securityAnswer):
         self.__securityAnswer = securityAnswer    
+        
+    def set_email(self, email):
+        self.__email = email
 
 #Login requirements
     def is_active(self):

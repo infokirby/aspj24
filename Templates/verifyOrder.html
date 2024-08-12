@@ -1,10 +1,20 @@
 {% extends 'base.html' %}
 {% block title %}South Canteen - OTP Verify{% endblock %}
-
 {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+  {% if messages %}
+  {% for category, message in messages %}
+    <div class="alert bg-{{ category }} alert-dismissible text-center position-fixed top-0 start-50 translate-middle-x w-25 p-2" aria-hidden="true" role="alert" style="z-index: 1050;">
+      <p class="text-white mb-0">{{message}}</p>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
 <div class="container">
     <h1>Verify Order</h1>
-    <form method="POST">
+    <form method="POST" action="{{ url_for('verify_order', order_id=order_id, next=request.args.get('next')) }}">
         <div class="form-group">
             <label for="otp">Enter OTP:</label>
             <input type="text" id="otp" name="otp" class="form-control" required>
@@ -12,4 +22,33 @@
         <button type="submit" class="btn btn-primary">Verify</button>
     </form>
 </div>
+<script>
+    console.log('Script loaded');
+    let formSubmitting = false;
+
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function() {
+        formSubmitting = true;
+    });
+
+    window.addEventListener('beforeunload', function (e) {
+        if (!formSubmitting) {
+            console.log('beforeunload event triggered');
+            fetch('{{ url_for("delete_order", order_id=order_id) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    console.log('Order deleted successfully');
+                } else {
+                    console.error('Failed to delete order');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    });
+</script>
 {% endblock %}

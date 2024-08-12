@@ -18,6 +18,7 @@ from utils import is_fraudulent_order
 
 
 
+
 app = Flask(__name__)
 
 app.config.update(
@@ -57,7 +58,14 @@ csp = {
     'connect-src': [  
         '\'self\'',
         'ka-f.fontawesome.com'
-    ]
+    ],
+    'script-src': [
+        '\'self\'',
+        '\'unsafe-inline\'',
+        'cdn.jsdelivr.net',
+        'kit.fontawesome.com',
+        'ka-f.fontawesome.com'
+    ],
 }
 
 Talisman(app, content_security_policy=csp)
@@ -266,7 +274,7 @@ def register():
             if str(form.phoneNumber.data) not in userdb:
                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
                 formattedSecurityQuestionAnswer = form.securityAnswer.data.strip().title()
-                user = RegisterCustomer(form.name.data, form.phoneNumber.data, hashed_password, form.gender.data, form.securityQuestion.data, formattedSecurityQuestionAnswer)
+                user = RegisterCustomer(form.name.data, form.phoneNumber.data, form.email.data, hashed_password, form.gender.data, form.securityQuestion.data, formattedSecurityQuestionAnswer)
                 if isinstance(user, Customer):
                     userdb[user.get_id()] = user
                     flash('Registration Successful!', "success")
@@ -285,18 +293,18 @@ def profile():
     form = EditUserForm(request.form, gender = shownGender)
     if request.method == 'POST' and form.validate():
         with shelve.open('userdb', 'c') as userdb:
-            user = EditDetails(form.phoneNumber.data, form.name.data, form.gender.data)
+            user = EditDetails(form.phoneNumber.data, form.name.data, form.email.data, form.gender.data)
             if isinstance(user, Customer):
                 for key in userdb:
                     if user.get_id() == key:
                         user = userdb[key]
                         user.set_name(form.name.data)
                         user.set_id(form.phoneNumber.data)
+                        user.set_email(form.email.data)
                         user.set_gender(form.gender.data)
                         userdb[key] = user
             flash('Successfully edited', 'success')
-            return redirect(url_for('profile'))
-        
+            return redirect(url_for('profile'))    
     return render_template('profile.html', form=form)
 
 #change password page
@@ -393,6 +401,10 @@ def stalls():
         order.set_remarks(form.remarks.data)
         order.set_status(form.status.data)
 
+        with shelve.open('order.db', 'c') as orderdb:
+            orderdb[order.get_orderID] = order
+            print("Successful Order ID: ", order.get_orderID)
+        
         # Fetch user's past orders
         past_orders = []
         with shelve.open('order.db', 'r') as orderdb:
@@ -407,18 +419,15 @@ def stalls():
 
         # Check if the order is fraudulent
         current_order_data = {
-            "CustomerEmail": current_user.get_id(),
+            "CustomerEmail": current_user.get_email(),
             'Quantity': form.itemQuantity.data,
             'Price': form.price.data,
             'Total': total
         }
         if is_fraudulent_order(current_order_data, past_orders):
-            flash('Order is fraudulent and has been canceled. If error, complete otp', 'danger')
-            return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form)
-
-        # Save the order if not fraudulent
-        with shelve.open('order.db', 'c') as orderdb:
-            orderdb[order.get_orderID] = order
+            flash('Order is fraudulent and has been canceled. If error, enter OTP sent to email', 'danger')
+            return redirect(url_for('verify_order', order_id=form.orderID.data, next=request.url))    
+        
 
     return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form)
 
@@ -440,19 +449,31 @@ def cart():
 @app.route('/verifyOrder/<string:order_id>', methods=['GET', 'POST'])
 @login_required
 def verify_order(order_id):
+    next_url = request.args.get('next')
     if request.method == 'POST':
         entered_otp = request.form['otp']
         with shelve.open('order.db', 'c') as orderdb:
-            order = orderdb[order_id]
-            if order.get('OTP') == entered_otp:
-                order.set_status("Verified")
-                orderdb[order_id] = order
-                flash("Order successfully verified.", "success")
-                return redirect(url_for('current_orders'))
+            if order_id in orderdb:
+                order = orderdb[order_id]
+                if session.get('otp') == entered_otp:
+                    orderdb[order_id] = order
+                    flash("Order successfully verified.", "success")
+                    return redirect(next_url or url_for('current_orders'))
+                else:
+                    flash("Invalid OTP. Please try again.", "danger")
             else:
-                flash("Invalid OTP. Please try again.", "danger")
+                flash("Order ID not found.", "danger")
     
     return render_template('verifyOrder.html', order_id=order_id)
+
+@app.route('/delete_order/<order_id>', methods=['POST'])
+def delete_order(order_id):
+    with shelve.open('order.db', 'c') as orderdb:
+        if order_id in orderdb:
+            del orderdb[order_id]
+            return {'status': 'success'}, 200
+        else:
+            return {'status': 'error', 'message': 'Order ID not found'}, 404
 
 #mark complete
 @app.route('/completeOrder/<string:id>', methods=['GET', 'POST'])
@@ -758,6 +779,7 @@ def unknown_error(error):
 # @app.errorhandler(AttributeError)
 # def attribute_error(error):
 #         return render_template('error.html', error_code = AttributeError)
+
 
 if __name__ == '__main__':
     app.run(debug = True)
