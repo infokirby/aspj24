@@ -1,0 +1,2 @@
+CustID,OrderTime,OrderID,StallName,Item,ItemQuantity,Price,Total,Remarks
+89448485, 2024-08-12 17:22:36, 75, Drinks, Kopi, 1, 1, 1.0, No Remarks
