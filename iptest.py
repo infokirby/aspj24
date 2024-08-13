@@ -16,4 +16,3 @@ def get_public_ip():
     response = requests.get('https://api.ipify.org?format=json')
     return response.json()['ip']
 
-geolocate(get_public_ip())

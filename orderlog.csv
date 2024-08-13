@@ -7,3 +7,5 @@ CustID,OrderTime,OrderID,StallName,Item,ItemQuantity,Price,Total,Remarks
 1,2,",",1,2,",",2,0,2,4,-,0,8,-,1,3, ,2,1,:,2,1,:,0,2,.,7,6,6,2,8,8,",",D,r,i,n,k,s,",",C,a,l,a,m,a,n,s,i,",",1,",",1,.,2,",",1,.,2,",",N,o, ,R,e,m,a,r,k,s,",",C,o,m,p,l,e,t,e,d
 13,13,2024-08-13 21:29:19.254923,Drinks,Teh,1,1.0,1.0,No Remarks,Completed
 89448485,2024-08-13 21:29:19.254923,14,Drinks,Kopi,1,1.0,1.0,No Remarks,Completed
+90288065,2024-08-13 22:11:33.647563,17,Drinks,Teh,1,1.0,1.0,No Remarks
+90288065,2024-08-13 22:15:15.349764,18,Pizza,Cheese Pizza,1,4.0,4.0,No Remarks

@@ -168,7 +168,7 @@ with engine.connect() as conn:
     if not conn.dialect.has_schema(conn, "ASPJ_DB"): 
         conn.execute(CreateSchema("ASPJ_DB"))
 Base = declarative_base(metadata=metadata)
-conn = engine.connect()
+# conn = engine.connect()
 Session = sessionmaker(bind=engine)
 dbSession = Session()
 
@@ -186,7 +186,6 @@ superUser = RegisterAdmin(90288065, hashed_password)
 
 @app.route('/session_data')
 def session_data():
-    print(session)  # print the entire session data
     return "Check the console for session data"
 
 #all logs
@@ -199,7 +198,6 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
 def allowed_file(filename):
-    print(f"Checking file: {filename}")
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.after_request
@@ -210,12 +208,10 @@ def apply_caching(response):
 def save_picture(form_picture):
     filename = str(uuid.uuid4()) + '_' + secure_filename(form_picture.filename)
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    print(filename)
-    print(f"Saving picture to: {filepath}")
     try:
         form_picture.save(filepath)
     except Exception as e:
-        print(f"Error saving picture: {e}")
+        pass
     return filename
 
 
@@ -526,7 +522,6 @@ def profile():
     form = EditUserForm(request.form)
     if request.method == 'POST' and form.validate():
         currentUser = dbSession.query(Customer).filter(Customer.phoneNumber == current_user.get_id()).first()
-        print(current_user.get_id(),"\n")
         if isinstance(currentUser, Customer):
             currentUser.set_name(form.name.data)
             currentUser.set_id(form.phoneNumber.data)
@@ -652,11 +647,8 @@ def verify_recaptcha(response_token):
         'secret': secret_key,
         'response': response_token
     }
-    print(data)
     response = requests.post(url, data=data)
-    print(response)
     result = response.json()
-    print(result)
     return result
 
 #order
@@ -682,13 +674,7 @@ def stalls():
     form = CustOrderForm(request.form)
     now = datetime.now()    
 
-    # if len(response_token) > 0:
     if request.method == "POST":
-        # response_token = request.form['g-recaptcha-response']  # This should be the token you get from the client-side reCAPTCHA
-        # print(response_token)
-        # verification_result = verify_recaptcha(response_token)
-        # print(verification_result)
-        # if verification_result.get('success'):
         form.orderID.data = str(newOrderID())
         form.phoneNumber.data = current_user.get_id()
         form.itemQuantity.data = request.form.get('itemQuantity')
@@ -739,7 +725,6 @@ def cart():
     form = CustOrderForm(request.form)
     customerOrders = dbSession.query(Orders).filter(Orders.customerID == current_user.get_id()).all()
     for order in customerOrders:
-        print(order.get_status())
         if order.get_status() == "Pending":
             orders.append(order)
             total = total + order.get_total()
@@ -761,7 +746,7 @@ def completeOrder(id):
     try:
         dbSession.add(currentOrder)
         dbSession.commit()
-        flash('Successfully edited', 'success')
+        flash('Moved into order history.', 'success')
     except Exception as e:
         dbSession.rollback()
         flash(f'An error occurred: {e}', 'danger')
@@ -1014,22 +999,22 @@ def dashboard():
     # except:
     #     raise 404
 
-    food_list = ['Plain waffle', 'Chocolate Waffle', 'Peanut Butter Waffle']
-    plain_list = []
-    chocolate_list = []
-    peanut_list = []
-    print(pie_dict)
-    for order in pie_dict:
-        if 'Plain Waffle' in order:
-            plain_list.append(order.get_quantity())
-        elif order.get_food() == 'Chocolate Waffle':
-            chocolate_list.append(order.get_quantity())
-        elif order.get_food() == "Peanut Butter Waffle":
-            peanut_list.append(order.get_quantity())
+    # food_list = ['Plain waffle', 'Chocolate Waffle', 'Peanut Butter Waffle']
+    # plain_list = []
+    # chocolate_list = []
+    # peanut_list = []
+    # print(pie_dict)
+    # for order in pie_dict:
+    #     if 'Plain Waffle' in order:
+    #         plain_list.append(order.get_quantity())
+    #     elif order.get_food() == 'Chocolate Waffle':
+    #         chocolate_list.append(order.get_quantity())
+    #     elif order.get_food() == "Peanut Butter Waffle":
+    #         peanut_list.append(order.get_quantity())
 
-    db.close()
+    # db.close()
 
-    return render_template('salesDashboard.html', )
+    # return render_template('salesDashboard.html', )
 
 @app.route('/download_excel_api')
 def downloadExcelApi():
