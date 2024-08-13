@@ -1,4 +1,5 @@
 import logging
+import csv
 from logging.handlers import TimedRotatingFileHandler
 
 """
@@ -9,28 +10,50 @@ log retention policy:
 - keep 7 days of system log
 - keep 30 days of transaction log
 """
+class CsvFileHandler(logging.FileHandler):
+    def headerWriter(self, header, logfile):
+        # Check if the file already exists and is not empty
+        file_exists = False
+        try:
+            with open(logfile, 'r', newline='') as f:
+                file_exists = f.read(1) != ''
+        except FileNotFoundError:
+            pass
 
-# Define custom log levels 
-ORDER_LEVEL = 21
-
-
-logging.addLevelName(ORDER_LEVEL, "ORDER")
-
-
-# Create a custom logger
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)  # Set the base level to DEBUG to capture all log levels
-
-# Create handlers with log rotation
-order_handler = TimedRotatingFileHandler('order.log', when='midnight', interval=1, backupCount=7)
-order_handler.setLevel(ORDER_LEVEL)
-
-# Create formatters and add them to the handlers
-formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
-order_handler.setFormatter(formatter)
-
-# Add handlers to the logger
-logger.addHandler(order_handler)
+        # Open the file in append mode
+        with open(logfile, 'a', newline='') as f:
+            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            # Write the header only if the file is empty
+            if not file_exists:
+                writer.writerow(header)
 
 
+def write_csv_log(logfile, logrecord):
+    with open(logfile, 'a', newline='') as f:
+        writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        writer.writerow(logrecord)
 
+# create order log
+orderColName = ["CustID", "OrderTime", "OrderID", "StallName", "Item", "ItemQuantity", "Price", "Total", "Remarks"]
+orderLogHandler = CsvFileHandler('orderlog.csv')
+orderLogHandler.headerWriter(orderColName, 'orderlog.csv')
+orderLogHandler.setLevel(logging.INFO)
+orderLog = logging.getLogger('OrderLogger')
+orderLog.addHandler(orderLogHandler)
+orderLog.setLevel(logging.INFO)
+# create login log
+loginColName = ["CustID", "Location", "Month", "Day", "DayOfWeek", "Hour", "Minute"]
+loginLogHandler = CsvFileHandler('loginlog.csv')
+loginLogHandler.headerWriter(loginColName, 'loginlog.csv')
+loginLogHandler.setLevel(logging.INFO)
+loginLog = logging.getLogger('LoginLogger')
+loginLog.addHandler(loginLogHandler)
+loginLog.setLevel(logging.INFO)
+
+
+# Configure the logger
+syslog = logging.basicConfig(
+    filename='system.log',  # Log to a file named 'system.log'
+    level=logging.DEBUG,    # Set the logging level to DEBUG
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)

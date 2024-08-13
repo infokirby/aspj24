@@ -15,12 +15,11 @@ class CustomerOrder(C):
         self.__orderID = orderID
         self.__item = item
         self.__itemQuantity = itemQuantity
-        #self.__ingredient = ingredient
-        #self.__ingredientQuantity = ingredientQuantity
         self.__price = price
         self.__total = total
         self.__remarks = remarks
         self.__status = status
+        self.__dateTimeData = None
 
     @property
     def get_stall(self):

@@ -1,14 +1,16 @@
 #General Libraries
+from dotenv import load_dotenv
 import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re, os, pandas, numpy, requests, logging
 from io import BytesIO
 from datetime import datetime, timedelta
 from flask_talisman import Talisman
 from werkzeug.utils import secure_filename
 import uuid
-from logs_config import ORDER_LEVEL
 
 #Flask Framework
 from flask import Flask, render_template, url_for, request, redirect, flash, session, send_file, jsonify, send_from_directory
+from flask_wtf.csrf import CSRFProtect
+
 
 #For forms rendering
 from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
@@ -28,11 +30,10 @@ from flask_limiter.util import get_remote_address
 
 #For ML 
 import joblib
-from iptest import geolocate
+from logs_config import write_csv_log, orderLog
+from iptest import geolocate, get_public_ip
 from sklearn.preprocessing import StandardScaler
 
-#For recaptcha
-from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
 
 #For PFP checker
 from extensionChecker import ALLOWED_EXTENSIONS, allowed_file
@@ -44,8 +45,14 @@ from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, 
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.schema import CreateSchema
 
+# For logs
+from logs_config import orderLog, loginLog, syslog, write_csv_log
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
+
+
+
+
 
 #Login ML load
 iso_forest = joblib.load('iso_forest_model.pkl')
@@ -55,6 +62,9 @@ feature_names = ['hour', 'day', 'month', 'year'] + [f'location_{loc}' for loc in
 
 app = Flask(__name__, template_folder='Templates', static_folder='Static')
 
+# csrf protect
+csrf = CSRFProtect(app)
+csrf.init_app(app)
 app.config.update(
     SESSION_COOKIE_SECURE=False,
     SESSION_COOKIE_HTTPONLY=True,
@@ -70,7 +80,9 @@ csp = {
         'use.fontawesome.com',
         'cdn.jsdelivr.net',
         'kit.fontawesome.com',
-        'ka-f.fontawesome.com'
+        'ka-f.fontawesome.com',        
+        'www.google.com/recaptcha/',
+        'www.recaptcha.net',
     ],
     'img-src': ['\'self\''],
     'style-src': [
@@ -79,7 +91,9 @@ csp = {
         'fonts.googleapis.com',
         'use.fontawesome.com',
         'cdn.jsdelivr.net',
-        'kit.fontawesome.com'
+        'kit.fontawesome.com',
+        'www.google.com/recaptcha/',
+        'www.recaptcha.net',
     ],
     'font-src': [
         '\'self\'',
@@ -92,6 +106,17 @@ csp = {
     'connect-src': [  
         '\'self\'',
         'ka-f.fontawesome.com'
+    ],
+    'script-src': [
+        '\'self\'',
+        '\'unsafe-inline\'',
+        'cdn.jsdelivr.net',
+        'kit.fontawesome.com',
+        'ka-f.fontawesome.com',
+        'www.google.com/recaptcha/api.js',
+        'www.google.com/recaptcha/',
+        'www.recaptcha.net',
+        'https://www.gstatic.com/recaptcha/'
     ]
 }
 
@@ -106,9 +131,11 @@ bcrypt = Bcrypt(app)
 app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
 app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdcmxUqAAAAAGVF_1zJ26DFEs61J2oJ8cQ3eM-4' 
 app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdcmxUqAAAAAHUKANmhqXNRcY8ZvRjiTl-Uzjmm'
+login_manager = LoginManager()
+csrf = CSRFProtect(app)
 
 #Session Timeout
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes = 5)
+# app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes = 5)
 
 app.config['UPLOAD_FOLDER'] = 'Static/profile_pics'
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB max size for uploads
@@ -290,7 +317,7 @@ def contactUs():
 
 #Login Page
 @app.route('/login', methods=['GET', 'POST'])
-@limiter.limit("15/hour;5/minute")
+# @limiter.limit("15/hour;5/minute")
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -300,6 +327,7 @@ def login():
                 remember = form.remember.data
                 login_user(user, remember=remember)
                 session['id'] = int(user.get_id())
+                write_csv_log('loginlog.csv', [user.get_id(), geolocate(get_public_ip()), datetime.now().month, datetime.now().day, datetime.now().weekday(), datetime.now().hour, datetime.now().minute])
                 return render_template('home.html')
             
             else:
@@ -616,7 +644,6 @@ def sanitize_input(input_string):
     sanitized_string = re.sub(pattern, '', input_string)
     return sanitized_string
 
-
 # recaptcha verification
 def verify_recaptcha(response_token):
     secret_key = '6LdcmxUqAAAAAHUKANmhqXNRcY8ZvRjiTl-Uzjmm'  # Replace with your actual secret key
@@ -647,7 +674,7 @@ def verify_recaptcha(response_token):
 @app.route('/Takoyaki', methods=['GET', 'POST'])
 @app.route('/Snack', methods=['GET', 'POST'])
 @app.route('/Waffle', methods=['GET', 'POST'])
-@app.route('/Drinks', methods=['GET', "POST"])
+@app.route('/Drinks', methods=['GET', 'POST'])
 @login_required
 def stalls():
     path = request.path
@@ -655,23 +682,27 @@ def stalls():
     form = CustOrderForm(request.form)
     now = datetime.now()    
 
-    if request.method == 'POST' and form.validate():
-        # form.orderID.data = str(newOrderID())
-        # form.phoneNumber.data = current_user.get_id()
-        # form.itemQuantity.data = request.form.get('itemQuantity')
-        # total = float(request.form.get('price')) * float(request.form.get('itemQuantity'))
-        # order = CustomerOrder(form.phoneNumber.data)
-        # order.set_id(current_user.get_id())
-        # order.set_datetime(form.orderDatetime.data)
-        # order.set_dateTimeData(form.orderDatetime.data)
-        # order.set_stallName(stall_name)
-        # order.set_orderID(form.orderID.data)
-        # order.set_item(form.item.data)
-        # order.set_itemQuantity(int(form.itemQuantity.data))
-        # order.set_price(form.price.data)
-        # order.set_total(total)
-        # response_token = request.form['g-recaptcha-response']
+    # if len(response_token) > 0:
+    if request.method == "POST":
+        # response_token = request.form['g-recaptcha-response']  # This should be the token you get from the client-side reCAPTCHA
+        # print(response_token)
         # verification_result = verify_recaptcha(response_token)
+        # print(verification_result)
+        # if verification_result.get('success'):
+        form.orderID.data = str(newOrderID())
+        form.phoneNumber.data = current_user.get_id()
+        form.itemQuantity.data = request.form.get('itemQuantity')
+        total = float(request.form.get('price')) * float(request.form.get('itemQuantity'))
+        order = CustomerOrder(form.phoneNumber.data)
+        order.set_id(current_user.get_id())
+        order.set_dateTimeData(form.orderDatetime.data)
+        order.set_stallName(stall_name)
+        order.set_orderID(form.orderID.data)
+        order.set_item(form.item.data)
+        order.set_itemQuantity(int(form.itemQuantity.data))
+        order.set_price(form.price.data)
+        order.set_total(total)
+        #regex to remove special characters
         if form.remarks.data != "":
             sanitized_remarks = sanitize_input(form.remarks.data)
         # if verification_result.get('success') or not verification_result.get('success'):
@@ -687,7 +718,6 @@ def stalls():
                 flash("Error occured. Please try again", "warning")
 
         # order create log
-        logging.log(ORDER_LEVEL, f"Order {form.orderID.data} created by {current_user.get_id()}")
         dbSession.close()
         
     
@@ -703,6 +733,7 @@ def stalls():
 @app.route('/cart', methods=['GET', 'POST'])
 @login_required
 def cart():
+    
     total = 0
     orders = [] 
     form = CustOrderForm(request.form)
@@ -724,6 +755,9 @@ def completeOrder(id):
     # order complete log
     currentOrder = dbSession.query(Orders).filter(Orders.ID == id).first()
     currentOrder.set_status_complete()
+    logrecord = [currentOrder.customerID, currentOrder.get_datetime(), currentOrder.get_orderID(), currentOrder.get_stallName(), currentOrder.get_item(), currentOrder.get_itemQuantity(), currentOrder.get_price(), currentOrder.get_total(), currentOrder.get_remarks()]
+    write_csv_log('orderlog.csv', logrecord)
+
     try:
         dbSession.add(currentOrder)
         dbSession.commit()
@@ -732,40 +766,47 @@ def completeOrder(id):
         dbSession.rollback()
         flash(f'An error occurred: {e}', 'danger')
 
-    logging.log(ORDER_LEVEL, f"Order {id} completed by {current_user.get_id()}")
     dbSession.close()
     return redirect(url_for('cart'))
 
+
+
 #edit
-@app.route('/editOrder/<string:id>', methods=['GET', 'POST'])
+@app.route('/editOrder/<string:id>', methods=["GET", "POST"])
 @login_required
 def editOrder(id):
+    print("moo")
     form = CustOrderForm(request.form)
-    if request.method == 'POST' and form.validate():
-        # order updated log
-        logging.log(ORDER_LEVEL, f"Order {id} updated by {current_user.get_id()}")
+    print("moo")
+
+    if form.validate():
+        print("moo")
+        price = 0.0
+        for i, j in menu.items():
+            for form.item.data in j:
+                price = j[form.item.data]
+                print(price)
         with shelve.open('order.db', 'c') as orderdb:
             order = orderdb[id]
             order.set_itemQuantity(form.itemQuantity.data)
-            order.set_total(int(form.itemQuantity.data) * float(form.price.data))
+            order.set_total(order.get_itemQuantity * price)
+            print(order.get_itemQuantity)
+            print(order.get_total)
             order.set_remarks(form.remarks.data)
-
-            # if form.remarks.data != "":
-            #     order.set_remarks(form.remarks.data)
-
-            # else:
-            #     order.set_remarks("")
             orderdb[id] = order
+            orderdb.sync()
+    else:
+        print(form.errors)
+
     
     # form=form
-    return redirect(url_for('cart'))
+    return redirect(url_for('cart', menu=menu, form=form))
 
 #delete
 @app.route('/deleteOrder/<string:id>', methods=['GET', 'POST'])
 @login_required
 def deleteOrder(id):
     # order delete log
-    logging.log(ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
     customerOrders = dbSession.query(Orders).filter(Orders.customerID == current_user.get_id()).all()
     for order in customerOrders:
         if order.get_orderID() == id:
@@ -794,7 +835,6 @@ def deleteAllOrder():
             dbSession.delete(order)
         dbSession.commit()
         flash("All orders successfully deleted", 'success')
-        logging.log(ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
 
 
     except Exception as e:
@@ -883,7 +923,7 @@ def payment():
         
         )
 
-
+    
     except stripe.error.StripeError as e:
         print(f"Error updating price: {e}")
     webbrowser.open_new_tab("https://buy.stripe.com/test_9AQ8wwfBibLX2Pe28e")
@@ -1093,4 +1133,4 @@ def request_entitiy_too_large(error):
 #     return render_template('error.html', error_code = 500, message='Unknown error occured, please try again later.')
 
 if __name__ == '__main__':
-    app.run(debug = True)
+    app.run(debug = True, ssl_context='adhoc')
