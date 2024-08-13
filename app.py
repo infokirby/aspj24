@@ -675,19 +675,6 @@ def stalls():
     now = datetime.now()    
 
     if request.method == "POST":
-        form.orderID.data = str(newOrderID())
-        form.phoneNumber.data = current_user.get_id()
-        form.itemQuantity.data = request.form.get('itemQuantity')
-        total = float(request.form.get('price')) * float(request.form.get('itemQuantity'))
-        order = CustomerOrder(form.phoneNumber.data)
-        order.set_id(current_user.get_id())
-        order.set_dateTimeData(form.orderDatetime.data)
-        order.set_stallName(stall_name)
-        order.set_orderID(form.orderID.data)
-        order.set_item(form.item.data)
-        order.set_itemQuantity(int(form.itemQuantity.data))
-        order.set_price(form.price.data)
-        order.set_total(total)
         #regex to remove special characters
         if form.remarks.data != "":
             sanitized_remarks = sanitize_input(form.remarks.data)
@@ -842,8 +829,9 @@ def orderHistory():
     for order in customerOrders:
         if order.get_status() == "Completed":
             orders.append(order)
-            monthlyTotal += float(order.get_total())
-        return render_template('orderHistory.html', menu=menu, orders=orders, monthlyTotal = f"{monthlyTotal:.2f}")
+            if order.get_datetime().month == current_datetime.month:
+                monthlyTotal += float(order.get_total())
+    return render_template('orderHistory.html', menu=menu, orders=orders, monthlyTotal = f"{monthlyTotal:.2f}")
 
         
 

@@ -9,3 +9,4 @@ CustID,OrderTime,OrderID,StallName,Item,ItemQuantity,Price,Total,Remarks
 89448485,2024-08-13 21:29:19.254923,14,Drinks,Kopi,1,1.0,1.0,No Remarks,Completed
 90288065,2024-08-13 22:11:33.647563,17,Drinks,Teh,1,1.0,1.0,No Remarks
 90288065,2024-08-13 22:15:15.349764,18,Pizza,Cheese Pizza,1,4.0,4.0,No Remarks
+90288065,2024-08-13 22:21:50.513398,19,Ban Mian,Tom Yum U Mian,1,3.0,3.0,No Remarks

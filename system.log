@@ -2747,3 +2747,112 @@ ssl.SSLEOFError: EOF occurred in violation of protocol (_ssl.c:2427)
 2024-08-13 22:16:03,352 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:16:03] "GET /Static/Trees.jpg HTTP/1.1" 200 -
 2024-08-13 22:16:31,052 - werkzeug - INFO -  * Detected change in '/Users/lucian/Desktop/Github/ASPJ24/app.py', reloading
 2024-08-13 22:16:31,358 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 22:21:45,067 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on https://127.0.0.1:5000
+2024-08-13 22:21:45,068 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-08-13 22:21:45,069 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 22:21:54,848 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 22:21:54,857 - werkzeug - INFO -  * Debugger PIN: 135-639-166
+2024-08-13 22:23:49,525 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:23:49] "GET / HTTP/1.1" 200 -
+2024-08-13 22:23:49,586 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:23:49] "GET /Static/South%20Canteen%20Logo.png HTTP/1.1" 200 -
+2024-08-13 22:23:49,588 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:23:49] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 22:23:49,727 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:23:49] "GET /Static/Background%20image.webp HTTP/1.1" 200 -
+2024-08-13 22:23:50,842 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:23:50] "GET /Static/Trees.jpg HTTP/1.1" 200 -
+2024-08-13 22:23:55,180 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:23:55] "GET /cart HTTP/1.1" 200 -
+2024-08-13 22:23:55,192 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:23:55] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 22:23:55,192 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:23:55] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 22:23:55,192 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:23:55] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 22:23:57,787 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:23:57] "GET /orderHistory HTTP/1.1" 200 -
+2024-08-13 22:23:57,798 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:23:57] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 22:23:57,798 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:23:57] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 22:23:57,799 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:23:57] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 22:24:01,073 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:01] "GET /Drinks HTTP/1.1" 200 -
+2024-08-13 22:24:01,090 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:01] "[36mGET /Static/menu-items/Iced_Milo.jpg HTTP/1.1[0m" 304 -
+2024-08-13 22:24:01,090 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:01] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 22:24:01,091 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:01] "[36mGET /Static/menu-items/Iced_Lemon_Tea.jpg HTTP/1.1[0m" 304 -
+2024-08-13 22:24:01,092 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:01] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 22:24:01,093 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:01] "[36mGET /Static/menu-items/Calamansi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 22:24:01,108 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:01] "[36mGET /Static/menu-items/Teh.jpg HTTP/1.1[0m" 304 -
+2024-08-13 22:24:01,116 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:01] "[36mGET /Static/menu-items/Kopi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 22:24:01,122 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:01] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 22:24:03,724 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:03] "GET /Ban%20Mian HTTP/1.1" 200 -
+2024-08-13 22:24:03,756 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:03] "GET /Static/menu-items/Ban_Mian.jpg HTTP/1.1" 200 -
+2024-08-13 22:24:03,774 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:03] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 22:24:03,780 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:03] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 22:24:03,788 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:03] "GET /Static/menu-items/Tom_Yum_U_Mian.jpg HTTP/1.1" 200 -
+2024-08-13 22:24:03,793 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:03] "GET /Static/menu-items/Fish_Slice_Soup_with_Bee_Hoon.jpg HTTP/1.1" 200 -
+2024-08-13 22:24:03,798 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:03] "GET /Static/menu-items/Dumplings.jpg HTTP/1.1" 200 -
+2024-08-13 22:24:03,804 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:03] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 22:24:09,581 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:09] "POST /Ban%20Mian HTTP/1.1" 200 -
+2024-08-13 22:24:09,621 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:09] "GET /Static/South%20Canteen%20Logo.png HTTP/1.1" 200 -
+2024-08-13 22:24:09,629 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:09] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 22:24:09,634 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:09] "GET /Static/menu-items/Ban_Mian.jpg HTTP/1.1" 200 -
+2024-08-13 22:24:09,641 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:09] "GET /Static/menu-items/Tom_Yum_U_Mian.jpg HTTP/1.1" 200 -
+2024-08-13 22:24:09,649 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:09] "GET /Static/menu-items/Fish_Slice_Soup_with_Bee_Hoon.jpg HTTP/1.1" 200 -
+2024-08-13 22:24:09,655 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:09] "GET /Static/menu-items/Dumplings.jpg HTTP/1.1" 200 -
+2024-08-13 22:24:09,659 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:09] "GET /Static/Trees.jpg HTTP/1.1" 200 -
+2024-08-13 22:24:13,954 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:13] "GET /cart HTTP/1.1" 200 -
+2024-08-13 22:24:13,964 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:13] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 22:24:13,966 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:13] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 22:24:13,967 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:13] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 22:24:14,006 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:14] "[36mGET /Static/menu-items/Tom_Yum_U_Mian.jpg HTTP/1.1[0m" 304 -
+2024-08-13 22:24:22,660 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:22] "[32mGET /completeOrder/19 HTTP/1.1[0m" 302 -
+2024-08-13 22:24:24,297 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:24] "GET /cart HTTP/1.1" 200 -
+2024-08-13 22:24:24,355 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:24] "GET /Static/South%20Canteen%20Logo.png HTTP/1.1" 200 -
+2024-08-13 22:24:24,361 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:24] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 22:24:24,371 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:24] "GET /Static/Trees.jpg HTTP/1.1" 200 -
+2024-08-13 22:24:26,552 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:26] "GET /orderHistory HTTP/1.1" 200 -
+2024-08-13 22:24:26,566 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:26] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 22:24:26,567 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:26] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 22:24:26,568 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:24:26] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 22:26:44,281 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:26:44] "GET /orderHistory HTTP/1.1" 200 -
+2024-08-13 22:26:44,347 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:26:44] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 22:26:44,357 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:26:44] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 22:26:44,714 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:26:44] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 22:28:25,400 - werkzeug - INFO -  * Detected change in '/Users/lucian/Desktop/Github/ASPJ24/app.py', reloading
+2024-08-13 22:28:25,701 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 22:28:36,244 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 22:28:36,251 - werkzeug - INFO -  * Debugger PIN: 135-639-166
+2024-08-13 22:28:42,365 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:28:42] "GET /orderHistory HTTP/1.1" 200 -
+2024-08-13 22:28:42,425 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:28:42] "GET /Static/South%20Canteen%20Logo.png HTTP/1.1" 200 -
+2024-08-13 22:28:42,429 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:28:42] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 22:28:43,822 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:28:43] "GET /Static/Trees.jpg HTTP/1.1" 200 -
+2024-08-13 22:30:03,864 - werkzeug - INFO -  * Detected change in '/Users/lucian/Desktop/Github/ASPJ24/app.py', reloading
+2024-08-13 22:30:04,207 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 22:30:13,974 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 22:30:13,982 - werkzeug - INFO -  * Debugger PIN: 135-639-166
+2024-08-13 22:30:20,345 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:30:20] "[35m[1mGET /orderHistory HTTP/1.1[0m" 500 -
+2024-08-13 22:30:20,390 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:30:20] "GET /orderHistory?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2024-08-13 22:30:20,396 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:30:20] "GET /orderHistory?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2024-08-13 22:30:20,407 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:30:20] "GET /orderHistory?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2024-08-13 22:30:20,463 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:30:20] "[36mGET /orderHistory?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-08-13 22:30:36,803 - werkzeug - INFO -  * Detected change in '/Users/lucian/Desktop/Github/ASPJ24/app.py', reloading
+2024-08-13 22:30:37,234 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 22:30:47,007 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 22:30:47,014 - werkzeug - INFO -  * Debugger PIN: 135-639-166
+2024-08-13 22:31:00,286 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:31:00] "[35m[1mGET /orderHistory HTTP/1.1[0m" 500 -
+2024-08-13 22:31:00,332 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:31:00] "GET /orderHistory?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2024-08-13 22:31:00,335 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:31:00] "GET /orderHistory?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2024-08-13 22:31:00,344 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:31:00] "GET /orderHistory?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2024-08-13 22:32:54,128 - werkzeug - INFO -  * Detected change in '/Users/lucian/Desktop/Github/ASPJ24/DBcreateTables.py', reloading
+2024-08-13 22:32:54,628 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 22:33:04,552 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 22:33:04,559 - werkzeug - INFO -  * Debugger PIN: 135-639-166
+2024-08-13 22:33:13,746 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:33:13] "[35m[1mGET /orderHistory HTTP/1.1[0m" 500 -
+2024-08-13 22:33:13,792 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:33:13] "GET /orderHistory?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2024-08-13 22:33:13,796 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:33:13] "GET /orderHistory?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2024-08-13 22:33:13,806 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:33:13] "GET /orderHistory?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2024-08-13 22:36:03,775 - werkzeug - INFO -  * Detected change in '/Users/lucian/Desktop/Github/ASPJ24/DBcreateTables.py', reloading
+2024-08-13 22:36:04,109 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 22:38:23,920 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on https://127.0.0.1:5000
+2024-08-13 22:38:23,922 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-08-13 22:38:23,922 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 22:38:33,686 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 22:38:33,692 - werkzeug - INFO -  * Debugger PIN: 135-639-166
+2024-08-13 22:38:44,786 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:38:44] "GET /orderHistory HTTP/1.1" 200 -
+2024-08-13 22:38:44,862 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:38:44] "GET /Static/South%20Canteen%20Logo.png HTTP/1.1" 200 -
+2024-08-13 22:38:44,865 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:38:44] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 22:38:45,826 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:38:45] "GET /Static/Trees.jpg HTTP/1.1" 200 -
+2024-08-13 23:05:53,421 - werkzeug - INFO -  * Detected change in '/Users/lucian/Desktop/Github/ASPJ24/app.py', reloading
+2024-08-13 23:05:53,740 - werkzeug - INFO -  * Restarting with stat

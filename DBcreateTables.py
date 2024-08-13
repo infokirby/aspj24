@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean, ForeignKey, Float
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean, ForeignKey, Float, DateTime, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.schema import CreateSchema
 from sqlalchemy.orm import relationship, sessionmaker
@@ -95,7 +95,7 @@ class Orders(Base):
     total = Column(Float())
     remarks = Column(String(255))
     completionStatus = Column(String(30), default='Pending')
-    dateTime = Column(String(255), default = dt.now())
+    dateTime = Column(DateTime, default = dt.now())
     customer = relationship('Customer', back_populates='orders')
 
     def set_status_purchased(self):
@@ -149,3 +149,4 @@ def wipe():
     session.add(adminRole)
     session.commit()
     session.close()
+
