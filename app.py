@@ -13,7 +13,7 @@ from flask_wtf.csrf import CSRFProtect
 
 
 #For forms rendering
-from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
+from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm, verifyOrderForm
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
 from customer import Customer
@@ -33,7 +33,7 @@ import joblib
 from logs_config import write_csv_log, orderLog
 from iptest import geolocate, get_public_ip
 from sklearn.preprocessing import StandardScaler
-
+from utils import is_fraudulent_order
 
 #For PFP checker
 from extensionChecker import ALLOWED_EXTENSIONS, allowed_file
@@ -673,34 +673,92 @@ def stalls():
     path = request.path
     stall_name = path.lstrip('/')
     form = CustOrderForm(request.form)
-    now = datetime.now()    
-
-    if request.method == "POST":
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    
+    if request.method == 'POST' and form.validate():
         #regex to remove special characters
         if form.remarks.data != "":
             sanitized_remarks = sanitize_input(form.remarks.data)
-        # if verification_result.get('success') or not verification_result.get('success'):
-        newOrder = Orders(customerID = current_user.get_id(), stallName = stall_name, item = form.item.data, itemQuantity = form.itemQuantity.data, price = form.price.data, total = float(request.form.get('price')) * float(request.form.get('itemQuantity')), remarks = sanitized_remarks)
-        if isinstance(newOrder, Orders):
-            try:
-                dbSession.add(newOrder)
-                dbSession.commit()
+        form.orderID.data = str(newOrderID())
+        form.phoneNumber.data = current_user.get_id()
+        form.itemQuantity.data = request.form.get('itemQuantity')
+        total = float(request.form.get('price')) * float(request.form.get('itemQuantity'))
+        
+        newOrder = Orders(
+            customerID=current_user.get_id(),
+            stallName=stall_name,
+            item=form.item.data,
+            itemQuantity=form.itemQuantity.data,
+            price=form.price.data,
+            total=total,
+            remarks=sanitized_remarks,
+        )
+        
+        try:
+            dbSession.add(newOrder)
+            dbSession.commit()
+
+            # Fetch user's past orders
+            past_orders = dbSession.query(Orders).filter(Orders.customerID == current_user.get_id()).all()
+            past_orders_data = [
+                {
+                    'Quantity': order.itemQuantity,
+                    'Price': order.price,
+                    'Total': order.total
+                }
+                for order in past_orders
+            ]
+
+            # Check if the order is fraudulent
+            current_order_data = {
+                "CustomerEmail": current_user.get_email(),
+                'Quantity': form.itemQuantity.data,
+                'Price': form.price.data,
+                'Total': total
+            }
+            if is_fraudulent_order(current_order_data, past_orders_data):
+                flash('Order is fraudulent and has been canceled. If error, enter OTP sent to email', 'danger')
+                return redirect(url_for('verify_order', order_id=newOrder.get_orderID(), next=request.url))
+            
+            else:
                 flash("Item added to cart!", "success")
+                return redirect(url_for('stalls'))
 
-            except Exception as e:
-                dbSession.rollback()
-                flash("Error occured. Please try again", "warning")
+        except Exception as e:
+            dbSession.rollback()
+            flash(f"Error occurred: {str(e)}", "warning")
 
-        # order create log
-        dbSession.close()
-        
+        finally:
+            dbSession.close()
     
-    else:
-        print("Form not validated")
-        print(form.errors)
-        
     return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form)
 
+#verifyOTP
+@app.route('/verifyOrder/<int:order_id>', methods=['GET', 'POST'])
+@login_required
+def verify_order(order_id):
+    form = verifyOrderForm(request.form)
+    next_url = request.args.get('next')
+    if request.method == 'POST' and form.validate_on_submit():
+        entered_otp = request.form['otp']
+        order = dbSession.query(Orders).filter(Orders.ID == order_id).first()
+        if order:
+            if session.get('otp') == entered_otp:
+                try:
+                    order.status = 'Verified'
+                    dbSession.commit()
+                    flash("Order successfully verified.", "success")
+                    return redirect(next_url or url_for('current_orders'))
+                except Exception as e:
+                    dbSession.rollback()
+                    flash("Error occurred. Please try again.", "danger")
+            else:
+                flash("Invalid OTP. Please try again.", "danger")
+        else:
+            flash("Order ID not found.", "danger")
+    print(form.csrf_token)
+    return render_template('verifyOrder.html', order_id=order_id, form=form)
 
 
 #Cart
@@ -776,24 +834,23 @@ def editOrder(id):
     return redirect(url_for('cart', menu=menu, form=form))
 
 #delete
-@app.route('/deleteOrder/<string:id>', methods=['GET', 'POST'])
+@app.route('/deleteOrder/<int:id>', methods=['GET', 'POST'])
 @login_required
 def deleteOrder(id):
     # order delete log
-    customerOrders = dbSession.query(Orders).filter(Orders.customerID == current_user.get_id()).all()
-    for order in customerOrders:
-        if order.get_orderID() == id:
-            try:
-                dbSession.delete(order)
-                flash(f"Order {id} successfully deleted", "success")
-                dbSession.commit()
-
-            except Exception as e:
-                dbSession.rollback()
-                flash("Error occured, action aborted", 'warning')
-
-            finally:
-                dbSession.close()
+    try:
+        order = dbSession.query(Orders).filter(Orders.ID == id, Orders.customerID == current_user.get_id()).first()
+        if order:
+            dbSession.delete(order)
+            dbSession.commit()
+            flash(f"Order {id} successfully deleted", "success")
+        else:
+            flash(f"Order {id} not found", "warning")
+    except Exception as e:
+        dbSession.rollback()
+        flash(f"Error occurred, action aborted: {e}", 'warning')
+    finally:
+        dbSession.close()
 
     return redirect(url_for('cart'))
 

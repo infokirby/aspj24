@@ -67,4 +67,8 @@ class StoreOwnerLoginForm(Form):
     password = PasswordField('Password:', [validators.InputRequired()])
     remember = BooleanField('Remember me:', default=True)
 
+class verifyOrderForm(FlaskForm):
+    phoneNumber = HiddenField()
+    orderID = HiddenField()
+    otp = IntegerField('OTP:', [validators.InputRequired()])
 
