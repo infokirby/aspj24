@@ -46,7 +46,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.schema import CreateSchema
 
 # For logs
-from logs_config import orderLog, loginLog, syslog, write_csv_log
+from logs_config import orderLog, loginLog, syslog, accountActivityLog, write_csv_log
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
@@ -323,13 +323,16 @@ def login():
                 remember = form.remember.data
                 login_user(user, remember=remember)
                 session['id'] = int(user.get_id())
+                accountActivityLog.info(f"{user.get_id()} logged in")
                 write_csv_log('loginlog.csv', [user.get_id(), geolocate(get_public_ip()), datetime.now().month, datetime.now().day, datetime.now().weekday(), datetime.now().hour, datetime.now().minute])
                 return render_template('home.html')
             
             else:
+                accountActivityLog.info(f"{form.phoneNumber.data} login failed")
                 flash("Wrong Username/Password.\n Please try again", 'danger')
 
         except Exception as e:
+            accountActivityLog.error(f"{form.phoneNumber.data} triggered exception {e} during login attempt")
             flash(f"An error {e} occured. Please try again.", "Warning")
 
         finally:
@@ -418,6 +421,7 @@ def register():
             new_user = Customer(phoneNumber = form.phoneNumber.data, name = form.name.data, hashedPW = hashed_password, profilePicture_location = profile_picture_filename)
             role = dbSession.query(Role).filter(Role.roleName == "user").first()
             new_user.roles.append(role)
+            accountActivityLog.info(f"{new_user.get_id()} registered")
             if isinstance(new_user, Customer):
                 dbSession.add(new_user)
                 dbSession.commit()
@@ -499,10 +503,12 @@ def forgotPassword():
                             user.set_password(hashed_password)
                             if isinstance(user, Customer):
                                 userdb[key] = user
+                                accountActivityLog.info(f"{user.get_id()} password reset")
                                 flash("Password successfully reset.", "success")
                                 return redirect(url_for("login"))
                             
                             else:
+                                accountActivityLog.warning(f"{user.get_id()} password reset failed")
                                 flash("something went wrong", "warning")
                                 return redirect(url_for('forgotPassword'))
 
@@ -510,6 +516,7 @@ def forgotPassword():
                         return render_template("forgotPassword.html", form=form, secQn = secQn)
                     
                     else:
+                        accountActivityLog.warning(f"{user.get_id()} security question failed")
                         flash("Incorrect Security Question Answer", "warning")
                         return redirect(url_for('forgotPassword'))
     return render_template("forgotPassword.html", form=form, secQn = secQn)
@@ -582,6 +589,7 @@ def changePassword():
         if bcrypt.check_password_hash(current_user.get_password(), form.password.data):
             if isinstance(currentUser, Customer):
                 currentUser.set_password(new_hashed_password)
+                accountActivityLog.info(f"{currentUser.get_id()} password changed")
                 try:
                     dbSession.add(currentUser)
                     dbSession.commit()
@@ -609,6 +617,7 @@ def deleteProfile():
             try:
                 dbSession.delete(dbSession.query(Customer).filter(Customer.phoneNumber == current_user.get_id()).first())
                 dbSession.commit()
+                accountActivityLog.info(f"{current_user.get_id()} profile deleted")
                 flash("Profile deleted. Please register for future use.", "success")
 
 
@@ -912,6 +921,7 @@ def logout():
     if 'id' in session:
         session.pop('id')
     session.clear()
+    accountActivityLog.info(f"{current_user.get_id()} logged out")
     flash("User successfully logged out." , 'success')
     return redirect(url_for("home"))
 

@@ -1,6 +1,7 @@
 import logging
 import csv
-from logging.handlers import TimedRotatingFileHandler
+import logging.handlers 
+from logging.handlers import RotatingFileHandler
 
 """
 log retention policy:
@@ -51,9 +52,19 @@ loginLog.addHandler(loginLogHandler)
 loginLog.setLevel(logging.INFO)
 
 
+
 # Configure the logger
 syslog = logging.basicConfig(
     filename='system.log',  # Log to a file named 'system.log'
     level=logging.DEBUG,    # Set the logging level to DEBUG
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
+
+
+accountActivityLog = logging.getLogger('InOutLogger')
+accountActivityLog.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+activityLogHandler = logging.handlers.RotatingFileHandler(
+    'acclog.log', maxBytes=100000, backupCount=7)
+activityLogHandler.setFormatter(formatter)
+accountActivityLog.addHandler(activityLogHandler)
