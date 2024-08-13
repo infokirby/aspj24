@@ -36,6 +36,7 @@ roles_users = Table('roles_users', metadata,
 class Customer(Base, UserMixin):
     __tablename__ = 'customer'
     phoneNumber = Column(Integer(), unique=True, primary_key=True)
+    email = Column(String(255), nullable=True)
     name = Column(String(255), nullable=False)
     hashedPW = Column(String(255), nullable=False, server_default=" ")
     profilePicture_location = Column(String(255), default='default.jpeg')
@@ -54,6 +55,9 @@ class Customer(Base, UserMixin):
 
     def set_id(self, id):
         self.phoneNumber = id
+        
+    def set_email(self, email):
+        self.email = email
 
     def lockout(self):
         self.active = False
@@ -64,6 +68,9 @@ class Customer(Base, UserMixin):
     #Accessors
     def get_id(self):
         return self.phoneNumber
+    
+    def get_email(self):
+        return self.email
     
     def get_password(self):
         return self.hashedPW

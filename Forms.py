@@ -11,6 +11,7 @@ from flask_wtf.file import FileAllowed, FileField
 class RegistrationForm(FlaskForm):
     name = StringField('Name:', [validators.InputRequired()])
     phoneNumber = IntegerField('Phone Number:', [validators.InputRequired(), validators.NumberRange(6000000, 99999999)])
+    email = EmailField('Email:', [validators.InputRequired(), validators.Email()])
     password = PasswordField('New Password:',[validators.InputRequired(), validators.Regexp(r'\A(?=\S*?\d)(?=\S*?[A-Z])(?=\S*?[a-z])\S{6,}\Z', message="Password must have at least: \n-6 Characters\n-1 Uppercase, \n-1 Number"), is_not_weak_password])
     confirm = PasswordField('Repeat Password:',[validators.InputRequired(), validators.EqualTo('password', message='Passwords must match')])
     profilePicture = FileField('Profile Picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
@@ -38,6 +39,7 @@ class CustOrderForm(FlaskForm):
 
 class EditUserForm(Form):
     name = StringField('Name:', [validators.InputRequired()])
+    email = EmailField('Email:', [validators.InputRequired(), validators.Email()])
     phoneNumber = IntegerField('Phone Number:', [validators.InputRequired(), validators.NumberRange(6000000, 99999999)])
     profilePicture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
     

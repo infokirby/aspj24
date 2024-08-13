@@ -415,7 +415,7 @@ def register():
                     else:
                         flash('Allowed file types are - png, jpg, jpeg', 'danger')
                     
-            new_user = Customer(phoneNumber = form.phoneNumber.data, name = form.name.data, hashedPW = hashed_password, profilePicture_location = profile_picture_filename)
+            new_user = Customer(phoneNumber = form.phoneNumber.data, name = form.name.data, email= form.email.data, hashedPW = hashed_password, profilePicture_location = profile_picture_filename)
             role = dbSession.query(Role).filter(Role.roleName == "user").first()
             new_user.roles.append(role)
             if isinstance(new_user, Customer):
@@ -524,6 +524,7 @@ def profile():
         currentUser = dbSession.query(Customer).filter(Customer.phoneNumber == current_user.get_id()).first()
         if isinstance(currentUser, Customer):
             currentUser.set_name(form.name.data)
+            currentUser.set_email(form.email.data)
             currentUser.set_id(form.phoneNumber.data)
             if 'profilePicture' in request.files:
                 profile_picture_file = request.files['profilePicture']

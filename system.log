@@ -2856,3 +2856,21 @@ ssl.SSLEOFError: EOF occurred in violation of protocol (_ssl.c:2427)
 2024-08-13 22:38:45,826 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 22:38:45] "GET /Static/Trees.jpg HTTP/1.1" 200 -
 2024-08-13 23:05:53,421 - werkzeug - INFO -  * Detected change in '/Users/lucian/Desktop/Github/ASPJ24/app.py', reloading
 2024-08-13 23:05:53,740 - werkzeug - INFO -  * Restarting with stat
+2024-08-14 00:13:43,712 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on https://127.0.0.1:5000
+2024-08-14 00:13:43,712 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-08-14 00:13:43,713 - werkzeug - INFO -  * Restarting with stat
+2024-08-14 00:13:52,308 - werkzeug - WARNING -  * Debugger is active!
+2024-08-14 00:13:52,310 - werkzeug - INFO -  * Debugger PIN: 905-934-492
+2024-08-14 00:14:03,209 - werkzeug - INFO -  * Detected change in 'c:\\Users\\raphy\\Documents\\GitHub\\aspj24\\app.py', reloading
+2024-08-14 00:14:03,527 - werkzeug - INFO -  * Restarting with stat
+2024-08-14 00:14:11,917 - werkzeug - WARNING -  * Debugger is active!
+2024-08-14 00:14:11,920 - werkzeug - INFO -  * Debugger PIN: 905-934-492
+2024-08-14 00:14:47,251 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on https://127.0.0.1:5000
+2024-08-14 00:14:47,251 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-08-14 00:14:47,252 - werkzeug - INFO -  * Restarting with stat
+2024-08-14 00:14:55,830 - werkzeug - WARNING -  * Debugger is active!
+2024-08-14 00:14:55,833 - werkzeug - INFO -  * Debugger PIN: 905-934-492
+2024-08-14 00:17:38,476 - werkzeug - INFO -  * Detected change in 'c:\\Users\\raphy\\Documents\\GitHub\\aspj24\\app.py', reloading
+2024-08-14 00:17:38,794 - werkzeug - INFO -  * Restarting with stat

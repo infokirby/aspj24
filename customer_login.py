@@ -14,9 +14,10 @@ class RegisterAdmin(C):
             self.set_profilePicture(profilePicture)
 
 class RegisterCustomer(C):
-    def __init__(self, name, phoneNumber, password, gender, securityQuestion, securityAnswer, profilePicture = 'default.jpeg'):
+    def __init__(self, name, phoneNumber, email, password, gender, securityQuestion, securityAnswer, profilePicture = 'default.jpeg'):
         super().__init__(phoneNumber)
         self.set_id(phoneNumber)
+        self.set_email(email)
         self.set_password(password)
         self.set_name(name)
         self.set_gender(gender)
@@ -26,9 +27,10 @@ class RegisterCustomer(C):
             self.set_profilePicture(profilePicture)
 
 class EditDetails(C):
-    def __init__(self, phoneNumber, name, gender, profilePicture = 'default.jpeg'):
+    def __init__(self, phoneNumber, name, email, gender, profilePicture = 'default.jpeg'):
         super().__init__(phoneNumber)
         self.set_name(name)
+        self.set_email(email)
         self.set_gender(gender)
         if profilePicture:
             self.set_profilePicture(profilePicture)
