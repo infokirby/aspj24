@@ -56,4 +56,4 @@ def main():
     checkData()
     
 
-print(dbSession.query(Customer).get(81234567))
+main()

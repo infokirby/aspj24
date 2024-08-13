@@ -1,50 +1,72 @@
-from flask import Flask, render_template, url_for, request, redirect, flash, session, send_file, jsonify
+#General Libraries
+import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re, os, pandas, numpy, requests, logging
+from io import BytesIO
+from datetime import datetime
+from werkzeug.utils import secure_filename
+import uuid
+from logs_config import ORDER_LEVEL
+
+#Flask Framework
+from flask import Flask, render_template, url_for, request, redirect, flash, session, send_file, jsonify, send_from_directory
+
+#For forms rendering
 from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
 from customer import Customer
-from flask_login import LoginManager, current_user, login_required, login_user, logout_user
-from flask_bcrypt import Bcrypt
-from io import BytesIO
 from store_owner import StoreOwner
 from store_owner_login import StoreOwnerLogin, CreateStoreOwner
 from menu import menu as menu
-import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re, os, pandas, numpy
-from datetime import datetime
-from werkzeug.utils import secure_filename
-from flask import Flask, render_template, redirect, url_for, flash, request, redirect, send_from_directory
-from flask_login import current_user, login_required
-import uuid
-from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
-import requests, logging, joblib
+
+#For Login Functions
+from flask_login import LoginManager, current_user, login_required, login_user, logout_user
+from flask_bcrypt import Bcrypt
 from flask.sessions import SecureCookieSessionInterface
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from logs_config import ORDER_LEVEL
+
+#For ML 
+import joblib
 from iptest import geolocate
 from sklearn.preprocessing import StandardScaler
+
+#For recaptcha
+from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
+
+#For PFP checker
 from extensionChecker import ALLOWED_EXTENSIONS, allowed_file
 
 #for database
 from flask_sqlalchemy import SQLAlchemy
-from DBcreateTables import Customer, Role
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, URL, Insert, Result, Boolean, text
+from DBcreateTables import Customer, Role, Orders
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, URL, Insert, Result, Boolean, text, update
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.schema import CreateSchema
 
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
-#Login ML
+#Login ML load
 iso_forest = joblib.load('iso_forest_model.pkl')
 scaler = joblib.load('scaler.pkl')
 feature_names = ['hour', 'day', 'month', 'year'] + [f'location_{loc}' for loc in ['SG']]
 
 
 app = Flask(__name__, template_folder='Templates', static_folder='Static')
+
+
+#API configs
+app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
+app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdcmxUqAAAAAGVF_1zJ26DFEs61J2oJ8cQ3eM-4' 
+app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdcmxUqAAAAAHUKANmhqXNRcY8ZvRjiTl-Uzjmm'
+app.config['UPLOAD_FOLDER'] = 'Static/profile_pics'
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB max size for uploads
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:Password123@database-1.cr0sk8kqijy4.ap-southeast-1.rds.amazonaws.com'
+
 stripe.api_key = "sk_test_51OboMaDA20MkhXhqx0KQdxFgKbMYsLGIciIpWAKrwhXhXHytVQkPncx6SPDL79SOW0fdliJpbUkQ01kq5ZDdjYmP00nojJWp0p"
 bcrypt = Bcrypt(app)
-db = SQLAlchemy(app)
+db = SQLAlchemy()
+db.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 limiter = Limiter(
@@ -53,24 +75,14 @@ limiter = Limiter(
     storage_uri = "memory://"
 )
 
-#API configs
-app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHuO4]9/PH3/>n'
-app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdcmxUqAAAAAGVF_1zJ26DFEs61J2oJ8cQ3eM-4' 
-app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdcmxUqAAAAAHUKANmhqXNRcY8ZvRjiTl-Uzjmm'
-app.config['UPLOAD_FOLDER'] = 'Static/profile_pics'
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB max size for uploads
-
-
-
 #Database Connection things
 url_object = URL.create(
     "mysql+pymysql",
-    username="root",
-    password="mysqlpassword",
-    host="localhost",
-    database="customer",
+    username="admin",
+    password="awsPassword123fk",
+    host="aspj24-final.cybuljfuqrm3.us-east-1.rds.amazonaws.com",
+    database="ASPJ_DB",
 )
-
 #DB engine config
 engine = create_engine(url_object)
 metadata = MetaData(schema="ASPJ_DB")
@@ -90,12 +102,6 @@ limiter = Limiter(
     storage_uri="memory://"
 )
 
-#Creating pfp path if not avil
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
-
-
-
 #SuperUser account
 hashed_password = bcrypt.generate_password_hash("Pass123").decode('utf-8')
 superUser = RegisterAdmin(90288065, hashed_password)
@@ -103,6 +109,16 @@ superUser = RegisterAdmin(90288065, hashed_password)
 #all logs
 logging.basicConfig(filename='app.log', level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(message)s')
+
+
+#Creating pfp path if not avil
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
+def allowed_file(filename):
+    print(f"Checking file: {filename}")
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @app.after_request
 def apply_caching(response):
     response.headers["Set-Cookie"] = SecureCookieSessionInterface().get_signing_serializer(app).dumps(dict(session))
@@ -111,13 +127,24 @@ def apply_caching(response):
 def save_picture(form_picture):
     filename = str(uuid.uuid4()) + '_' + secure_filename(form_picture.filename)
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    print(filename)
     print(f"Saving picture to: {filepath}")
-    form_picture.save(filepath)
+    try:
+        form_picture.save(filepath)
+    except Exception as e:
+        print(f"Error saving picture: {e}")
     return filename
+
 
 @login_manager.user_loader
 def load_user(id):
-    return dbSession.query(Customer).get(id)
+    try:
+        return dbSession.query(Customer).filter(Customer.phoneNumber == id).first()
+    except Exception as e:
+        dbSession.rollback()
+
+    finally:
+        dbSession.close()
     # with shelve.open('userdb', 'c') as userdb:
     #     if id in userdb:
     #         for keys in userdb:
@@ -204,67 +231,126 @@ def findUs():
 def contactUs():
     return render_template('contactUs.html')
 
+
+#Login Page
 @app.route('/login', methods=['GET', 'POST'])
 @limiter.limit("15/hour;5/minute")
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
-        with shelve.open('userdb', 'c') as userdb:
-            user = CustomerLogin(form.phoneNumber.data, form.password.data)
-            if isinstance(user, Customer):
-                for keys in userdb:
-                    if user.get_id() == keys:
-                        if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
-                             #extract data here
-                            currentDT = datetime.now().timetuple()
-                            hour = currentDT[3]
-                            day = currentDT[2]
-                            month = currentDT[1]
-                            year = currentDT[0]
+        try:
+            user = dbSession.query(Customer).filter(Customer.phoneNumber == form.phoneNumber.data).first()
+            if isinstance(user, Customer) and bcrypt.check_password_hash(user.hashedPW, form.password.data):
+                remember = form.remember.data
+                login_user(user, remember=remember)
+                session['id'] = int(user.get_id())
+                return render_template('home.html')
+            
+            else:
+                flash("Wrong Username/Password.\n Please try again", 'danger')
 
-                            new_data = pandas.DataFrame({
-                                'hour': [hour],
-                                'day' : [day],
-                                'month' : [month],
-                                'year' : [year],
-                            })
+        except Exception as e:
+            flash(f"An error {e} occured. Please try again.", "Warning")
 
-                            location_dummies = pandas.get_dummies(geolocate('219.74.99.238'), prefix='location')
-                            for col in location_dummies.columns:
-                                new_data[col] = location_dummies[col]
+        finally:
+            dbSession.close()
+    return render_template('login.html', form=form)
+
+
+    #     with shelve.open('userdb', 'c') as userdb:
+    #         user = CustomerLogin(form.phoneNumber.data, form.password.data)
+    #         if isinstance(user, Customer):
+    #             for keys in userdb:
+    #                 if user.get_id() == keys:
+    #                     if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
+    #                          #extract data here
+    #                         currentDT = datetime.now().timetuple()
+    #                         hour = currentDT[3]
+    #                         day = currentDT[2]
+    #                         month = currentDT[1]
+    #                         year = currentDT[0]
+
+    #                         new_data = pandas.DataFrame({
+    #                             'hour': [hour],
+    #                             'day' : [day],
+    #                             'month' : [month],
+    #                             'year' : [year],
+    #                         })
+
+    #                         location_dummies = pandas.get_dummies(geolocate('219.74.99.238'), prefix='location')
+    #                         for col in location_dummies.columns:
+    #                             new_data[col] = location_dummies[col]
     
-                                # Ensure all location columns are present
-                                for col in feature_names:
-                                    if col not in new_data.columns:
-                                        new_data[col] = 0
+    #                             # Ensure all location columns are present
+    #                             for col in feature_names:
+    #                                 if col not in new_data.columns:
+    #                                     new_data[col] = 0
 
-                            for col in new_data.columns:
-                                pandas.concat
+    #                         for col in new_data.columns:
+    #                             pandas.concat
                             
-                            # Extract features for prediction
-                            X_new = new_data[feature_names].values
+    #                         # Extract features for prediction
+    #                         X_new = new_data[feature_names].values
 
-                            # Standardize the features
-                            X_new_scaled = scaler.transform(X_new)
+    #                         # Standardize the features
+    #                         X_new_scaled = scaler.transform(X_new)
                             
-                            # Predict if the login data is an anomaly
-                            prediction = iso_forest.predict(X_new_scaled)
+    #                         # Predict if the login data is an anomaly
+    #                         prediction = iso_forest.predict(X_new_scaled)
                                 
 
-                            if prediction[0] == -1: #anomaly
-                                flash("Login not authorised. Please leave site.", "danger")
-                                return render_template('login.html', form=form)
+    #                         if prediction[0] == -1: #anomaly
+    #                             flash("Login not authorised. Please leave site.", "danger")
+    #                             return render_template('login.html', form=form)
                             
-                            else:
-                                if form.remember.data:
-                                    login_user(userdb[keys], remember=True)
-                                else:
-                                    login_user(userdb[keys])
-                            session['id'] = user.get_id()
-                            return render_template('home.html', logined=True)
-            flash("wrong username/password. please try again", "warning")
+    #                         else:
+    #                             if form.remember.data:
+    #                                 login_user(userdb[keys], remember=True)
+    #                             else:
+    #                                 login_user(userdb[keys])
+    #                         session['id'] = user.get_id()
+    #                         return render_template('home.html', logined=True)
+    #         flash("wrong username/password. please try again", "warning")
+    #         return redirect(url_for('login'))
+    # return render_template('login.html', form=form)
+
+
+#Registration Route
+@app.route('/register', methods=['GET', 'POST'])
+@limiter.limit("15/hour;5/minute")
+def register():
+    form = RegistrationForm(request.form)
+    if request.method == 'POST' and form.validate():
+        user = dbSession.query(Customer).filter(Customer.phoneNumber == form.phoneNumber.data).first()
+        if not user:
+            hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+
+            profile_picture_filename = "default.jpeg"
+            if 'profilePicture' in request.files:
+                profile_picture_file = request.files['profilePicture']
+                if profile_picture_file and profile_picture_file.filename != '':
+                    if allowed_file(profile_picture_file.filename):
+                        profile_picture_filename = save_picture(profile_picture_file)
+                        user.set_profilePicture(profile_picture_filename)
+                    else:
+                        flash('Allowed file types are - png, jpg, jpeg', 'danger')
+                    
+            new_user = Customer(phoneNumber = form.phoneNumber.data, name = form.name.data, hashedPW = hashed_password, profilePicture_location = profile_picture_filename)
+            role = dbSession.query(Role).filter(Role.roleName == "user").first()
+            new_user.roles.append(role)
+            if isinstance(new_user, Customer):
+                dbSession.add(new_user)
+                dbSession.commit()
+                session.clear()
+                flash('Registration Successful!', "success")
+                return redirect(url_for('login'))
+        else:
+            flash("Already registered please login instead" , 'success')
             return redirect(url_for('login'))
-    return render_template('login.html', form=form)
+        
+    dbSession.close()
+    return render_template('register.html', form=form)
+    
 
 @app.route('/2fa', methods = ["POST", "GET"])
 @limiter.limit("15/hour;5/minute")
@@ -295,24 +381,25 @@ def authentication():
 def storeOwnerLogin():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
-        with shelve.open('SOdb', 'c') as SOdb:
-            storeOwner = StoreOwnerLogin(form.phoneNumber.data, form.password.data)
-            if isinstance(storeOwner, StoreOwner):
-                for keys in SOdb:
-                    if storeOwner.get_phoneNumber() == SOdb[keys].get_phoneNumber():
-                        if bcrypt.check_password_hash(SOdb[keys].get_password(), storeOwner.get_password()):
-                            if form.remember.data == True:
-                                login_user(SOdb[keys], remember=True)
-                            else:
-                                login_user(SOdb[keys])
-                            session['id'] = SOdb[keys].get_id()
-                            return render_template('storeOwnerHome.html', logined = True, accountTypeSO = True)
-
+        try:
+            storeOwner = dbSession.query(StoreOwner).filter(StoreOwner.phoneNumber == form.phoneNumber.data).first()
+            if isinstance(storeOwner, StoreOwner) and bcrypt.check_password_hash(storeOwner.hashedPW, form.password.data):
+                remember = form.remember.data
+                login_user(storeOwner, remember=remember)
+                session['id'] = int(storeOwner.get_id())
+                return render_template('storeOwnerHome.html')
+            
             else:
-                flash("wrong username/password. please try again")
-                return redirect(url_for('storeOwnerLogin'))
+                flash("Wrong Username/Password.\n Please try again", 'danger')
+
+        except Exception as e:
+            flash("An error occured. Please try again.", "Critical")
+
+        finally:
+            dbSession.close()
     return render_template('storeOwnerLogin.html', form=form)
 
+#Forgot Pw
 @app.route('/forgotPassword', methods=["Get", "POST"])
 def forgotPassword():
         
@@ -348,77 +435,40 @@ def forgotPassword():
     return render_template("forgotPassword.html", form=form, secQn = secQn)
 
 
-#Registration Route
-@app.route('/register', methods=['GET', 'POST'])
-@limiter.limit("15/hour;5/minute")
-def register():
-    form = RegistrationForm(request.form)
-    if request.method == 'POST' and form.validate():
-        with shelve.open('userdb', 'c') as userdb:
-            if str(form.phoneNumber.data) not in userdb:
-                hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-                formattedSecurityQuestionAnswer = form.securityAnswer.data.strip().title()
-
-                profile_picture_filename = 'default.jpeg'
-                if 'profilePicture' in request.files:
-                    profile_picture_file = request.files['profilePicture']
-                    if profile_picture_file and profile_picture_file.filename != '':
-                        if allowed_file(profile_picture_file.filename):
-                            profile_picture_filename = save_picture(profile_picture_file)
-                        else:
-                            return redirect(url_for('register'))
-
-                user = RegisterCustomer(
-                    form.name.data,
-                    form.phoneNumber.data,
-                    hashed_password,
-                    form.gender.data,
-                    form.securityQuestion.data,
-                    formattedSecurityQuestionAnswer,
-                    profile_picture_filename)
-
-                if isinstance(user, Customer):
-                    userdb[user.get_id()] = user
-                    flash('Registration Successful!', "success")
-                    return redirect(url_for('login'))
-            else:
-                flash("Already registered, please login instead" , 'success')
-                return redirect(url_for('login'))
-    return render_template('register.html', form=form)
-
 #profile page
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    shownGender = str(current_user.get_gender())
-    form = EditUserForm(request.form, gender = shownGender)
+    form = EditUserForm(request.form)
     if request.method == 'POST' and form.validate():
-        with shelve.open('userdb', 'c') as userdb:
-            user = EditDetails(form.phoneNumber.data, form.name.data, form.gender.data)
-            if isinstance(user, Customer):
-                for key in userdb:
-                    if user.get_id() == key:
-                        user = userdb[key]
-                        user.set_name(form.name.data)
-                        user.set_id(form.phoneNumber.data)
-                        user.set_gender(form.gender.data)
-
-                        if 'profilePicture' in request.files:
-                            profile_picture_file = request.files['profilePicture']
-                            if profile_picture_file and profile_picture_file.filename != '':
-                                if allowed_file(profile_picture_file.filename):
-                                    profile_picture_filename = save_picture(profile_picture_file)
-                                    user.set_profilePicture(profile_picture_filename)
-                                else:
-                                    flash('Allowed file types are - png, jpg, jpeg', 'danger')
-                                    return redirect(url_for('profile'))
-
-                        userdb[key] = user
-                        flash('Successfully edited', 'success')
+        currentUser = dbSession.query(Customer).filter(Customer.phoneNumber == current_user.get_id()).first()
+        print(current_user.get_id(),"\n")
+        if isinstance(currentUser, Customer):
+            currentUser.set_name(form.name.data)
+            currentUser.set_id(form.phoneNumber.data)
+            if 'profilePicture' in request.files:
+                profile_picture_file = request.files['profilePicture']
+                if profile_picture_file and profile_picture_file.filename != '':
+                    if allowed_file(profile_picture_file.filename):
+                        profile_picture_filename = save_picture(profile_picture_file)
+                        currentUser.set_profilePicture(profile_picture_filename)
+                    else:
+                        flash('Allowed file types are - png, jpg, jpeg', 'danger')
                         return redirect(url_for('profile'))
+
+            try:
+                dbSession.add(currentUser)
+                dbSession.commit()
+                flash('Successfully edited', 'success')
+            except Exception as e:
+                dbSession.rollback()
+                flash(f'An error occurred: {e}', 'danger')
+
+            dbSession.close()
+        return redirect(url_for('profile'))
         
     return render_template('profile.html', form=form)
-
+        
 #Upload PFP
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
@@ -448,22 +498,25 @@ def uploaded_file(filename):
 def changePassword():
     form = ChangePasswordForm(request.form)
     if request.method == 'POST' and form.validate():
-        with shelve.open('userdb', 'c') as userdb:
-            new_hashed_password = bcrypt.generate_password_hash(form.newPassword.data).decode('utf-8')
-            if bcrypt.check_password_hash(current_user.get_password(), form.password.data):
-                user = ChangePassword(current_user.get_id(), new_hashed_password)
-                print(user.get_id())
-                for keys in userdb:
-                    if keys == user.get_id():
-                        user = userdb[keys]
-                        user.set_password(new_hashed_password)
-                        if isinstance(user, Customer):
-                            userdb[keys] = user
-                            flash("Password changed successfully", "success")
-                            return redirect(url_for('home'))
-            else:
-                flash("Password change unsuccessful", "danger")
-                return redirect(url_for('changePassword'))
+        currentUser = dbSession.query(Customer).filter(Customer.phoneNumber == current_user.get_id()).first()
+        new_hashed_password = bcrypt.generate_password_hash(form.newPassword.data).decode('utf-8')
+        if bcrypt.check_password_hash(current_user.get_password(), form.password.data):
+            if isinstance(currentUser, Customer):
+                currentUser.set_password(new_hashed_password)
+                try:
+                    dbSession.add(currentUser)
+                    dbSession.commit()
+                    flash('Password successfully edited', 'success')
+                except Exception as e:
+                    dbSession.rollback()
+                    flash(f'An error occurred: {e}', 'danger')
+
+                finally:
+                    dbSession.close()
+                return redirect(url_for('home'))
+        else:
+            flash("Password change unsuccessful", "danger")
+            return redirect(url_for('changePassword'))
 
     return render_template('changePassword.html', form=form)
 
@@ -474,16 +527,23 @@ def deleteProfile():
     form = request.form
     if request.method == "POST":
         if request.form.get('Delete') == 'Delete':
-            with shelve.open('userdb', 'c') as userdb:
-                for key in userdb:
-                    if current_user.get_id() == key:
-                        print("Slay")
-                        del userdb[key]
-                        userdb.sync()
-                        flash("Profile deleted. Please register for future use.", "success")
-                        session.pop('id')
-                        logout_user
-                        return redirect(url_for('home'))
+            try:
+                dbSession.delete(dbSession.query(Customer).filter(Customer.phoneNumber == current_user.get_id()).first())
+                dbSession.commit()
+                flash("Profile deleted. Please register for future use.", "success")
+
+
+            except Exception as e:
+                    dbSession.rollback()
+                    flash(f'An error occurred: {e}', 'danger')
+
+            finally:
+                dbSession.close()
+
+            session.pop('id')
+            logout_user()
+            return redirect(url_for('home'))
+
         elif  request.form.get('Cancel') == 'Cancel':
             flash("Profile deletion aborted", "warning")
             return redirect(url_for('profile'))
@@ -501,6 +561,20 @@ def sanitize_input(input_string):
     return sanitized_string
 
 
+# recaptcha verification
+def verify_recaptcha(response_token):
+    secret_key = '6LdcmxUqAAAAAHUKANmhqXNRcY8ZvRjiTl-Uzjmm'  # Replace with your actual secret key
+    url = 'https://www.google.com/recaptcha/api/siteverify'
+    data = {
+        'secret': secret_key,
+        'response': response_token
+    }
+    print(data)
+    response = requests.post(url, data=data)
+    print(response)
+    result = response.json()
+    print(result)
+    return result
 
 #order
 @app.route('/Vegetarian', methods=['GET', 'POST'])
@@ -525,32 +599,41 @@ def stalls():
     form = CustOrderForm(request.form)
     now = datetime.now()    
 
-    if request.method == 'POST' and form.validate_on_submit():
-        form.orderID.data = str(newOrderID())
-        form.phoneNumber.data = current_user.get_id()
-        form.itemQuantity.data = request.form.get('itemQuantity')
-        total = float(request.form.get('price')) * float(request.form.get('itemQuantity'))
-        order = CustomerOrder(form.phoneNumber.data)
-        order.set_id(current_user.get_id())
-        order.set_datetime(form.orderDatetime.data)
-        order.set_dateTimeData(form.orderDatetime.data)
-        order.set_stallName(stall_name)
-        order.set_orderID(form.orderID.data)
-        order.set_item(form.item.data)
-        order.set_itemQuantity(int(form.itemQuantity.data))
-        order.set_price(form.price.data)
-        order.set_total(total)
-        #regex to remove special characters
+    if request.method == 'POST' and form.validate():
+        # form.orderID.data = str(newOrderID())
+        # form.phoneNumber.data = current_user.get_id()
+        # form.itemQuantity.data = request.form.get('itemQuantity')
+        # total = float(request.form.get('price')) * float(request.form.get('itemQuantity'))
+        # order = CustomerOrder(form.phoneNumber.data)
+        # order.set_id(current_user.get_id())
+        # order.set_datetime(form.orderDatetime.data)
+        # order.set_dateTimeData(form.orderDatetime.data)
+        # order.set_stallName(stall_name)
+        # order.set_orderID(form.orderID.data)
+        # order.set_item(form.item.data)
+        # order.set_itemQuantity(int(form.itemQuantity.data))
+        # order.set_price(form.price.data)
+        # order.set_total(total)
+        # response_token = request.form['g-recaptcha-response']
+        # verification_result = verify_recaptcha(response_token)
         if form.remarks.data != "":
             sanitized_remarks = sanitize_input(form.remarks.data)
-            order.set_remarks(sanitized_remarks)
-        order.set_status(form.status.data)
+        # if verification_result.get('success') or not verification_result.get('success'):
+        newOrder = Orders(customerID = current_user.get_id(), stallName = stall_name, item = form.item.data, itemQuantity = form.itemQuantity.data, price = form.price.data, total = float(request.form.get('price')) * float(request.form.get('itemQuantity')), remarks = sanitized_remarks)
+        if isinstance(newOrder, Orders):
+            try:
+                dbSession.add(newOrder)
+                dbSession.commit()
+                flash("Item added to cart!", "success")
+
+            except Exception as e:
+                dbSession.rollback()
+                flash("Error occured. Please try again", "warning")
 
         # order create log
         logging.log(ORDER_LEVEL, f"Order {form.orderID.data} created by {current_user.get_id()}")
-
-        with shelve.open('order.db', 'c') as orderdb:
-            orderdb[order.get_orderID] = order
+        dbSession.close()
+        
     
     else:
         print("Form not validated")
@@ -566,14 +649,17 @@ def stalls():
 @login_required
 def cart():
     total = 0
+    orders = [] 
     form = CustOrderForm(request.form)
-    with shelve.open('order.db', 'c') as orderdb:
-        orders = []
-        for order in orderdb:
-            if orderdb[order].get_id() == current_user.get_id():
-                if orderdb[order].get_status == "Pending":
-                    orders.append(orderdb[order])
-                    total = total + orderdb[order].get_total
+    customerOrders = dbSession.query(Orders).filter(Orders.customerID == current_user.get_id()).all()
+    for order in customerOrders:
+        print(order.get_status())
+        if order.get_status() == "Pending":
+            orders.append(order)
+            total = total + order.get_total()
+
+
+    dbSession.close()
     return render_template('cart.html', menu=menu, orders=orders, form=form, total=f'{total:.2f}')
 
 #mark complete
@@ -581,11 +667,18 @@ def cart():
 @login_required
 def completeOrder(id):
     # order complete log
-    with shelve.open('order.db', 'c') as orderdb:
-        order = orderdb[id]
-        order.set_status("Completed")
-        orderdb[id] = order
-        logging.log(ORDER_LEVEL, f"Order {id} completed by {current_user.get_id()}")
+    currentOrder = dbSession.query(Orders).filter(Orders.ID == id).first()
+    currentOrder.set_status_complete()
+    try:
+        dbSession.add(currentOrder)
+        dbSession.commit()
+        flash('Successfully edited', 'success')
+    except Exception as e:
+        dbSession.rollback()
+        flash(f'An error occurred: {e}', 'danger')
+
+    logging.log(ORDER_LEVEL, f"Order {id} completed by {current_user.get_id()}")
+    dbSession.close()
     return redirect(url_for('cart'))
 
 #edit
@@ -618,8 +711,21 @@ def editOrder(id):
 def deleteOrder(id):
     # order delete log
     logging.log(ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
-    with shelve.open('order.db', 'c') as orderdb:
-        orderdb.pop(id)
+    customerOrders = dbSession.query(Orders).filter(Orders.customerID == current_user.get_id()).all()
+    for order in customerOrders:
+        if order.get_orderID() == id:
+            try:
+                dbSession.delete(order)
+                flash(f"Order {id} successfully deleted", "success")
+                dbSession.commit()
+
+            except Exception as e:
+                dbSession.rollback()
+                flash("Error occured, action aborted", 'warning')
+
+            finally:
+                dbSession.close()
+
     return redirect(url_for('cart'))
 
 # delete all
@@ -627,13 +733,21 @@ def deleteOrder(id):
 @login_required
 def deleteAllOrder():
     count = 0
-    with shelve.open('order.db', 'c') as orderdb:
-        for order in orderdb:
-            if orderdb[order].get_id() == current_user.get_id() and orderdb[order].get_status == "Pending":
-                del orderdb[order]
-                count += 1
-                # order delete log
-                logging.log(ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
+    customerOrders = dbSession.query(Orders).filter(Orders.customerID == current_user.get_id()).all()
+    try:
+        for order in customerOrders:
+            dbSession.delete(order)
+        dbSession.commit()
+        flash("All orders successfully deleted", 'success')
+        logging.log(ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
+
+
+    except Exception as e:
+        dbSession.rollback()
+        flash("Error occured, action aborted", 'warning')
+
+    finally:
+        dbSession.close()
 
     return redirect(url_for('cart'))
 
@@ -641,23 +755,36 @@ def deleteAllOrder():
 @app.route('/orderHistory', methods=['GET', 'POST'])
 @login_required
 def orderHistory():
-    with shelve.open('order.db', 'c') as orderdb:
-        orders = []
-        count = 0
-        monthlyTotal = 0
-        current_datetime = datetime.now()
-        for order in orderdb:
-            if orderdb[order].get_id() == current_user.get_id() and orderdb[order].get_status == "Completed":
-                count += 1
-                if count > 30:
-                    orders.append(orderdb[order])
-                    orders.pop(orders[count-30])
-                else:
-                    orders.append(orderdb[order])
+    orders = []
+    monthlyTotal = 0
+    current_datetime = datetime.now()
+    customerOrders = dbSession.query(Orders).filter(Orders.customerID == current_user.get_id()).all()
+    for order in customerOrders:
+        if order.get_status() == "Completed":
+            orders.append(order)
+            monthlyTotal += float(order.get_total())
+        return render_template('orderHistory.html', menu=menu, orders=orders, monthlyTotal = f"{monthlyTotal:.2f}")
+
+        
+
+
+    # with shelve.open('order.db', 'c') as orderdb:
+    #     orders = []
+    #     count = 0
+    #     monthlyTotal = 0
+    #     current_datetime = datetime.now()
+    #     for order in orderdb:
+    #         if orderdb[order].get_id() == current_user.get_id() and orderdb[order].get_status == "Completed":
+    #             count += 1
+    #             if count > 30:
+    #                 orders.append(orderdb[order])
+    #                 orders.pop(orders[count-30])
+    #             else:
+    #                 orders.append(orderdb[order])
                     
-                if orderdb[order].get_dateTimeData.month ==  current_datetime.month:
-                    monthlyTotal += float(orderdb[order].get_total)
-    return render_template('orderHistory.html', menu=menu, orders=orders, monthlyTotal = f"{monthlyTotal:.2f}")
+    #             if orderdb[order].get_dateTimeData.month ==  current_datetime.month:
+    #                 monthlyTotal += float(orderdb[order].get_total)
+    # return render_template('orderHistory.html', menu=menu, orders=orders, monthlyTotal = f"{monthlyTotal:.2f}")
 
 #Instead of total impliment a monthly tally
 
@@ -665,10 +792,10 @@ price_id = "price_1ObuyUDA20MkhXhqmqe3Niwb"
 
 def calculate_amount():
     total = 0
-    with shelve.open('order.db', 'c') as orderdb:
-        for order in orderdb:
-            if orderdb[order].get_id() == current_user.get_id() and orderdb[order].get_status == "Pending":
-                total = total + orderdb[order].get_total
+    customerOrders = dbSession.query(Orders).filter(Orders.customerID == current_user.get_id()).all()
+    for order in customerOrders:
+        if order.get_status == "Pending":
+            total = total + order.get_total()
             return total
 
 @app.route("/checkout")
@@ -676,6 +803,10 @@ def calculate_amount():
 def payment():
     try:
         amount = calculate_amount()
+        customerOrders = dbSession.query(Orders).filter(Orders.customerID == current_user.get_id()).all()
+        for order in customerOrders:
+            if order.get_status == "Pending":
+                order.set_status_purchased()
 
         
         stripe.Price.modify(
@@ -710,12 +841,14 @@ def payment():
 @login_required
 def logout():
     logout_user()
-    session.pop('id')
+    if 'id' in session:
+        session.pop('id')
+    session.clear()
     flash("User successfully logged out." , 'success')
     return redirect(url_for("home"))
 
 
-
+#StoreOwners side
 @app.route('/currentOrders')
 def current_orders():
     with shelve.open('order.db', 'c') as orderdb:
@@ -900,9 +1033,9 @@ def request_entitiy_too_large(error):
     flash('File is too large. Maximum file size is 5 MB', 'danger')
     return redirect(request.url)
 
-@app.errorhandler(Exception)
-def handle_exception(error):
-    return render_template('error.html', error_code = 500, message='Unknown error occured, please try again later.')
+# @app.errorhandler(Exception)
+# def handle_exception(error):
+#     return render_template('error.html', error_code = 500, message='Unknown error occured, please try again later.')
 
 if __name__ == '__main__':
     app.run(debug = True)
