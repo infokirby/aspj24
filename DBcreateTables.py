@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean, ForeignKey, Float
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean, ForeignKey, Float, DateTime, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.schema import CreateSchema
 from sqlalchemy.orm import relationship, sessionmaker
@@ -37,14 +37,16 @@ roles_users = Table('roles_users', metadata,
 class Customer(Base, UserMixin):
     __tablename__ = 'customer'
     phoneNumber = Column(Integer(), unique=True, primary_key=True)
+    email = Column(String(255), nullable=True)
     name = Column(String(255), nullable=False)
     hashedPW = Column(String(255), nullable=False, server_default=" ")
     profilePicture_location = Column(String(255), default='default.jpeg')
-    twoFA = Column(Boolean(), nullable=False, default=False)
+    twoFA = Column(Boolean(), nullable=True, default=False)
     roles = relationship('Role', secondary=roles_users, backref='customers')
     active = Column(Boolean(), default = True)
     orders = relationship('Orders', back_populates='customer')
     secretToken = Column(String(255), unique=True, default=pyotp.random_base32())
+
 
     #Mutators
     def set_password(self, password):
@@ -74,15 +76,21 @@ class Customer(Base, UserMixin):
     
     def get_profilePicture(self):
         return self.profilePicture_location
-
-    #2FA thingz
-    def get_authentication_setup_uri(self):
-        return pyotp.totp.TOTP(self.secretToken).provisioning_uri(name = self.get_name(), issuer_name="South Caneteen App")
     
-    def is_otp_valid(self, userOtp):
-        totp = pyotp.parse_uri(self.get_authentication_setup_uri())
-        return totp.verify(userOtp)
+    
+    #2fa requirements
+    def get_2fa(self):
+        return self.twoFA
+    
+    def set_2fa_True(self):
+        self.twoFA = True
 
+    def get_authentication_setup_uri(self):
+        return pyotp.totp.TOTP(self.secretToken).provisioning_uri(name=self.get_name(), issuer_name="South Canteen WebApp")
+
+    def is_otp_valid(self, user_otp):
+        totp = pyotp.parse_uri(self.get_authentication_setup_uri())
+        return totp.verify(user_otp)
 
     #Flask_login requirements
     def is_active(self):
@@ -105,7 +113,7 @@ class Orders(Base):
     total = Column(Float())
     remarks = Column(String(255))
     completionStatus = Column(String(30), default='Pending')
-    dateTime = Column(String(255), default = dt.now())
+    dateTime = Column(DateTime, default = dt.now())
     customer = relationship('Customer', back_populates='orders')
 
     def set_status_purchased(self):
@@ -157,5 +165,17 @@ def wipe():
     session.add(userRole)
     session.add(StoreOwner)
     session.add(adminRole)
+    session.commit()
+    session.close()
+
+
+if __name__ == "__main__":
+    session.execute(text("ALTER TABLE customer ADD COLUMN secretToken VARCHAR(255) UNIQUE DEFAULT NULL"))
+
+    # Update existing rows to have the new secretToken value
+    customers = session.query(Customer).all()
+    for customer in customers:
+        if customer.secretToken is None:
+            customer.secretToken = pyotp.random_base32()
     session.commit()
     session.close()

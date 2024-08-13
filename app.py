@@ -11,7 +11,7 @@ from flask import Flask, render_template, url_for, request, redirect, flash, ses
 from flask_talisman import Talisman
 
 #For forms rendering
-from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
+from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm, TwoFactorForm
 from customer_login import CustomerLogin, RegisterCustomer, EditDetails, ChangePassword, securityQuestions, RegisterAdmin
 from customer_order import CustomerOrder, newOrderID
 from customer import Customer
@@ -25,6 +25,8 @@ from flask_bcrypt import Bcrypt
 from flask.sessions import SecureCookieSessionInterface
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from generateQR import get_b64encoded_qr_image
+
 
 #For RBAC
 from functools import wraps
@@ -221,10 +223,9 @@ def save_picture(form_picture):
 
 @login_manager.user_loader
 def load_user(id):
-    try:
-        return dbSession.query(Customer).filter(Customer.phoneNumber == id).first()
-    except Exception as e:
-        dbSession.rollback()
+
+    return dbSession.query(Customer).filter(Customer.phoneNumber == id).first()
+
 
     # with shelve.open('userdb', 'c') as userdb:
     #     if id in userdb:
@@ -323,6 +324,11 @@ def login():
         try:
             user = dbSession.query(Customer).filter(Customer.phoneNumber == form.phoneNumber.data).first()
             if isinstance(user, Customer) and bcrypt.check_password_hash(user.hashedPW, form.password.data):
+                if user.get_2fa():
+                    remember = form.remember.data
+                    login_user(user, remember=remember)
+                    session['id'] = int(user.get_id())
+                    return redirect(url_for("verify_two_factor_auth"))
                 #extract data here
                 currentDT = datetime.now().timetuple()
                 hour = currentDT[3]
@@ -416,29 +422,41 @@ def register():
     return render_template('register.html', form=form)
     
 
-@app.route('/2fa', methods = ["POST", "GET"])
-@limiter.limit("15/hour;5/minute")
-def authentication():
-    form = Authorisation(request.form)
-    if request.method == 'POST' and form.validate():
-        with shelve.open('userdb', 'c') as userdb:
-            user = CustomerLogin(form.phoneNumber.data, form.password.data)
-            if isinstance(user, Customer):
-                for keys in userdb:
-                    if user.get_id() == keys:
-                        if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
-                            if form.remember.data == True:
-                                login_user(userdb[keys], remember=True)
-                            else:
-                                login_user(userdb[keys])
-                            session['id'] =int(user.get_id())
-                            return render_template('home.html', logined = True)
+@app.route('/setup_2fa', methods = ["POST", "GET"])
+@limiter.limit("5/hour;3/minute")
+def setup_two_factor_auth():
+    secret = current_user.secretToken
+    uri = current_user.get_authentication_setup_uri()
+    base64_qr_image = get_b64encoded_qr_image(uri)
+    return render_template("/setup_2fa.html", secret=secret, qr_image=base64_qr_image)
 
+@app.route('/verify_2fa',methods = ["POST", "GET"])
+@role_required("User", "Admin", "StoreOwner")
+def verify_two_factor_auth():
+    form = TwoFactorForm(request.form)
+    if form.validate():
+        if current_user.is_otp_valid(form.otp.data):
+            if current_user.get_2fa():
+                flash("2FA verification successful. You are logged in!", "success")
+                return redirect(url_for('home'))
             else:
-                flash("wrong username/password. please try again", "warning")
-                return redirect(url_for('login'))
-    return render_template('login.html', form=form)
-
+                try:
+                    current_user.set_2fa_True()
+                    dbSession.commit()
+                    flash("2FA setup successful. You are logged in!", "success")
+                    return redirect(url_for('home'))
+                except Exception:
+                    dbSession.rollback()
+                    flash("2FA setup failed. Please try again.", "danger")
+                    return redirect(url_for('verify_two_factor_auth'))
+        else:
+            flash("Invalid OTP. Please try again.", "danger")
+            return redirect(url_for('verify_two_factor_auth'))
+    else:
+        if not current_user.get_2fa():
+            flash(
+                "You have not enabled 2-Factor Authentication. Please enable it first.", "info")
+    return render_template("verify_2fa.html", form=form)
 
 #Store Owner Login
 @app.route('/storeOwnerLogin', methods=["POST", "GET"])
@@ -666,25 +684,8 @@ def stalls():
     now = datetime.now()    
 
     if request.method == 'POST' and form.validate():
-        # form.orderID.data = str(newOrderID())
-        # form.phoneNumber.data = current_user.get_id()
-        # form.itemQuantity.data = request.form.get('itemQuantity')
-        # total = float(request.form.get('price')) * float(request.form.get('itemQuantity'))
-        # order = CustomerOrder(form.phoneNumber.data)
-        # order.set_id(current_user.get_id())
-        # order.set_datetime(form.orderDatetime.data)
-        # order.set_dateTimeData(form.orderDatetime.data)
-        # order.set_stallName(stall_name)
-        # order.set_orderID(form.orderID.data)
-        # order.set_item(form.item.data)
-        # order.set_itemQuantity(int(form.itemQuantity.data))
-        # order.set_price(form.price.data)
-        # order.set_total(total)
-        # response_token = request.form['g-recaptcha-response']
-        # verification_result = verify_recaptcha(response_token)
         if form.remarks.data != "":
             sanitized_remarks = sanitize_input(form.remarks.data)
-        # if verification_result.get('success') or not verification_result.get('success'):
         newOrder = Orders(customerID = current_user.get_id(), stallName = stall_name, item = form.item.data, itemQuantity = form.itemQuantity.data, price = form.price.data, total = float(request.form.get('price')) * float(request.form.get('itemQuantity')), remarks = sanitized_remarks)
         if isinstance(newOrder, Orders):
             try:
@@ -801,7 +802,8 @@ def deleteAllOrder():
     customerOrders = dbSession.query(Orders).filter(Orders.customerID == current_user.get_id()).all()
     try:
         for order in customerOrders:
-            dbSession.delete(order)
+            if order.get_status == "Pending":
+                dbSession.delete(order)
         dbSession.commit()
         flash("All orders successfully deleted", 'success')
         logging.log(ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
@@ -833,28 +835,6 @@ def orderHistory():
     return render_template('orderHistory.html', menu=menu, orders=orders, monthlyTotal = f"{monthlyTotal:.2f}")
 
         
-
-
-    # with shelve.open('order.db', 'c') as orderdb:
-    #     orders = []
-    #     count = 0
-    #     monthlyTotal = 0
-    #     current_datetime = datetime.now()
-    #     for order in orderdb:
-    #         if orderdb[order].get_id() == current_user.get_id() and orderdb[order].get_status == "Completed":
-    #             count += 1
-    #             if count > 30:
-    #                 orders.append(orderdb[order])
-    #                 orders.pop(orders[count-30])
-    #             else:
-    #                 orders.append(orderdb[order])
-                    
-    #             if orderdb[order].get_dateTimeData.month ==  current_datetime.month:
-    #                 monthlyTotal += float(orderdb[order].get_total)
-    # return render_template('orderHistory.html', menu=menu, orders=orders, monthlyTotal = f"{monthlyTotal:.2f}")
-
-#Instead of total impliment a monthly tally
-
 price_id = "price_1ObuyUDA20MkhXhqmqe3Niwb"
 
 def calculate_amount():
@@ -907,13 +887,16 @@ def payment():
 @app.route('/logout')
 @login_required
 def logout():
-    logout_user()
-    if 'id' in session:
-        session.pop('id')
-    session.clear()
-    flash("User successfully logged out." , 'success')
-    return redirect(url_for("home"))
-
+    try:
+        logout_user()  
+        if 'id' in session:
+            session.pop('id')  
+        flash("User successfully logged out.", 'success')
+    except Exception as e:
+        print(f"Error during logout: {e}")
+        flash("An error occurred while logging out.", 'danger')
+    finally:
+        return redirect(url_for("home"))
 
 #StoreOwners side
 @app.route('/currentOrders')

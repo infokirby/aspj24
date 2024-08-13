@@ -1,210 +1,4 @@
-<<<<<<< HEAD
-2024-08-01 23:26:37,828:WARNING: * Debugger is active!
-2024-08-01 23:27:06,743:ORDER:Order 41 created by 89448485
-2024-08-01 23:28:43,174:ORDER:Order 42 created by 89448485
-2024-08-01 23:30:30,909:ORDER:Order 43 created by 89448485
-2024-08-01 23:30:33,890:ORDER:Order 44 created by 89448485
-2024-08-01 23:32:15,661:ORDER:Order 41 deleted by 89448485
-2024-08-01 23:32:59,211:ORDER:Order 42 completed by 89448485
-2024-08-01 23:33:53,659:WARNING: * Debugger is active!
-2024-08-01 23:33:58,779:ORDER:Order 43 completed by 89448485
-2024-08-01 23:35:36,307:ORDER:Order 45 created by 89448485
-2024-08-01 23:46:34,254:WARNING: * Debugger is active!
-2024-08-02 00:14:24,881:WARNING: * Debugger is active!
-2024-08-02 00:30:26,374:WARNING: * Debugger is active!
-2024-08-02 00:31:29,287:WARNING: * Debugger is active!
-<<<<<<< HEAD
-2024-08-02 06:30:59,695:WARNING: * Debugger is active!
-2024-08-02 06:31:12,872:WARNING: * Debugger is active!
-2024-08-02 06:31:14,989:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:14] code 400, message Bad request version ('HcÊ|«\x00\x00*ÚÚ\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
-2024-08-02 06:31:15,001:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad request version ('öÆhBå\x1b\x0fk\x00,\x1a\x1a\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
-2024-08-02 06:31:15,002:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad request syntax ('\x16\x03\x01\x00}\x01\x00\x00y\x03\x01Rýl4\x0e5"\x16Hs·F_Ví)m\x92¿BBh§Ã\x9e\x81\x862z\x12\x05~\x00\x00\x14À')
-2024-08-02 06:31:15,124:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad request version ('\x07Ohéøaöø\x81ø\x9b¨ú[¢\x19¸yÍ²\x00*ZZ\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
-2024-08-02 06:31:15,125:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad request version ('}')
-2024-08-02 06:31:15,126:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad request syntax ('\x16\x03\x01\x00}\x01\x00\x00y\x03\x01\x04¡\x84ÒÑ¸gÝÿÞìF\x13ô\x95h¡¯"¼÷Ao\x15\'¯JDê\x93Wú\x00\x00\x14À')
-2024-08-02 06:31:15,127:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad request version ('½Ô\x00*zz\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
-2024-08-02 06:31:15,128:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad request version ('¹h]f²!`&¸ÒE_\x00,')
-2024-08-02 06:31:15,129:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:15] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00}\x01\x00\x00y\x03\x01U¢ý÷fWÜº\x9eçþê\x93')
-2024-08-02 06:31:19,394:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad request version ('Å3Ú"§\\\x0fø\x08wüå\x14\x8bN\x89Å×[\x00*\x1a\x1a\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
-2024-08-02 06:31:19,396:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad request version ('çF!)O\x14#EÜ\x02\x8f\x86')
-2024-08-02 06:31:19,398:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad request syntax ('\x16\x03\x01\x00}\x01\x00\x00y\x03\x01\x9f£èS\x07HØe!¢ä8Ú°`hs\x97&\x16¸re3p\x90ÅW#Êá\x95\x00\x00\x14À')
-2024-08-02 06:31:19,440:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad request version ('Â\x08·\x9aÄe\x90\x83àKòû\x83dè\x05^&\x00*JJ\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
-2024-08-02 06:31:19,442:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad request version ('Ðñ0¿¨Ù\x99Ù¥0;_ðD\x0eöÿù\x86I[Î\x00¹.Q&u\x14G·Ã\x00,\x8a\x8a\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
-2024-08-02 06:31:19,443:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x00}\x01\x00\x00y\x03\x01\x97Qxäª\x915\xadl')
-2024-08-02 06:31:19,444:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad request version ('¤ÕÂs\x93\x80w"â\x83s^À\x16\x00*êê\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
-2024-08-02 06:31:19,445:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad request version ('Ãä=ÖdÝX\x11ÿZ¤õýªëÖnOÌZSí<\x99¹m\x90ÌÁ_R÷\x00,\x9a\x9a\x13\x01\x13\x02\x13\x03À,À+Ì©À0À/Ì¨À')
-2024-08-02 06:31:19,446:ERROR:127.0.0.1 - - [02/Aug/2024 06:31:19] code 400, message Bad HTTP/0.9 request type ("\x16\x03\x01\x00}\x01\x00\x00y\x03\x01@_ªG'Çÿ°½7")
-2024-08-02 06:31:38,220:WARNING: * Debugger is active!
-2024-08-02 06:37:10,158:WARNING: * Debugger is active!
-2024-08-02 06:37:34,870:WARNING: * Debugger is active!
-2024-08-02 06:39:06,387:WARNING: * Debugger is active!
-2024-08-02 06:39:10,383:ORDER:Order 46 created by 90288065
-2024-08-02 06:40:54,289:WARNING: * Debugger is active!
-2024-08-02 06:41:36,931:ORDER:Order 47 created by 90288065
-2024-08-02 06:42:13,337:ORDER:Order 46 deleted by 90288065
-2024-08-02 06:42:18,479:ORDER:Order 47 updated by 90288065
-2024-08-02 06:43:21,695:WARNING: * Debugger is active!
-2024-08-02 06:43:35,629:ORDER:Order 47 updated by 90288065
-2024-08-02 06:43:46,250:WARNING: * Debugger is active!
-2024-08-02 06:43:48,222:ORDER:Order 47 updated by 90288065
-2024-08-02 06:43:54,151:WARNING: * Debugger is active!
-2024-08-02 06:43:56,146:ORDER:Order 47 updated by 90288065
-2024-08-02 06:44:52,919:WARNING: * Debugger is active!
-2024-08-02 06:44:56,186:ORDER:Order 47 updated by 90288065
-2024-08-02 06:46:58,358:WARNING: * Debugger is active!
-=======
-2024-08-02 05:24:50,029:WARNING: * Debugger is active!
-2024-08-02 05:25:51,312:WARNING: * Debugger is active!
-2024-08-02 05:27:39,312:WARNING: * Debugger is active!
-2024-08-02 05:27:51,228:WARNING: * Debugger is active!
-2024-08-02 05:27:53,785:WARNING: * Debugger is active!
-2024-08-02 05:28:53,119:WARNING: * Debugger is active!
-2024-08-02 05:29:45,271:WARNING: * Debugger is active!
-2024-08-02 05:38:02,421:WARNING: * Debugger is active!
-2024-08-02 05:38:17,261:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 05:38:20,265:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 05:38:57,914:WARNING: * Debugger is active!
-2024-08-02 05:52:35,538:WARNING: * Debugger is active!
-2024-08-02 05:52:46,573:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 05:52:49,576:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 05:56:39,531:WARNING: * Debugger is active!
-2024-08-02 05:57:52,157:WARNING: * Debugger is active!
-2024-08-02 05:57:57,454:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 05:58:00,458:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 06:02:24,473:WARNING: * Debugger is active!
-2024-08-02 06:02:39,389:WARNING: * Debugger is active!
-2024-08-02 06:02:49,419:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 06:02:52,425:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 06:05:58,994:WARNING: * Debugger is active!
-2024-08-02 06:06:09,717:WARNING: * Debugger is active!
-2024-08-02 06:06:19,390:WARNING: * Debugger is active!
-2024-08-02 06:07:45,134:WARNING: * Debugger is active!
-2024-08-02 06:14:50,529:WARNING: * Debugger is active!
-2024-08-02 06:15:25,905:WARNING: * Debugger is active!
-2024-08-02 06:15:35,067:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 06:15:38,076:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 06:17:51,420:WARNING: * Debugger is active!
-2024-08-02 06:19:05,854:WARNING: * Debugger is active!
-2024-08-02 06:19:28,814:WARNING: * Debugger is active!
-2024-08-02 06:19:41,165:WARNING: * Debugger is active!
-2024-08-02 06:19:53,738:WARNING: * Debugger is active!
-2024-08-02 06:20:12,527:WARNING: * Debugger is active!
-2024-08-02 06:20:24,805:WARNING: * Debugger is active!
-2024-08-02 06:22:07,270:WARNING: * Debugger is active!
-2024-08-02 06:22:24,073:WARNING: * Debugger is active!
-2024-08-02 06:22:53,406:WARNING: * Debugger is active!
-2024-08-02 06:51:07,725:WARNING: * Debugger is active!
-2024-08-02 06:51:34,154:ORDER:Order 46 created by 90288065
-2024-08-02 06:52:39,739:ORDER:Order 47 created by 90288065
->>>>>>> Lucian
-2024-08-02 06:58:24,324:WARNING: * Debugger is active!
-2024-08-02 06:58:35,297:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 06:58:38,303:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 06:59:24,925:WARNING: * Debugger is active!
-2024-08-02 06:59:27,732:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 06:59:30,737:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 06:59:37,688:ORDER:Order 48 created by 90288065
-2024-08-02 06:59:42,733:ORDER:Order 49 created by 90288065
-2024-08-02 07:00:22,300:WARNING: * Debugger is active!
-2024-08-02 07:09:55,596:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 07:09:58,605:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 07:10:02,486:ORDER:Order 50 created by 90288065
-2024-08-02 07:10:33,279:ORDER:Order 51 created by 90288065
-2024-08-02 07:10:38,652:WARNING: * Debugger is active!
-2024-08-02 07:10:41,453:ORDER:Order 52 created by 90288065
-2024-08-02 07:11:38,323:ORDER:Order 53 created by 90288065
-2024-08-02 07:11:53,378:WARNING: * Debugger is active!
-2024-08-02 07:11:55,415:ORDER:Order 54 created by 90288065
-2024-08-02 07:17:07,252:WARNING: * Debugger is active!
-2024-08-02 07:17:21,282:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 07:17:24,284:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
-2024-08-02 07:20:30,549:WARNING: * Debugger is active!
-2024-08-02 07:23:19,525:WARNING: * Debugger is active!
-2024-08-02 09:18:17,813:WARNING: * Debugger is active!
-2024-08-02 09:22:19,750:WARNING: * Debugger is active!
-2024-08-02 09:23:43,379:ORDER:Order 54 deleted by 90288065
-2024-08-02 09:23:58,212:ORDER:Order 46 completed by 90288065
-2024-08-02 09:23:59,304:ORDER:Order 47 completed by 90288065
-2024-08-02 09:27:56,202:WARNING: * Debugger is active!
-2024-08-02 09:28:33,679:WARNING: * Debugger is active!
-=======
-2024-08-13 00:45:06,856:WARNING: * Debugger is active!
-2024-08-13 01:14:18,150:WARNING: * Debugger is active!
-2024-08-13 01:19:12,821:WARNING: * Debugger is active!
-2024-08-13 01:23:43,665:WARNING: * Debugger is active!
-2024-08-13 01:24:41,511:WARNING: * Debugger is active!
-2024-08-13 01:42:14,489:WARNING: * Debugger is active!
-2024-08-13 01:47:10,130:WARNING: * Debugger is active!
-2024-08-13 01:47:42,667:WARNING: * Debugger is active!
-2024-08-13 02:09:01,490:WARNING: * Debugger is active!
-2024-08-13 02:10:28,058:WARNING: * Debugger is active!
-2024-08-13 02:10:51,252:WARNING: * Debugger is active!
-2024-08-13 02:11:12,677:WARNING: * Debugger is active!
-2024-08-13 02:13:47,937:WARNING: * Debugger is active!
-2024-08-13 02:17:43,357:WARNING: * Debugger is active!
-2024-08-13 12:53:45,606:ERROR:Exception during reset or similar
-Traceback (most recent call last):
-  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 988, in _finalize_fairy
-    fairy._reset(
-  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1438, in _reset
-    pool._dialect.do_rollback(self)
-  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 692, in do_rollback
-    dbapi_connection.rollback()
-  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/pymysql/connections.py", line 493, in rollback
-    self._read_ok_packet()
-  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/pymysql/connections.py", line 453, in _read_ok_packet
-    pkt = self._read_packet()
-          ^^^^^^^^^^^^^^^^^^^
-  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/pymysql/connections.py", line 744, in _read_packet
-    packet_header = self._read_bytes(4)
-                    ^^^^^^^^^^^^^^^^^^^
-  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/pymysql/connections.py", line 798, in _read_bytes
-    raise err.OperationalError(
-pymysql.err.OperationalError: (2013, 'Lost connection to MySQL server during query')
-2024-08-13 12:58:28,743:WARNING: * Debugger is active!
-2024-08-13 13:03:29,309:WARNING: * Debugger is active!
-2024-08-13 13:05:04,366:WARNING: * Debugger is active!
-2024-08-13 13:06:47,636:ORDER:Order 1 completed by 90288065
-2024-08-13 13:07:45,331:WARNING: * Debugger is active!
-2024-08-13 13:08:27,424:WARNING: * Debugger is active!
-2024-08-13 13:09:44,834:WARNING: * Debugger is active!
->>>>>>> Lucian
-2024-08-13 13:40:37,328:WARNING: * Debugger is active!
-2024-08-13 13:43:00,472:WARNING: * Debugger is active!
-2024-08-13 13:44:07,027:WARNING: * Debugger is active!
-2024-08-13 13:46:02,038:WARNING: * Debugger is active!
-2024-08-13 13:47:08,998:WARNING: * Debugger is active!
-2024-08-13 13:47:45,248:WARNING: * Debugger is active!
-2024-08-13 13:48:07,774:WARNING: * Debugger is active!
-2024-08-13 13:48:25,501:WARNING: * Debugger is active!
-2024-08-13 13:49:13,928:WARNING: * Debugger is active!
-2024-08-13 13:52:37,390:WARNING: * Debugger is active!
-2024-08-13 13:53:18,450:WARNING: * Debugger is active!
-2024-08-13 13:55:37,857:WARNING: * Debugger is active!
-2024-08-13 13:56:09,360:WARNING: * Debugger is active!
-2024-08-13 13:57:36,584:WARNING: * Debugger is active!
-2024-08-13 15:12:55,092:WARNING: * Debugger is active!
-2024-08-13 15:13:19,676:WARNING: * Debugger is active!
-2024-08-13 15:13:49,502:WARNING: * Debugger is active!
-2024-08-13 15:16:02,154:WARNING: * Debugger is active!
-2024-08-13 15:18:43,677:WARNING: * Debugger is active!
-2024-08-13 15:19:16,033:WARNING: * Debugger is active!
-2024-08-13 15:19:44,609:WARNING: * Debugger is active!
-2024-08-13 15:20:00,598:WARNING: * Debugger is active!
-2024-08-13 15:21:16,286:WARNING: * Debugger is active!
-2024-08-13 15:28:17,756:WARNING: * Debugger is active!
-2024-08-13 15:33:20,131:WARNING: * Debugger is active!
-2024-08-13 15:34:15,119:WARNING: * Debugger is active!
-2024-08-13 15:34:58,126:WARNING: * Debugger is active!
-2024-08-13 15:35:23,651:WARNING: * Debugger is active!
-2024-08-13 16:09:47,973:WARNING: * Debugger is active!
-2024-08-13 16:10:47,249:WARNING: * Debugger is active!
-2024-08-13 16:10:57,986:WARNING: * Debugger is active!
-2024-08-13 16:12:44,070:WARNING: * Debugger is active!
-2024-08-13 16:14:50,277:WARNING: * Debugger is active!
-2024-08-13 16:17:53,497:WARNING: * Debugger is active!
-2024-08-13 16:19:32,045:WARNING: * Debugger is active!
-2024-08-13 21:52:30,387:ERROR:Exception during reset or similar
+2024-08-14 01:41:26,192:ERROR:Exception during reset or similar
 Traceback (most recent call last):
   File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/pymysql/connections.py", line 782, in _read_bytes
     data = self._rfile.read(num_bytes)
@@ -234,3 +28,29 @@ Traceback (most recent call last):
   File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/pymysql/connections.py", line 788, in _read_bytes
     raise err.OperationalError(
 pymysql.err.OperationalError: (2013, 'Lost connection to MySQL server during query ([Errno 54] Connection reset by peer)')
+2024-08-14 01:41:47,080:WARNING: * Debugger is active!
+2024-08-14 01:44:54,546:WARNING: * Debugger is active!
+2024-08-14 01:45:59,142:WARNING: * Debugger is active!
+2024-08-14 01:46:40,922:WARNING: * Debugger is active!
+2024-08-14 01:47:08,390:WARNING: * Debugger is active!
+2024-08-14 01:49:11,348:WARNING: * Debugger is active!
+2024-08-14 01:50:10,224:WARNING: * Debugger is active!
+2024-08-14 01:50:39,714:WARNING: * Debugger is active!
+2024-08-14 01:53:50,269:WARNING: * Debugger is active!
+2024-08-14 02:00:45,928:WARNING: * Debugger is active!
+2024-08-14 02:02:33,243:WARNING: * Debugger is active!
+2024-08-14 02:02:55,165:WARNING: * Debugger is active!
+2024-08-14 02:06:20,090:WARNING: * Debugger is active!
+2024-08-14 02:10:44,511:WARNING: * Debugger is active!
+2024-08-14 02:13:46,408:WARNING: * Debugger is active!
+2024-08-14 02:14:53,328:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-14 02:14:56,295:ERROR:Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Queenstown+Estate%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-14 02:16:34,246:WARNING: * Debugger is active!
+2024-08-14 02:21:02,219:WARNING: * Debugger is active!
+2024-08-14 02:21:37,742:WARNING: * Debugger is active!
+2024-08-14 02:21:48,101:WARNING: * Debugger is active!
+2024-08-14 02:22:27,928:WARNING: * Debugger is active!
+2024-08-14 02:24:37,743:WARNING: * Debugger is active!
+2024-08-14 02:25:10,936:WARNING: * Debugger is active!
+2024-08-14 02:39:59,154:WARNING: * Debugger is active!
+2024-08-14 02:41:29,847:WARNING: * Debugger is active!

@@ -70,6 +70,8 @@ class StoreOwnerLoginForm(Form):
     password = PasswordField('Password:', [validators.InputRequired()])
     remember = BooleanField('Remember me:', default=True)
 
+class TwoFactorForm(Form):
+    otp = StringField('Enter OTP: ', [validators.input_required(),validators.Length(min=6, max=6)])
 
 # class CustOrderForm(Form):
 #     phoneNumber = HiddenField()
