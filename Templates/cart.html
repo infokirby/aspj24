@@ -27,28 +27,28 @@
                 <tbody>
                     {% for order in orders %}
                     <tr>
-                        <td>{{ order.get_orderID }}</td>
-                        <td>{{ order.get_datetime }}</td>
-                        <td>{{ order.get_stallName }}</td>
-                        <td>{{ order.get_item }}</td>
-                        <td>{{ order.get_itemQuantity }}</td>
-                        <td>${{ "%0.2f" | format(order.get_price | float) }}</td>
-                        <td>${{ "%0.2f" | format(order.get_total | float) }}</td>
-                        <td>{{ order.get_remarks }}</td>
-                        <td>{{ order.get_status }}</td>
-                        <td><button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#{{ order.get_item.replace(' ', '_') }}Modal">Edit</button></td>
+                        <td>{{ order.get_orderID() }}</td>
+                        <td>{{ order.get_datetime() }}</td>
+                        <td>{{ order.get_stallName() }}</td>
+                        <td>{{ order.get_item() }}</td>
+                        <td>{{ order.get_itemQuantity() }}</td>
+                        <td>${{ "%0.2f" | format(order.get_price() | float) }}</td>
+                        <td>${{ "%0.2f" | format(order.get_total() | float) }}</td>
+                        <td>{{ order.get_remarks() }}</td>
+                        <td>{{ order.get_status() }}</td>
+                        <td><button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#{{ order.get_item().replace(' ', '_') }}Modal">Edit</button></td>
                             <!-- Modal -->
-                            <div class="modal fade" id="{{ order.get_item.replace(' ', '_') }}Modal" tabindex="-1" role="dialog" aria-labelledby="{{ order.get_item.replace(' ', '_') }}ModalLabel" aria-hidden="true">
+                            <div class="modal fade" id="{{ order.get_item().replace(' ', '_') }}Modal" tabindex="-1" role="dialog" aria-labelledby="{{ order.get_item().replace(' ', '_') }}ModalLabel" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="{{ order.get_item.replace(' ', '_') }}ModalLabel">{{ order.get_item }}</h5>
+                                            <h5 class="modal-title" id="{{ order.get_item().replace(' ', '_') }}ModalLabel">{{ order.get_item() }}</h5>
                                         </div>
                                         <div class="modal-body">
                                             <!-- Product image-->
-                                            <img class="card-img-top" src="{{url_for('static', filename='menu-items/' + order.get_item.replace(' ', '_') + '.jpg' )}}" alt="{{ order.get_name }}" />
+                                            <img class="card-img-top" src="{{url_for('static', filename='menu-items/' + order.get_item().replace(' ', '_') + '.jpg' )}}" alt="{{ order.get_item() }}" />
                                             <!-- Order Form -->
-                                            <form method="POST" action="{{ url_for('editOrder', id=order.get_orderID)}}">
+                                            <form method="POST" action="{{ url_for('editOrder', id=order.get_orderID())}}">
                                                 {{ form.csrf_token }}
                                                 {{ form.orderDatetime }}
                                                 {{ form.phoneNumber }}
@@ -67,8 +67,8 @@
                                     </div>
                                 </div>
                             </div>
-                        <td><a href="{{ url_for('deleteOrder', id=order.get_orderID)}}" class="btn btn-danger" onclick="return confirm('Confirm Delete');">Delete</button></td>
-                        <td><a href="{{ url_for('completeOrder', id=order.get_orderID)}}" class="btn btn-info" onclick="return confirm('Confirm food for order {{order.get_orderID}} collected');">Collected</a></td>
+                        <td><a href="{{ url_for('deleteOrder', id=order.get_orderID())}}" class="btn btn-danger" onclick="return confirm('Confirm Delete');">Delete</button></td>
+                        <td><a href="{{ url_for('completeOrder', id=order.get_orderID())}}" class="btn btn-info" onclick="return confirm('Confirm food for order {{order.get_orderID()}} collected');">Collected</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>

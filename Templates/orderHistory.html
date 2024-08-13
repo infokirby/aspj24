@@ -24,14 +24,14 @@
         <tbody>
             {% for order in orders %}
             <tr>
-                <td>{{ order.get_orderID }}</td>
-                <td>{{ order.get_datetime }}</td>
-                <td>{{ order.get_stallName }}</td>
-                <td>{{ order.get_item }}</td>
-                <td>{{ order.get_itemQuantity }}</td>
-                <td>${{ order.get_price }}</td>
-                <td>${{ order.get_total }}</td>
-                <td>{{ order.get_remarks }}</td>
+                <td>{{ order.get_orderID() }}</td>
+                <td>{{ order.get_datetime() }}</td>
+                <td>{{ order.get_stallName() }}</td>
+                <td>{{ order.get_item() }}</td>
+                <td>{{ order.get_itemQuantity() }}</td>
+                <td>${{ order.get_price() }}</td>
+                <td>${{ order.get_total() }}</td>
+                <td>{{ order.get_remarks() }}</td>
             </tr>
             </tbody>
             {% endfor %}
