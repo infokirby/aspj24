@@ -5,6 +5,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 from flask_login import UserMixin
 from sqlalchemy.engine import URL
 from datetime import datetime as dt
+import pyotp
 
 url_object = URL.create(
     "mysql+pymysql",
@@ -39,11 +40,11 @@ class Customer(Base, UserMixin):
     name = Column(String(255), nullable=False)
     hashedPW = Column(String(255), nullable=False, server_default=" ")
     profilePicture_location = Column(String(255), default='default.jpeg')
-    twoFA = Column(Boolean(), nullable=True)
+    twoFA = Column(Boolean(), nullable=False, default=False)
     roles = relationship('Role', secondary=roles_users, backref='customers')
     active = Column(Boolean(), default = True)
     orders = relationship('Orders', back_populates='customer')
-
+    secretToken = Column(String(255), unique=True, default=pyotp.random_base32())
 
     #Mutators
     def set_password(self, password):
@@ -73,6 +74,15 @@ class Customer(Base, UserMixin):
     
     def get_profilePicture(self):
         return self.profilePicture_location
+
+    #2FA thingz
+    def get_authentication_setup_uri(self):
+        return pyotp.totp.TOTP(self.secretToken).provisioning_uri(name = self.get_name(), issuer_name="South Caneteen App")
+    
+    def is_otp_valid(self, userOtp):
+        totp = pyotp.parse_uri(self.get_authentication_setup_uri())
+        return totp.verify(userOtp)
+
 
     #Flask_login requirements
     def is_active(self):

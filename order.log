@@ -169,3 +169,68 @@ pymysql.err.OperationalError: (2013, 'Lost connection to MySQL server during que
 2024-08-13 13:08:27,424:WARNING: * Debugger is active!
 2024-08-13 13:09:44,834:WARNING: * Debugger is active!
 >>>>>>> Lucian
+2024-08-13 13:40:37,328:WARNING: * Debugger is active!
+2024-08-13 13:43:00,472:WARNING: * Debugger is active!
+2024-08-13 13:44:07,027:WARNING: * Debugger is active!
+2024-08-13 13:46:02,038:WARNING: * Debugger is active!
+2024-08-13 13:47:08,998:WARNING: * Debugger is active!
+2024-08-13 13:47:45,248:WARNING: * Debugger is active!
+2024-08-13 13:48:07,774:WARNING: * Debugger is active!
+2024-08-13 13:48:25,501:WARNING: * Debugger is active!
+2024-08-13 13:49:13,928:WARNING: * Debugger is active!
+2024-08-13 13:52:37,390:WARNING: * Debugger is active!
+2024-08-13 13:53:18,450:WARNING: * Debugger is active!
+2024-08-13 13:55:37,857:WARNING: * Debugger is active!
+2024-08-13 13:56:09,360:WARNING: * Debugger is active!
+2024-08-13 13:57:36,584:WARNING: * Debugger is active!
+2024-08-13 15:12:55,092:WARNING: * Debugger is active!
+2024-08-13 15:13:19,676:WARNING: * Debugger is active!
+2024-08-13 15:13:49,502:WARNING: * Debugger is active!
+2024-08-13 15:16:02,154:WARNING: * Debugger is active!
+2024-08-13 15:18:43,677:WARNING: * Debugger is active!
+2024-08-13 15:19:16,033:WARNING: * Debugger is active!
+2024-08-13 15:19:44,609:WARNING: * Debugger is active!
+2024-08-13 15:20:00,598:WARNING: * Debugger is active!
+2024-08-13 15:21:16,286:WARNING: * Debugger is active!
+2024-08-13 15:28:17,756:WARNING: * Debugger is active!
+2024-08-13 15:33:20,131:WARNING: * Debugger is active!
+2024-08-13 15:34:15,119:WARNING: * Debugger is active!
+2024-08-13 15:34:58,126:WARNING: * Debugger is active!
+2024-08-13 15:35:23,651:WARNING: * Debugger is active!
+2024-08-13 16:09:47,973:WARNING: * Debugger is active!
+2024-08-13 16:10:47,249:WARNING: * Debugger is active!
+2024-08-13 16:10:57,986:WARNING: * Debugger is active!
+2024-08-13 16:12:44,070:WARNING: * Debugger is active!
+2024-08-13 16:14:50,277:WARNING: * Debugger is active!
+2024-08-13 16:17:53,497:WARNING: * Debugger is active!
+2024-08-13 16:19:32,045:WARNING: * Debugger is active!
+2024-08-13 21:52:30,387:ERROR:Exception during reset or similar
+Traceback (most recent call last):
+  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/pymysql/connections.py", line 782, in _read_bytes
+    data = self._rfile.read(num_bytes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/socket.py", line 706, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [Errno 54] Connection reset by peer
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 988, in _finalize_fairy
+    fairy._reset(
+  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1438, in _reset
+    pool._dialect.do_rollback(self)
+  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 692, in do_rollback
+    dbapi_connection.rollback()
+  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/pymysql/connections.py", line 493, in rollback
+    self._read_ok_packet()
+  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/pymysql/connections.py", line 453, in _read_ok_packet
+    pkt = self._read_packet()
+          ^^^^^^^^^^^^^^^^^^^
+  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/pymysql/connections.py", line 744, in _read_packet
+    packet_header = self._read_bytes(4)
+                    ^^^^^^^^^^^^^^^^^^^
+  File "/Users/lucian/Desktop/Github/ASPJ24/aspj24/lib/python3.11/site-packages/pymysql/connections.py", line 788, in _read_bytes
+    raise err.OperationalError(
+pymysql.err.OperationalError: (2013, 'Lost connection to MySQL server during query ([Errno 54] Connection reset by peer)')

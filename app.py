@@ -2,13 +2,13 @@
 import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re, os, pandas, numpy, requests, logging
 from io import BytesIO
 from datetime import datetime, timedelta
-from flask_talisman import Talisman
 from werkzeug.utils import secure_filename
 import uuid
 from logs_config import ORDER_LEVEL
 
 #Flask Framework
 from flask import Flask, render_template, url_for, request, redirect, flash, session, send_file, jsonify, send_from_directory
+from flask_talisman import Talisman
 
 #For forms rendering
 from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
@@ -26,6 +26,9 @@ from flask.sessions import SecureCookieSessionInterface
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
+#For RBAC
+from functools import wraps
+
 #For ML 
 import joblib
 from iptest import geolocate
@@ -39,7 +42,7 @@ from extensionChecker import ALLOWED_EXTENSIONS, allowed_file
 
 #for database
 from flask_sqlalchemy import SQLAlchemy
-from DBcreateTables import Customer, Role, Orders
+from DBcreateTables import Customer, Role, Orders, roles_users
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, URL, Insert, Result, Boolean, text, update
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.schema import CreateSchema
@@ -95,9 +98,33 @@ csp = {
     ]
 }
 
-Talisman(app, content_security_policy=csp)
+# Talisman(app, content_security_policy=csp)
 
-load_dotenv()
+# load_dotenv()
+
+#RBAC
+def role_required(*required_roles):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if current_user.is_authenticated:
+                # Check if the current user has the required role
+                users_roles = dbSession.query(roles_users).all()
+                all_roles = dbSession.query(Role).all()
+                required_role_ids = [role.ID for role in all_roles if role.roleName in required_roles]
+
+                # Check if the user has any of the required roles
+                for user_role in users_roles:
+                    if user_role.role_id in required_role_ids:
+                        return f(*args, **kwargs)
+               
+                    else:
+                        return redirect(url_for('unauthorized'))
+            else:
+                flash("Please log in to access this page.", "warning")
+                return redirect(url_for('login'))
+        return decorated_function
+    return decorator
 
 stripe.api_key = os.getenv("STRIPE_API_KEY")
 bcrypt = Bcrypt(app)
@@ -199,8 +226,6 @@ def load_user(id):
     except Exception as e:
         dbSession.rollback()
 
-    finally:
-        dbSession.close()
     # with shelve.open('userdb', 'c') as userdb:
     #     if id in userdb:
     #         for keys in userdb:
@@ -225,10 +250,11 @@ def home():
 
 #storeownder home page
 @app.route('/storeOwnerHome')
+@role_required('storeOwner')
 def storeOwnerHome():
     return render_template('storeOwnerHome.html')
 
-
+#admin login
 @app.route('/admin', methods=['GET', 'POST'])
 def adminLogin():
     form = LoginForm(request.form)
@@ -239,21 +265,21 @@ def adminLogin():
                 if bcrypt.check_password_hash(superUser.get_password(), form.password.data):
                     login_user(admin)
                     session['id'] = admin.get_id()
-                    with shelve.open("userdb", 'c') as userdb:
-                        customerCount = len(userdb)
-                        return render_template('adminPage.html',  logined = True, customerCount=customerCount)
+                    customers = dbSession.query(Customer).all()
+                    dbSession.close()
+                    return render_template('adminPage.html',  logined = True, customerCount=len(customers))
 
                 else:
                     flash("For Admins only. Unauthorised access forbiddened.", 'Danger')
                     return redirect(url_for('home'))
     return render_template('adminLogin.html', form=form)
 
-# @app.route('/adminPage')
-# @login_required
-# def adminPage():
-#     with shelve.open("userdb", 'c') as userdb:
-#         customerCount = len(userdb)
-#         return render_template('adminPage.html', customerCount=customerCount)
+@app.route('/adminPage')
+@role_required("Admin")
+def adminPage():
+    with shelve.open("userdb", 'c') as userdb:
+        customerCount = len(userdb)
+        return render_template('adminPage.html', customerCount=customerCount)
     
 
 
@@ -297,6 +323,46 @@ def login():
         try:
             user = dbSession.query(Customer).filter(Customer.phoneNumber == form.phoneNumber.data).first()
             if isinstance(user, Customer) and bcrypt.check_password_hash(user.hashedPW, form.password.data):
+                #extract data here
+                currentDT = datetime.now().timetuple()
+                hour = currentDT[3]
+                day = currentDT[2]
+                month = currentDT[1]
+                year = currentDT[0]
+
+                new_data = pandas.DataFrame({
+                    'hour': [hour],
+                    'day' : [day],
+                    'month' : [month],
+                    'year' : [year],
+                })
+
+                location_dummies = pandas.get_dummies(geolocate('219.74.99.238'), prefix='location')
+                for col in location_dummies.columns:
+                    new_data[col] = location_dummies[col]
+
+                    # Ensure all location columns are present
+                    for col in feature_names:
+                        if col not in new_data.columns:
+                            new_data[col] = 0
+
+                for col in new_data.columns:
+                    pandas.concat
+                
+                # Extract features for prediction
+                X_new = new_data[feature_names].values
+
+                # Standardize the features
+                X_new_scaled = scaler.transform(X_new)
+                
+                # Predict if the login data is an anomaly
+                prediction = iso_forest.predict(X_new_scaled)
+                    
+
+                if prediction[0] == -1: #anomaly
+                    flash("Login not authorised. Please leave site.", "danger")
+                    return render_template('login.html', form=form)
+                
                 remember = form.remember.data
                 login_user(user, remember=remember)
                 session['id'] = int(user.get_id())
@@ -311,64 +377,6 @@ def login():
         finally:
             dbSession.close()
     return render_template('login.html', form=form)
-
-
-    #     with shelve.open('userdb', 'c') as userdb:
-    #         user = CustomerLogin(form.phoneNumber.data, form.password.data)
-    #         if isinstance(user, Customer):
-    #             for keys in userdb:
-    #                 if user.get_id() == keys:
-    #                     if bcrypt.check_password_hash(userdb[keys].get_password(), form.password.data):
-    #                          #extract data here
-    #                         currentDT = datetime.now().timetuple()
-    #                         hour = currentDT[3]
-    #                         day = currentDT[2]
-    #                         month = currentDT[1]
-    #                         year = currentDT[0]
-
-    #                         new_data = pandas.DataFrame({
-    #                             'hour': [hour],
-    #                             'day' : [day],
-    #                             'month' : [month],
-    #                             'year' : [year],
-    #                         })
-
-    #                         location_dummies = pandas.get_dummies(geolocate('219.74.99.238'), prefix='location')
-    #                         for col in location_dummies.columns:
-    #                             new_data[col] = location_dummies[col]
-    
-    #                             # Ensure all location columns are present
-    #                             for col in feature_names:
-    #                                 if col not in new_data.columns:
-    #                                     new_data[col] = 0
-
-    #                         for col in new_data.columns:
-    #                             pandas.concat
-                            
-    #                         # Extract features for prediction
-    #                         X_new = new_data[feature_names].values
-
-    #                         # Standardize the features
-    #                         X_new_scaled = scaler.transform(X_new)
-                            
-    #                         # Predict if the login data is an anomaly
-    #                         prediction = iso_forest.predict(X_new_scaled)
-                                
-
-    #                         if prediction[0] == -1: #anomaly
-    #                             flash("Login not authorised. Please leave site.", "danger")
-    #                             return render_template('login.html', form=form)
-                            
-    #                         else:
-    #                             if form.remember.data:
-    #                                 login_user(userdb[keys], remember=True)
-    #                             else:
-    #                                 login_user(userdb[keys])
-    #                         session['id'] = user.get_id()
-    #                         return render_template('home.html', logined=True)
-    #         flash("wrong username/password. please try again", "warning")
-    #         return redirect(url_for('login'))
-    # return render_template('login.html', form=form)
 
 
 #Registration Route
@@ -493,7 +501,7 @@ def forgotPassword():
 
 #profile page
 @app.route('/profile', methods=['GET', 'POST'])
-@login_required
+@role_required("User", "Admin", "StoreOwner")
 def profile():
     form = EditUserForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -527,6 +535,7 @@ def profile():
         
 #Upload PFP
 @app.route('/upload', methods=['GET', 'POST'])
+@role_required("User", "Admin", "StoreOwner")
 def upload_file():
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -544,13 +553,14 @@ def upload_file():
     return render_template('upload.html')
 
 @app.route('/uploads/<filename>')
+@role_required("User", "Admin", "StoreOwner")
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 #change password page
 @app.route('/changePassword', methods=['GET', 'POST'])
-@login_required
+@role_required("User", "Admin", "StoreOwner")
 def changePassword():
     form = ChangePasswordForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -578,7 +588,7 @@ def changePassword():
 
 
 @app.route('/deleteProfile', methods = ["POST", "GET"])
-@login_required
+@role_required("User")
 def deleteProfile():
     form = request.form
     if request.method == "POST":
@@ -648,7 +658,7 @@ def verify_recaptcha(response_token):
 @app.route('/Snack', methods=['GET', 'POST'])
 @app.route('/Waffle', methods=['GET', 'POST'])
 @app.route('/Drinks', methods=['GET', "POST"])
-@login_required
+@role_required("User", "Admin", "StoreOwner")
 def stalls():
     path = request.path
     stall_name = path.lstrip('/')
@@ -701,7 +711,7 @@ def stalls():
 
 #Cart
 @app.route('/cart', methods=['GET', 'POST'])
-@login_required
+@role_required("User", "Admin", "StoreOwner")
 def cart():
     total = 0
     orders = [] 
@@ -719,7 +729,7 @@ def cart():
 
 #mark complete
 @app.route('/completeOrder/<string:id>', methods=['GET', 'POST'])
-@login_required
+@role_required("User", "Admin", "StoreOwner")
 def completeOrder(id):
     # order complete log
     currentOrder = dbSession.query(Orders).filter(Orders.ID == id).first()
@@ -738,7 +748,7 @@ def completeOrder(id):
 
 #edit
 @app.route('/editOrder/<string:id>', methods=['GET', 'POST'])
-@login_required
+@role_required("User", "Admin", "StoreOwner")
 def editOrder(id):
     form = CustOrderForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -762,7 +772,7 @@ def editOrder(id):
 
 #delete
 @app.route('/deleteOrder/<string:id>', methods=['GET', 'POST'])
-@login_required
+@role_required("User", "Admin", "StoreOwner")
 def deleteOrder(id):
     # order delete log
     logging.log(ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
@@ -785,7 +795,7 @@ def deleteOrder(id):
 
 # delete all
 @app.route('/deleteAllOrder', methods=['GET', 'POST'])
-@login_required
+@role_required("User", "Admin", "StoreOwner")
 def deleteAllOrder():
     count = 0
     customerOrders = dbSession.query(Orders).filter(Orders.customerID == current_user.get_id()).all()
@@ -808,7 +818,7 @@ def deleteAllOrder():
 
 #Customer Order History
 @app.route('/orderHistory', methods=['GET', 'POST'])
-@login_required
+@role_required("User", "Admin", "StoreOwner")
 def orderHistory():
     orders = []
     monthlyTotal = 0
@@ -818,7 +828,9 @@ def orderHistory():
         if order.get_status() == "Completed":
             orders.append(order)
             monthlyTotal += float(order.get_total())
-        return render_template('orderHistory.html', menu=menu, orders=orders, monthlyTotal = f"{monthlyTotal:.2f}")
+
+    dbSession.close()
+    return render_template('orderHistory.html', menu=menu, orders=orders, monthlyTotal = f"{monthlyTotal:.2f}")
 
         
 
@@ -974,22 +986,22 @@ def dashboard():
     # except:
     #     raise 404
 
-    food_list = ['Plain waffle', 'Chocolate Waffle', 'Peanut Butter Waffle']
-    plain_list = []
-    chocolate_list = []
-    peanut_list = []
-    print(pie_dict)
-    for order in pie_dict:
-        if 'Plain Waffle' in order:
-            plain_list.append(order.get_quantity())
-        elif order.get_food() == 'Chocolate Waffle':
-            chocolate_list.append(order.get_quantity())
-        elif order.get_food() == "Peanut Butter Waffle":
-            peanut_list.append(order.get_quantity())
+    # food_list = ['Plain waffle', 'Chocolate Waffle', 'Peanut Butter Waffle']
+    # plain_list = []
+    # chocolate_list = []
+    # peanut_list = []
+    # print(pie_dict)
+    # for order in pie_dict:
+    #     if 'Plain Waffle' in order:
+    #         plain_list.append(order.get_quantity())
+    #     elif order.get_food() == 'Chocolate Waffle':
+    #         chocolate_list.append(order.get_quantity())
+    #     elif order.get_food() == "Peanut Butter Waffle":
+    #         peanut_list.append(order.get_quantity())
 
-    db.close()
+    # db.close()
 
-    return render_template('salesDashboard.html', )
+    # return render_template('salesDashboard.html', )
 
 @app.route('/download_excel_api')
 def downloadExcelApi():
@@ -1079,6 +1091,10 @@ def createHeadStyle():
 def not_authorised(error):
         return render_template('error.html', error_code = 401, message = "Please login to view this page")
     
+@app.errorhandler(403)
+def not_authorised(error):
+        return render_template('error.html', error_code = 403, message = "You don't have the required permissions to access this page.")
+
 @app.errorhandler(404)
 def not_found(error):
         return render_template('error.html', error_code = 404, message = 'Page not found. Sorry for the inconvinience caused.')
@@ -1091,6 +1107,11 @@ def request_entitiy_too_large(error):
 # @app.errorhandler(Exception)
 # def handle_exception(error):
 #     return render_template('error.html', error_code = 500, message='Unknown error occured, please try again later.')
+
+@app.route('/unauthorized')
+def unauthorized():
+    return render_template('error.html', error_code = 403, message = "You don't have the required permissions to access this page.")
+
 
 if __name__ == '__main__':
     app.run(debug = True)
