@@ -36,7 +36,7 @@
                                     <!-- Product image-->
                                     <img class="card-img-top" src="{{url_for('static', filename='menu-items/' + item.replace(' ', '_') + '.jpg' )}}" alt="{{ item.name }}" />
                                     <!-- Order Form -->
-                                    <form method="POST" id="order-form">
+                                    <form method='POST' id="order-form">
                                         {{ form.csrf_token }}
                                         {{ form.orderDatetime }}
                                         {{ form.phoneNumber }}
@@ -47,7 +47,9 @@
                                         {{ form.price(value = price) }}
                                         {{ form.total }}
                                         {{ render_field( form.remarks )}}
-                                        <div class="g-recaptcha" data-sitekey="{{ sitekey }}"></div>
+                                        {{ form.recaptcha }}
+                                        <!-- {{ recaptcha }} -->
+                                        <!-- <div class="g-recaptcha" data-sitekey="6LdcmxUqAAAAAGVF_1zJ26DFEs61J2oJ8cQ3eM-4"></div> -->
                                         {{ form.status }}
 
                                         

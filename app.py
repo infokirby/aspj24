@@ -25,7 +25,7 @@ from flask_limiter.util import get_remote_address
 from logs_config import write_csv_log, orderLog
 from iptest import geolocate
 from sklearn.preprocessing import StandardScaler
-# from flask_ngrok import run_with_ngrok 
+from flask_wtf.csrf import CSRFProtect
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
@@ -285,7 +285,7 @@ def contactUs():
 #     return render_template('login.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
-@limiter.limit("15/hour;5/minute")
+# @limiter.limit("15/hour;5/minute")
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -635,38 +635,38 @@ def stalls():
     stall_name = path.lstrip('/')
     form = CustOrderForm(request.form)
     now = datetime.now()    
-
-    if request.method == 'POST' and form.validate_on_submit():
+    response_token = request.form['g-recaptcha-response']  # This should be the token you get from the client-side reCAPTCHA
+    print(response_token)
+    verification_result = verify_recaptcha(response_token)
+    print(verification_result)
+    if len(response_token) > 0:
     # if request.method == 'POST':
-        response_token = request.form['g-recaptcha-response']  # This should be the token you get from the client-side reCAPTCHA
-        print(response_token)
-        verification_result = verify_recaptcha(response_token)
-        print(verification_result)
-        if verification_result.get('success'):
-            form.orderID.data = str(newOrderID())
-            form.phoneNumber.data = current_user.get_id()
-            form.itemQuantity.data = request.form.get('itemQuantity')
-            total = float(request.form.get('price')) * float(request.form.get('itemQuantity'))
-            order = CustomerOrder(form.phoneNumber.data)
-            order.set_id(current_user.get_id())
-            order.set_dateTimeData(form.orderDatetime.data)
-            order.set_stallName(stall_name)
-            order.set_orderID(form.orderID.data)
-            order.set_item(form.item.data)
-            order.set_itemQuantity(int(form.itemQuantity.data))
-            order.set_price(form.price.data)
-            order.set_total(total)
-            #regex to remove special characters
-            if form.remarks.data != "":
-                sanitized_remarks = sanitize_input(form.remarks.data)
-                order.set_remarks(sanitized_remarks)
-            order.set_status(form.status.data)
 
-            with shelve.open('order.db', 'c') as orderdb:
-                orderdb[order.get_orderID] = order
+        # if verification_result.get('success'):
+        form.orderID.data = str(newOrderID())
+        form.phoneNumber.data = current_user.get_id()
+        form.itemQuantity.data = request.form.get('itemQuantity')
+        total = float(request.form.get('price')) * float(request.form.get('itemQuantity'))
+        order = CustomerOrder(form.phoneNumber.data)
+        order.set_id(current_user.get_id())
+        order.set_dateTimeData(form.orderDatetime.data)
+        order.set_stallName(stall_name)
+        order.set_orderID(form.orderID.data)
+        order.set_item(form.item.data)
+        order.set_itemQuantity(int(form.itemQuantity.data))
+        order.set_price(form.price.data)
+        order.set_total(total)
+        #regex to remove special characters
+        if form.remarks.data != "":
+            sanitized_remarks = sanitize_input(form.remarks.data)
+            order.set_remarks(sanitized_remarks)
+        order.set_status(form.status.data)
 
-        else:
-            print("recaptcha not validated")
+        with shelve.open('order.db', 'c') as orderdb:
+            orderdb[order.get_orderID] = order
+
+        # else:
+        #     print("recaptcha not validated")
     
     else:
         print("Form not validated")
@@ -1030,4 +1030,4 @@ def handle_exception(error):
     return render_template('error.html', error_code = 500, message='Unknown error occured, please try again later.')
 
 if __name__ == '__main__':
-    app.run(debug = True)
+    app.run(debug = True, ssl_context='adhoc')
