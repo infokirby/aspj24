@@ -2155,3 +2155,349 @@ ssl.SSLEOFError: EOF occurred in violation of protocol (_ssl.c:2427)
 2024-08-13 21:12:27,781 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:12:27] "GET /Static/Trees.jpg HTTP/1.1" 200 -
 2024-08-13 21:12:28,654 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:12:28] "GET /favicon.ico HTTP/1.1" 200 -
 2024-08-13 21:14:25,070 - werkzeug - INFO -  * Detected change in 'c:\\Users\\kohka\\Documents\\GitHub\\aspj24\\app.py', reloading
+2024-08-13 21:14:25,672 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:14:34,625 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:14:34,629 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:14:42,639 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:14:42] "GET /Drinks HTTP/1.1" 200 -
+2024-08-13 21:14:42,902 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:14:42] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 21:14:42,905 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:14:42] "GET /Static/South%20Canteen%20Logo.png HTTP/1.1" 200 -
+2024-08-13 21:14:42,912 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:14:42] "GET /Static/menu-items/Iced_Milo.jpg HTTP/1.1" 200 -
+2024-08-13 21:14:43,006 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:14:43] "GET /Static/menu-items/Kopi.jpg HTTP/1.1" 200 -
+2024-08-13 21:14:43,020 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:14:43] "GET /Static/menu-items/Iced_Lemon_Tea.jpg HTTP/1.1" 200 -
+2024-08-13 21:14:43,033 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:14:43] "GET /Static/menu-items/Teh.jpg HTTP/1.1" 200 -
+2024-08-13 21:14:43,042 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:14:43] "GET /Static/menu-items/Calamansi.jpg HTTP/1.1" 200 -
+2024-08-13 21:14:43,820 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:14:43] "GET /Static/Trees.jpg HTTP/1.1" 200 -
+2024-08-13 21:14:45,422 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:14:45] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:18:21,447 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:21] "POST /Drinks HTTP/1.1" 200 -
+2024-08-13 21:18:21,584 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:21] "GET /Static/South%20Canteen%20Logo.png HTTP/1.1" 200 -
+2024-08-13 21:18:21,587 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:21] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 21:18:21,603 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:21] "GET /Static/menu-items/Kopi.jpg HTTP/1.1" 200 -
+2024-08-13 21:18:21,608 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:21] "GET /Static/menu-items/Teh.jpg HTTP/1.1" 200 -
+2024-08-13 21:18:21,612 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:21] "GET /Static/menu-items/Iced_Lemon_Tea.jpg HTTP/1.1" 200 -
+2024-08-13 21:18:21,615 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:21] "GET /Static/menu-items/Calamansi.jpg HTTP/1.1" 200 -
+2024-08-13 21:18:21,620 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:21] "GET /Static/menu-items/Iced_Milo.jpg HTTP/1.1" 200 -
+2024-08-13 21:18:22,590 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:22] "GET /Static/Trees.jpg HTTP/1.1" 200 -
+2024-08-13 21:18:24,242 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:24] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:18:26,919 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:26] "GET /cart HTTP/1.1" 200 -
+2024-08-13 21:18:27,126 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:27] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:18:27,133 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:27] "[36mGET /Static/menu-items/Teh.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:18:27,153 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:27] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:18:27,154 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:27] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 21:18:28,117 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:28] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:18:36,884 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:36] "[32mGET /completeOrder/10 HTTP/1.1[0m" 302 -
+2024-08-13 21:18:38,246 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:38] "GET /cart HTTP/1.1" 200 -
+2024-08-13 21:18:38,335 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:38] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:18:38,338 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:38] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 21:18:38,446 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:38] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:18:39,217 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:18:39] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:20:55,388 - werkzeug - INFO -  * Detected change in 'c:\\Users\\kohka\\Documents\\GitHub\\aspj24\\logs_config.py', reloading
+2024-08-13 21:20:56,081 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:21:06,610 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:21:06,617 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:21:13,379 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:13] "GET /Drinks HTTP/1.1" 200 -
+2024-08-13 21:21:13,627 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:13] "GET /Static/South%20Canteen%20Logo.png HTTP/1.1" 200 -
+2024-08-13 21:21:13,637 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:13] "GET /Static/menu-items/Iced_Milo.jpg HTTP/1.1" 200 -
+2024-08-13 21:21:13,722 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:13] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 21:21:13,999 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:13] "GET /Static/menu-items/Kopi.jpg HTTP/1.1" 200 -
+2024-08-13 21:21:14,007 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:14] "GET /Static/menu-items/Teh.jpg HTTP/1.1" 200 -
+2024-08-13 21:21:14,035 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:14] "GET /Static/menu-items/Iced_Lemon_Tea.jpg HTTP/1.1" 200 -
+2024-08-13 21:21:14,045 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:14] "GET /Static/menu-items/Calamansi.jpg HTTP/1.1" 200 -
+2024-08-13 21:21:14,791 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:14] "GET /Static/Trees.jpg HTTP/1.1" 200 -
+2024-08-13 21:21:16,277 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:16] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:21:18,323 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:18] "POST /Drinks HTTP/1.1" 200 -
+2024-08-13 21:21:18,471 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:18] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:21:18,507 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:18] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:18,519 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:18] "[36mGET /Static/menu-items/Kopi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:18,523 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:18] "[36mGET /Static/menu-items/Teh.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:18,527 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:18] "[36mGET /Static/menu-items/Iced_Lemon_Tea.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:18,532 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:18] "[36mGET /Static/menu-items/Calamansi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:18,535 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:18] "[36mGET /Static/menu-items/Iced_Milo.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:18,547 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:18] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:20,505 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:20] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:21:22,240 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:22] "POST /Drinks HTTP/1.1" 200 -
+2024-08-13 21:21:22,370 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:22] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:21:22,400 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:22] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:22,413 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:22] "[36mGET /Static/menu-items/Kopi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:22,421 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:22] "[36mGET /Static/menu-items/Teh.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:22,426 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:22] "[36mGET /Static/menu-items/Iced_Lemon_Tea.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:22,435 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:22] "[36mGET /Static/menu-items/Iced_Milo.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:22,441 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:22] "[36mGET /Static/menu-items/Calamansi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:22,445 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:22] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:23,908 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:23] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:21:26,598 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:26] "GET /cart HTTP/1.1" 200 -
+2024-08-13 21:21:26,720 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:26] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:21:26,757 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:26] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:26,766 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:26] "[36mGET /Static/menu-items/Iced_Lemon_Tea.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:26,770 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:26] "[36mGET /Static/menu-items/Calamansi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:26,774 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:26] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:27,919 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:27] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:21:29,986 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:29] "[32mGET /completeOrder/11 HTTP/1.1[0m" 302 -
+2024-08-13 21:21:31,355 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:31] "GET /cart HTTP/1.1" 200 -
+2024-08-13 21:21:31,484 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:31] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:21:31,524 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:31] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:31,535 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:31] "[36mGET /Static/menu-items/Calamansi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:31,539 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:31] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:21:32,439 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:21:32] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:22:31,501 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on https://127.0.0.1:5000
+2024-08-13 21:22:31,501 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-08-13 21:22:31,502 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:22:40,624 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:22:40,627 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:22:49,503 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:22:49] "[32mGET /completeOrder/12 HTTP/1.1[0m" 302 -
+2024-08-13 21:22:50,895 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:22:50] "GET /cart HTTP/1.1" 200 -
+2024-08-13 21:22:51,158 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:22:51] "GET /Static/South%20Canteen%20Logo.png HTTP/1.1" 200 -
+2024-08-13 21:22:51,192 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:22:51] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 21:22:52,366 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:22:52] "GET /Static/Trees.jpg HTTP/1.1" 200 -
+2024-08-13 21:22:53,174 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:22:53] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:27:22,806 - werkzeug - INFO -  * Detected change in 'c:\\Users\\kohka\\Documents\\GitHub\\aspj24\\app.py', reloading
+2024-08-13 21:27:23,462 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:27:32,627 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:27:32,631 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:28:46,449 - werkzeug - INFO -  * Detected change in 'c:\\Users\\kohka\\Documents\\GitHub\\aspj24\\logs_config.py', reloading
+2024-08-13 21:28:47,111 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:29:13,618 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on https://127.0.0.1:5000
+2024-08-13 21:29:13,618 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-08-13 21:29:13,620 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:29:22,880 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:29:22,884 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:29:35,879 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:35] "GET /Drinks HTTP/1.1" 200 -
+2024-08-13 21:29:36,163 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:36] "GET /Static/South%20Canteen%20Logo.png HTTP/1.1" 200 -
+2024-08-13 21:29:36,170 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:36] "GET /Static/menu-items/Iced_Milo.jpg HTTP/1.1" 200 -
+2024-08-13 21:29:36,176 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:36] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 21:29:36,252 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:36] "GET /Static/menu-items/Teh.jpg HTTP/1.1" 200 -
+2024-08-13 21:29:36,287 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:36] "GET /Static/menu-items/Kopi.jpg HTTP/1.1" 200 -
+2024-08-13 21:29:36,310 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:36] "GET /Static/menu-items/Iced_Lemon_Tea.jpg HTTP/1.1" 200 -
+2024-08-13 21:29:36,320 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:36] "GET /Static/menu-items/Calamansi.jpg HTTP/1.1" 200 -
+2024-08-13 21:29:37,048 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:37] "GET /Static/Trees.jpg HTTP/1.1" 200 -
+2024-08-13 21:29:38,759 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:38] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:29:40,970 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:40] "POST /Drinks HTTP/1.1" 200 -
+2024-08-13 21:29:41,099 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:41] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:29:41,131 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:41] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:41,146 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:41] "[36mGET /Static/menu-items/Kopi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:41,150 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:41] "[36mGET /Static/menu-items/Teh.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:41,153 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:41] "[36mGET /Static/menu-items/Iced_Lemon_Tea.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:41,157 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:41] "[36mGET /Static/menu-items/Iced_Milo.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:41,159 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:41] "[36mGET /Static/menu-items/Calamansi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:41,161 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:41] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:42,657 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:42] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:29:46,644 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:46] "POST /Drinks HTTP/1.1" 200 -
+2024-08-13 21:29:46,795 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:46] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:29:46,829 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:46] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:46,840 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:46] "[36mGET /Static/menu-items/Kopi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:46,848 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:46] "[36mGET /Static/menu-items/Teh.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:46,852 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:46] "[36mGET /Static/menu-items/Iced_Lemon_Tea.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:46,857 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:46] "[36mGET /Static/menu-items/Calamansi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:46,860 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:46] "[36mGET /Static/menu-items/Iced_Milo.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:46,882 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:46] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:48,309 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:48] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:29:51,281 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:51] "POST /Drinks HTTP/1.1" 200 -
+2024-08-13 21:29:51,405 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:51] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:29:51,434 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:51] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:51,447 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:51] "[36mGET /Static/menu-items/Kopi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:51,449 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:51] "[36mGET /Static/menu-items/Teh.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:51,455 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:51] "[36mGET /Static/menu-items/Iced_Lemon_Tea.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:51,459 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:51] "[36mGET /Static/menu-items/Iced_Milo.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:51,461 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:51] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:51,466 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:51] "[36mGET /Static/menu-items/Calamansi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:52,898 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:52] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:29:56,359 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:56] "POST /Drinks HTTP/1.1" 200 -
+2024-08-13 21:29:56,499 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:56] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:29:56,531 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:56] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:56,538 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:56] "[36mGET /Static/menu-items/Kopi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:56,542 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:56] "[36mGET /Static/menu-items/Teh.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:56,544 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:56] "[36mGET /Static/menu-items/Iced_Lemon_Tea.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:56,548 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:56] "[36mGET /Static/menu-items/Calamansi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:56,551 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:56] "[36mGET /Static/menu-items/Iced_Milo.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:56,562 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:56] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:29:58,191 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:29:58] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:30:00,339 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:00] "GET /cart HTTP/1.1" 200 -
+2024-08-13 21:30:00,531 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:00] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:30:00,544 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:00] "[36mGET /Static/menu-items/Calamansi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:30:00,547 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:00] "[36mGET /Static/menu-items/Teh.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:30:00,552 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:00] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 21:30:00,555 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:00] "[36mGET /Static/menu-items/Kopi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:30:00,560 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:00] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:30:00,565 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:00] "[36mGET /Static/menu-items/Iced_Milo.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:30:01,958 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:01] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:30:05,763 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:05] "[32mGET /completeOrder/13 HTTP/1.1[0m" 302 -
+2024-08-13 21:30:07,123 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:07] "GET /cart HTTP/1.1" 200 -
+2024-08-13 21:30:07,314 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:07] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:30:07,376 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:07] "[36mGET /Static/menu-items/Iced_Milo.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:30:07,389 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:07] "[36mGET /uploads/default.jpeg HTTP/1.1[0m" 304 -
+2024-08-13 21:30:07,406 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:07] "[36mGET /Static/menu-items/Kopi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:30:07,411 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:07] "[36mGET /Static/menu-items/Calamansi.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:30:07,420 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:07] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:30:08,870 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:30:08] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:30:42,111 - werkzeug - INFO -  * Detected change in 'c:\\Users\\kohka\\Documents\\GitHub\\aspj24\\app.py', reloading
+2024-08-13 21:30:42,780 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:30:52,201 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:30:52,204 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:31:04,752 - werkzeug - INFO -  * Detected change in 'c:\\Users\\kohka\\Documents\\GitHub\\aspj24\\app.py', reloading
+2024-08-13 21:31:05,450 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:31:14,779 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:31:14,789 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:31:24,629 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:31:24] "[32mGET /completeOrder/14 HTTP/1.1[0m" 302 -
+2024-08-13 21:31:26,017 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:31:26] "GET /cart HTTP/1.1" 200 -
+2024-08-13 21:31:26,195 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:31:26] "GET /Static/South%20Canteen%20Logo.png HTTP/1.1" 200 -
+2024-08-13 21:31:26,252 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:31:26] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 21:31:26,323 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:31:26] "GET /Static/menu-items/Iced_Milo.jpg HTTP/1.1" 200 -
+2024-08-13 21:31:26,328 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:31:26] "GET /Static/menu-items/Calamansi.jpg HTTP/1.1" 200 -
+2024-08-13 21:31:26,468 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:31:26] "GET /Static/Trees.jpg HTTP/1.1" 200 -
+2024-08-13 21:31:27,617 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:31:27] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:32:02,433 - werkzeug - INFO -  * Detected change in 'c:\\Users\\kohka\\Documents\\GitHub\\aspj24\\app.py', reloading
+2024-08-13 21:32:03,160 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:32:12,372 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:32:12,376 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:33:21,376 - werkzeug - INFO -  * Detected change in 'c:\\Users\\kohka\\Documents\\GitHub\\aspj24\\app.py', reloading
+2024-08-13 21:33:22,037 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:33:31,222 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:33:31,228 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:33:39,159 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:39] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-08-13 21:33:39,205 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:39] "GET / HTTP/1.1" 200 -
+2024-08-13 21:33:39,554 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:39] "GET /Static/South%20Canteen%20Logo.png HTTP/1.1" 200 -
+2024-08-13 21:33:39,623 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:39] "GET /Static/Background%20image.webp HTTP/1.1" 200 -
+2024-08-13 21:33:39,704 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:39] "GET /Static/Trees.jpg HTTP/1.1" 200 -
+2024-08-13 21:33:39,815 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:39] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:33:41,497 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:41] "GET /login HTTP/1.1" 200 -
+2024-08-13 21:33:41,585 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:41] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:33:41,632 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:41] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:33:41,696 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:41] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:33:49,226 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): api.db-ip.com:80
+2024-08-13 21:33:49,646 - urllib3.connectionpool - DEBUG - http://api.db-ip.com:80 "GET /v2/free/127.0.0.1 HTTP/11" 200 None
+2024-08-13 21:33:49,654 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): nominatim.openstreetmap.org:443
+2024-08-13 21:33:50,706 - urllib3.connectionpool - DEBUG - https://nominatim.openstreetmap.org:443 "GET /search?q=%2C++ZZ&format=jsonv2&addressdetails=1&limit=1 HTTP/11" 200 798
+2024-08-13 21:33:50,706 - geocoder.base - INFO - Requested https://nominatim.openstreetmap.org/search?q=%2C++ZZ&format=jsonv2&addressdetails=1&limit=1
+2024-08-13 21:33:51,162 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:51] "POST /login HTTP/1.1" 200 -
+2024-08-13 21:33:51,199 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:51] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:33:51,205 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:51] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 21:33:51,304 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:51] "[36mGET /Static/Background%20image.webp HTTP/1.1[0m" 304 -
+2024-08-13 21:33:51,310 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:51] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:33:52,083 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:33:52] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:35:55,716 - werkzeug - INFO -  * Detected change in 'c:\\Users\\kohka\\Documents\\GitHub\\aspj24\\iptest.py', reloading
+2024-08-13 21:35:56,368 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:36:05,752 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:36:05,756 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:36:11,562 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:11] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-08-13 21:36:11,593 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:11] "GET / HTTP/1.1" 200 -
+2024-08-13 21:36:11,961 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:11] "GET /Static/South%20Canteen%20Logo.png HTTP/1.1" 200 -
+2024-08-13 21:36:12,003 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:12] "GET /Static/Background%20image.webp HTTP/1.1" 200 -
+2024-08-13 21:36:12,083 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:12] "GET /Static/Trees.jpg HTTP/1.1" 200 -
+2024-08-13 21:36:12,213 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:12] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:36:14,053 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:14] "GET /login HTTP/1.1" 200 -
+2024-08-13 21:36:14,107 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:14] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:36:14,183 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:14] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:36:14,254 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:14] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:36:20,560 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:20] "POST /login HTTP/1.1" 200 -
+2024-08-13 21:36:20,594 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:20] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:36:20,684 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:20] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:36:20,747 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:20] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:36:32,375 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): api.db-ip.com:80
+2024-08-13 21:36:32,858 - urllib3.connectionpool - DEBUG - http://api.db-ip.com:80 "GET /v2/free/127.0.0.1 HTTP/11" 200 None
+2024-08-13 21:36:32,861 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): nominatim.openstreetmap.org:443
+2024-08-13 21:36:33,846 - urllib3.connectionpool - DEBUG - https://nominatim.openstreetmap.org:443 "GET /search?q=%2C++ZZ&format=jsonv2&addressdetails=1&limit=1 HTTP/11" 200 798
+2024-08-13 21:36:33,847 - geocoder.base - INFO - Requested https://nominatim.openstreetmap.org/search?q=%2C++ZZ&format=jsonv2&addressdetails=1&limit=1
+2024-08-13 21:36:34,297 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:34] "POST /login HTTP/1.1" 200 -
+2024-08-13 21:36:34,338 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:34] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:36:34,349 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:34] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 21:36:34,437 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:34] "[36mGET /Static/Background%20image.webp HTTP/1.1[0m" 304 -
+2024-08-13 21:36:34,442 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:34] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:36:35,191 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:36:35] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:36:51,039 - werkzeug - INFO -  * Detected change in 'c:\\Users\\kohka\\Documents\\GitHub\\aspj24\\iptest.py', reloading
+2024-08-13 21:36:51,745 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:37:00,965 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:37:00,972 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:38:03,411 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:03] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-08-13 21:38:03,443 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:03] "GET / HTTP/1.1" 200 -
+2024-08-13 21:38:03,838 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:03] "[36mGET /Static/Background%20image.webp HTTP/1.1[0m" 304 -
+2024-08-13 21:38:03,846 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:03] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:38:03,912 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:03] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:38:03,986 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:03] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:38:06,514 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:06] "GET /login HTTP/1.1" 200 -
+2024-08-13 21:38:06,565 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:06] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:38:06,654 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:06] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:38:06,736 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:06] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:38:12,544 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): api.db-ip.com:80
+2024-08-13 21:38:13,150 - urllib3.connectionpool - DEBUG - http://api.db-ip.com:80 "GET /v2/free/127.0.0.1 HTTP/11" 200 None
+2024-08-13 21:38:13,152 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): nominatim.openstreetmap.org:443
+2024-08-13 21:38:14,240 - urllib3.connectionpool - DEBUG - https://nominatim.openstreetmap.org:443 "GET /search?q=%2C++ZZ&format=jsonv2&addressdetails=1&limit=1 HTTP/11" 403 941
+2024-08-13 21:38:14,241 - geocoder.base - ERROR - Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=%2C++ZZ&format=jsonv2&addressdetails=1&limit=1
+2024-08-13 21:38:14,243 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): nominatim.openstreetmap.org:443
+2024-08-13 21:38:17,249 - urllib3.connectionpool - DEBUG - https://nominatim.openstreetmap.org:443 "GET /search?q=%2C+ZZ&format=jsonv2&addressdetails=1&limit=1 HTTP/11" 403 941
+2024-08-13 21:38:17,249 - geocoder.base - ERROR - Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=%2C+ZZ&format=jsonv2&addressdetails=1&limit=1
+2024-08-13 21:38:17,704 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:17] "POST /login HTTP/1.1" 200 -
+2024-08-13 21:38:17,743 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:17] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:38:17,748 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:17] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 21:38:17,827 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:17] "[36mGET /Static/Background%20image.webp HTTP/1.1[0m" 304 -
+2024-08-13 21:38:17,832 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:17] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:38:18,574 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:38:18] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:38:34,569 - werkzeug - INFO -  * Detected change in 'c:\\Users\\kohka\\Documents\\GitHub\\aspj24\\iptest.py', reloading
+2024-08-13 21:38:35,234 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:38:44,412 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:38:44,416 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:40:57,008 - werkzeug - INFO -  * Detected change in 'c:\\Users\\kohka\\Documents\\GitHub\\aspj24\\iptest.py', reloading
+2024-08-13 21:40:57,654 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:41:06,972 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:41:06,975 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:41:27,043 - werkzeug - INFO -  * Detected change in 'c:\\Users\\kohka\\Documents\\GitHub\\aspj24\\iptest.py', reloading
+2024-08-13 21:41:27,702 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:41:29,316 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): api.ipify.org:443
+2024-08-13 21:41:29,822 - urllib3.connectionpool - DEBUG - https://api.ipify.org:443 "GET /?format=json HTTP/11" 200 23
+2024-08-13 21:41:29,825 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): api.db-ip.com:80
+2024-08-13 21:41:30,196 - urllib3.connectionpool - DEBUG - http://api.db-ip.com:80 "GET /v2/free/49.245.100.159 HTTP/11" 200 None
+2024-08-13 21:41:30,198 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): nominatim.openstreetmap.org:443
+2024-08-13 21:41:30,872 - urllib3.connectionpool - DEBUG - https://nominatim.openstreetmap.org:443 "GET /search?q=Singapore+%28Jurong+East%29%2C++SG&format=jsonv2&addressdetails=1&limit=1 HTTP/11" 403 941
+2024-08-13 21:41:30,873 - geocoder.base - ERROR - Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Jurong+East%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-13 21:41:30,874 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): nominatim.openstreetmap.org:443
+2024-08-13 21:41:36,876 - urllib3.connectionpool - DEBUG - https://nominatim.openstreetmap.org:443 "GET /search?q=Singapore+%28Jurong+East%29%2C+SG&format=jsonv2&addressdetails=1&limit=1 HTTP/11" 403 941
+2024-08-13 21:41:36,877 - geocoder.base - ERROR - Status code 403 from https://nominatim.openstreetmap.org/search: ERROR - 403 Client Error: Forbidden for url: https://nominatim.openstreetmap.org/search?q=Singapore+%28Jurong+East%29%2C+SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-13 21:41:44,363 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:41:44,367 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:43:38,123 - werkzeug - INFO -  * Detected change in 'c:\\Users\\kohka\\Documents\\GitHub\\aspj24\\iptest.py', reloading
+2024-08-13 21:43:38,740 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:43:40,412 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): api.ipify.org:443
+2024-08-13 21:43:40,917 - urllib3.connectionpool - DEBUG - https://api.ipify.org:443 "GET /?format=json HTTP/11" 200 23
+2024-08-13 21:48:40,722 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): api.ipify.org:443
+2024-08-13 21:48:41,211 - urllib3.connectionpool - DEBUG - https://api.ipify.org:443 "GET /?format=json HTTP/11" 200 23
+2024-08-13 21:48:41,213 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): api.db-ip.com:80
+2024-08-13 21:48:41,421 - urllib3.connectionpool - DEBUG - http://api.db-ip.com:80 "GET /v2/free/49.245.100.159 HTTP/11" 200 None
+2024-08-13 21:48:41,424 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): nominatim.openstreetmap.org:443
+2024-08-13 21:48:42,268 - urllib3.connectionpool - DEBUG - https://nominatim.openstreetmap.org:443 "GET /search?q=Singapore+%28Jurong+East%29%2C++SG&format=jsonv2&addressdetails=1&limit=1 HTTP/11" 200 775
+2024-08-13 21:48:42,268 - geocoder.base - INFO - Requested https://nominatim.openstreetmap.org/search?q=Singapore+%28Jurong+East%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-13 21:48:50,119 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on https://127.0.0.1:5000
+2024-08-13 21:48:50,119 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-08-13 21:48:50,120 - werkzeug - INFO -  * Restarting with stat
+2024-08-13 21:48:51,770 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): api.ipify.org:443
+2024-08-13 21:48:52,276 - urllib3.connectionpool - DEBUG - https://api.ipify.org:443 "GET /?format=json HTTP/11" 200 23
+2024-08-13 21:48:52,279 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): api.db-ip.com:80
+2024-08-13 21:48:52,507 - urllib3.connectionpool - DEBUG - http://api.db-ip.com:80 "GET /v2/free/49.245.100.159 HTTP/11" 200 None
+2024-08-13 21:48:52,509 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): nominatim.openstreetmap.org:443
+2024-08-13 21:48:53,430 - urllib3.connectionpool - DEBUG - https://nominatim.openstreetmap.org:443 "GET /search?q=Singapore+%28Jurong+East%29%2C++SG&format=jsonv2&addressdetails=1&limit=1 HTTP/11" 200 775
+2024-08-13 21:48:53,431 - geocoder.base - INFO - Requested https://nominatim.openstreetmap.org/search?q=Singapore+%28Jurong+East%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-13 21:49:01,051 - werkzeug - WARNING -  * Debugger is active!
+2024-08-13 21:49:01,055 - werkzeug - INFO -  * Debugger PIN: 770-833-897
+2024-08-13 21:49:15,866 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:15] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-08-13 21:49:15,894 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:15] "GET / HTTP/1.1" 200 -
+2024-08-13 21:49:16,266 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:16] "GET /Static/South%20Canteen%20Logo.png HTTP/1.1" 200 -
+2024-08-13 21:49:16,289 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:16] "GET /Static/Background%20image.webp HTTP/1.1" 200 -
+2024-08-13 21:49:17,389 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:17] "GET /Static/Trees.jpg HTTP/1.1" 200 -
+2024-08-13 21:49:17,524 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:17] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:49:18,500 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:18] "GET /login HTTP/1.1" 200 -
+2024-08-13 21:49:18,594 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:18] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:49:18,641 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:18] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:49:18,702 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:18] "GET /favicon.ico HTTP/1.1" 200 -
+2024-08-13 21:49:26,431 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): api.ipify.org:443
+2024-08-13 21:49:27,079 - urllib3.connectionpool - DEBUG - https://api.ipify.org:443 "GET /?format=json HTTP/11" 200 23
+2024-08-13 21:49:27,083 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): api.db-ip.com:80
+2024-08-13 21:49:27,617 - urllib3.connectionpool - DEBUG - http://api.db-ip.com:80 "GET /v2/free/49.245.100.159 HTTP/11" 200 None
+2024-08-13 21:49:27,620 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): nominatim.openstreetmap.org:443
+2024-08-13 21:49:28,720 - urllib3.connectionpool - DEBUG - https://nominatim.openstreetmap.org:443 "GET /search?q=Singapore+%28Jurong+East%29%2C++SG&format=jsonv2&addressdetails=1&limit=1 HTTP/11" 200 775
+2024-08-13 21:49:28,720 - geocoder.base - INFO - Requested https://nominatim.openstreetmap.org/search?q=Singapore+%28Jurong+East%29%2C++SG&format=jsonv2&addressdetails=1&limit=1
+2024-08-13 21:49:29,177 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:29] "POST /login HTTP/1.1" 200 -
+2024-08-13 21:49:29,216 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:29] "[36mGET /Static/South%20Canteen%20Logo.png HTTP/1.1[0m" 304 -
+2024-08-13 21:49:29,220 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:29] "GET /uploads/default.jpeg HTTP/1.1" 200 -
+2024-08-13 21:49:29,317 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:29] "[36mGET /Static/Background%20image.webp HTTP/1.1[0m" 304 -
+2024-08-13 21:49:29,323 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:29] "[36mGET /Static/Trees.jpg HTTP/1.1[0m" 304 -
+2024-08-13 21:49:30,099 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2024 21:49:30] "GET /favicon.ico HTTP/1.1" 200 -

@@ -31,7 +31,7 @@ from flask_limiter.util import get_remote_address
 #For ML 
 import joblib
 from logs_config import write_csv_log, orderLog
-from iptest import geolocate
+from iptest import geolocate, get_public_ip
 from sklearn.preprocessing import StandardScaler
 
 
@@ -327,6 +327,7 @@ def login():
                 remember = form.remember.data
                 login_user(user, remember=remember)
                 session['id'] = int(user.get_id())
+                write_csv_log('loginlog.csv', [user.get_id(), geolocate(get_public_ip()), datetime.now().month, datetime.now().day, datetime.now().weekday(), datetime.now().hour, datetime.now().minute])
                 return render_template('home.html')
             
             else:
@@ -754,13 +755,12 @@ def completeOrder(id):
     # order complete log
     currentOrder = dbSession.query(Orders).filter(Orders.ID == id).first()
     currentOrder.set_status_complete()
-    logrecord = f"{currentOrder.ID},{currentOrder.get_orderID()},{currentOrder.get_datetime()},{currentOrder.get_stallName()},{currentOrder.get_item()},{currentOrder.get_itemQuantity()},{currentOrder.get_price()},{currentOrder.get_total()},{currentOrder.get_remarks()},{currentOrder.get_status()}"
+    logrecord = [currentOrder.customerID, currentOrder.get_datetime(), currentOrder.get_orderID(), currentOrder.get_stallName(), currentOrder.get_item(), currentOrder.get_itemQuantity(), currentOrder.get_price(), currentOrder.get_total(), currentOrder.get_remarks()]
     write_csv_log('orderlog.csv', logrecord)
 
     try:
         dbSession.add(currentOrder)
         dbSession.commit()
-        # orderLog.info(f"{id.get_id()},{id.get_orderID()},{id.get_dateTimeData()},{id.get_stallName()},{id.get_item()},{id.get_itemQuantity()},{id.get_price()},{id.get_total()},{id.get_remarks()},{id.get_status()}")
         flash('Successfully edited', 'success')
     except Exception as e:
         dbSession.rollback()
