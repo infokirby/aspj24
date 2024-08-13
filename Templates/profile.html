@@ -51,10 +51,6 @@ input[type=number] {
     </div>
 
     <div class="form-group text-muted bg-white rounded shadow-lg m-2 p-1">
-        {{ render_field(form.gender, class="form-control text-dark p-2", style="border: none") }}
-    </div>
-
-    <div class="form-group text-muted bg-white rounded shadow-lg m-2 p-1">
         <!-- File input field for profile picture -->
         {{ render_field(form.profilePicture, class="form-control-file text-dark p-2") }}
         {% for error in form.profilePicture.errors %}
