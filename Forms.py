@@ -8,7 +8,7 @@ from badPwValidator import is_not_weak_password
 from flask_wtf.file import FileAllowed, FileField
 
 
-class RegistrationForm(Form):
+class RegistrationForm(FlaskForm):
     name = StringField('Name:', [validators.InputRequired()])
     phoneNumber = IntegerField('Phone Number:', [validators.InputRequired(), validators.NumberRange(6000000, 99999999)])
     password = PasswordField('New Password:',[validators.InputRequired(), validators.Regexp(r'\A(?=\S*?\d)(?=\S*?[A-Z])(?=\S*?[a-z])\S{6,}\Z', message="Password must have at least: \n-6 Characters\n-1 Uppercase, \n-1 Number"), is_not_weak_password])
@@ -16,7 +16,7 @@ class RegistrationForm(Form):
     profilePicture = FileField('Profile Picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     phoneNumber = IntegerField('Phone Number:', [validators.InputRequired(), validators.NumberRange(6000000, 99999999)])
     password = PasswordField('Password:', [validators.InputRequired()])
     remember = BooleanField('Remember me:', default=True)
@@ -46,7 +46,7 @@ class ChangePasswordForm(Form):
     newPassword = PasswordField('New Password:',[validators.InputRequired(), validators.Regexp(r'\A(?=\S*?\d)(?=\S*?[A-Z])(?=\S*?[a-z])\S{6,}\Z', message="Password must have at least: \n-6 Characters\n-1 Uppercase, \n-1 Number"), is_not_weak_password])
     confirm = PasswordField('Repeat Password:',[validators.InputRequired(), validators.EqualTo('newPassword', message='Passwords must match')])
 
-class ForgotPasswordForm(Form):
+class ForgotPasswordForm(FlaskForm):
     phoneNumber = IntegerField('Phone Number:', [validators.InputRequired(), validators.NumberRange(6000000, 99999999)])
     securityAnswer = StringField('Answer to security question:', [validators.InputRequired()])
     newPassword = PasswordField('New Password:',[validators.InputRequired(), validators.Regexp(r'\A(?=\S*?\d)(?=\S*?[A-Z])(?=\S*?[a-z])\S{6,}\Z', message="Password must have at least: \n-6 Characters\n-1 Uppercase, \n-1 Number"), is_not_weak_password])

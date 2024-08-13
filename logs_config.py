@@ -30,7 +30,7 @@ class CsvFileHandler(logging.FileHandler):
 
 def write_csv_log(logfile, logrecord):
     with open(logfile, 'a', newline='') as f:
-        writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        writer = csv.writer(f, quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(logrecord)
 
 # create order log

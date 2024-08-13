@@ -1,14 +1,16 @@
 #General Libraries
+from dotenv import load_dotenv
 import shelve, sys, xlsxwriter, base64, json, stripe, webbrowser, re, os, pandas, numpy, requests, logging
 from io import BytesIO
 from datetime import datetime, timedelta
 from flask_talisman import Talisman
 from werkzeug.utils import secure_filename
 import uuid
-from logs_config import ORDER_LEVEL
 
 #Flask Framework
 from flask import Flask, render_template, url_for, request, redirect, flash, session, send_file, jsonify, send_from_directory
+from flask_wtf.csrf import CSRFProtect
+
 
 #For forms rendering
 from Forms import RegistrationForm, LoginForm, EditUserForm, ChangePasswordForm, ForgotPasswordForm, StoreOwnerRegistrationForm, CustOrderForm
@@ -32,8 +34,6 @@ from logs_config import write_csv_log, orderLog
 from iptest import geolocate
 from sklearn.preprocessing import StandardScaler
 
-#For recaptcha
-from GOOGLE_KEYS import GOOGLE_RECAPTCHA_SITE_KEY, GOOGLE_RECAPTCHA_SECRET_KEY
 
 #For PFP checker
 from extensionChecker import ALLOWED_EXTENSIONS, allowed_file
@@ -45,6 +45,8 @@ from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, 
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.schema import CreateSchema
 
+# For logs
+from logs_config import orderLog, loginLog, syslog, write_csv_log
 
 GOOGLE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
@@ -60,6 +62,9 @@ feature_names = ['hour', 'day', 'month', 'year'] + [f'location_{loc}' for loc in
 
 app = Flask(__name__, template_folder='Templates', static_folder='Static')
 
+# csrf protect
+csrf = CSRFProtect(app)
+csrf.init_app(app)
 app.config.update(
     SESSION_COOKIE_SECURE=False,
     SESSION_COOKIE_HTTPONLY=True,
@@ -75,7 +80,9 @@ csp = {
         'use.fontawesome.com',
         'cdn.jsdelivr.net',
         'kit.fontawesome.com',
-        'ka-f.fontawesome.com'
+        'ka-f.fontawesome.com',        
+        'www.google.com/recaptcha/',
+        'www.recaptcha.net',
     ],
     'img-src': ['\'self\''],
     'style-src': [
@@ -84,7 +91,9 @@ csp = {
         'fonts.googleapis.com',
         'use.fontawesome.com',
         'cdn.jsdelivr.net',
-        'kit.fontawesome.com'
+        'kit.fontawesome.com',
+        'www.google.com/recaptcha/',
+        'www.recaptcha.net',
     ],
     'font-src': [
         '\'self\'',
@@ -97,6 +106,17 @@ csp = {
     'connect-src': [  
         '\'self\'',
         'ka-f.fontawesome.com'
+    ],
+    'script-src': [
+        '\'self\'',
+        '\'unsafe-inline\'',
+        'cdn.jsdelivr.net',
+        'kit.fontawesome.com',
+        'ka-f.fontawesome.com',
+        'www.google.com/recaptcha/api.js',
+        'www.google.com/recaptcha/',
+        'www.recaptcha.net',
+        'https://www.gstatic.com/recaptcha/'
     ]
 }
 
@@ -112,10 +132,10 @@ app.config['SECRET_KEY'] = 'SH#e7:q%0"dZMWd-8u,gQ{i]8J""vsniU+Wy{08yGWDDO8]7dlHu
 app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdcmxUqAAAAAGVF_1zJ26DFEs61J2oJ8cQ3eM-4' 
 app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdcmxUqAAAAAHUKANmhqXNRcY8ZvRjiTl-Uzjmm'
 login_manager = LoginManager()
-# csrf = CSRFProtect(app)
+csrf = CSRFProtect(app)
 
 #Session Timeout
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes = 5)
+# app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes = 5)
 
 app.config['UPLOAD_FOLDER'] = 'Static/profile_pics'
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB max size for uploads
@@ -660,13 +680,13 @@ def stalls():
     stall_name = path.lstrip('/')
     form = CustOrderForm(request.form)
     now = datetime.now()    
-    response_token = request.form['g-recaptcha-response']  # This should be the token you get from the client-side reCAPTCHA
-    print(response_token)
-    verification_result = verify_recaptcha(response_token)
-    print(verification_result)
-    if len(response_token) > 0:
-    # if request.method == 'POST':
 
+    # if len(response_token) > 0:
+    if request.method == "POST":
+        # response_token = request.form['g-recaptcha-response']  # This should be the token you get from the client-side reCAPTCHA
+        # print(response_token)
+        # verification_result = verify_recaptcha(response_token)
+        # print(verification_result)
         # if verification_result.get('success'):
         form.orderID.data = str(newOrderID())
         form.phoneNumber.data = current_user.get_id()
@@ -697,7 +717,6 @@ def stalls():
                 flash("Error occured. Please try again", "warning")
 
         # order create log
-        logging.log(ORDER_LEVEL, f"Order {form.orderID.data} created by {current_user.get_id()}")
         dbSession.close()
         
     
@@ -705,7 +724,7 @@ def stalls():
         print("Form not validated")
         print(form.errors)
         
-    return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form, sitekey=GOOGLE_RECAPTCHA_SITE_KEY)
+    return render_template(f'{stall_name}.html', menu=menu, stall_name=stall_name, form=form)
 
 
 
@@ -735,15 +754,18 @@ def completeOrder(id):
     # order complete log
     currentOrder = dbSession.query(Orders).filter(Orders.ID == id).first()
     currentOrder.set_status_complete()
+    logrecord = f"{currentOrder.ID},{currentOrder.get_orderID()},{currentOrder.get_datetime()},{currentOrder.get_stallName()},{currentOrder.get_item()},{currentOrder.get_itemQuantity()},{currentOrder.get_price()},{currentOrder.get_total()},{currentOrder.get_remarks()},{currentOrder.get_status()}"
+    write_csv_log('orderlog.csv', logrecord)
+
     try:
         dbSession.add(currentOrder)
         dbSession.commit()
+        # orderLog.info(f"{id.get_id()},{id.get_orderID()},{id.get_dateTimeData()},{id.get_stallName()},{id.get_item()},{id.get_itemQuantity()},{id.get_price()},{id.get_total()},{id.get_remarks()},{id.get_status()}")
         flash('Successfully edited', 'success')
     except Exception as e:
         dbSession.rollback()
         flash(f'An error occurred: {e}', 'danger')
 
-    logging.log(ORDER_LEVEL, f"Order {id} completed by {current_user.get_id()}")
     dbSession.close()
     return redirect(url_for('cart'))
 
@@ -785,7 +807,6 @@ def editOrder(id):
 @login_required
 def deleteOrder(id):
     # order delete log
-    logging.log(ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
     customerOrders = dbSession.query(Orders).filter(Orders.customerID == current_user.get_id()).all()
     for order in customerOrders:
         if order.get_orderID() == id:
@@ -814,7 +835,6 @@ def deleteAllOrder():
             dbSession.delete(order)
         dbSession.commit()
         flash("All orders successfully deleted", 'success')
-        logging.log(ORDER_LEVEL, f"Order {id} deleted by {current_user.get_id()}")
 
 
     except Exception as e:
