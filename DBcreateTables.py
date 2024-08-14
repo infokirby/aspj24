@@ -5,6 +5,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 from flask_login import UserMixin
 from sqlalchemy.engine import URL
 from datetime import datetime as dt
+import pyotp, bcrypt
 
 url_object = URL.create(
     "mysql+pymysql",
@@ -40,10 +41,11 @@ class Customer(Base, UserMixin):
     name = Column(String(255), nullable=False)
     hashedPW = Column(String(255), nullable=False, server_default=" ")
     profilePicture_location = Column(String(255), default='default.jpeg')
-    twoFA = Column(Boolean(), nullable=True)
+    twoFA = Column(Boolean(), nullable=True, default=False)
     roles = relationship('Role', secondary=roles_users, backref='customers')
     active = Column(Boolean(), default = True)
     orders = relationship('Orders', back_populates='customer')
+    secretToken = Column(String(255), unique=True, default=pyotp.random_base32())
 
 
     #Mutators
@@ -80,6 +82,21 @@ class Customer(Base, UserMixin):
     
     def get_profilePicture(self):
         return self.profilePicture_location
+    
+    
+    #2fa requirements
+    def get_2fa(self):
+        return self.twoFA
+    
+    def set_2fa_True(self):
+        self.twoFA = True
+
+    def get_authentication_setup_uri(self):
+        return pyotp.totp.TOTP(self.secretToken).provisioning_uri(name=self.get_name(), issuer_name="South Canteen WebApp")
+
+    def is_otp_valid(self, user_otp):
+        totp = pyotp.parse_uri(self.get_authentication_setup_uri())
+        return totp.verify(user_otp)
 
     #Flask_login requirements
     def is_active(self):
@@ -156,4 +173,3 @@ def wipe():
     session.add(adminRole)
     session.commit()
     session.close()
-
