@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 from flask_login import UserMixin
 from sqlalchemy.engine import URL
 from datetime import datetime as dt
-import pyotp
+import pyotp, bcrypt
 
 url_object = URL.create(
     "mysql+pymysql",
@@ -167,6 +167,7 @@ def wipe():
     session.add(adminRole)
     session.commit()
     session.close()
+
 
 
 if __name__ == "__main__":

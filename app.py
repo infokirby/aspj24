@@ -174,6 +174,13 @@ conn = engine.connect()
 Session = sessionmaker(bind=engine)
 dbSession = Session()
 
+def createAdmin():
+    admin = Customer(phoneNumber = 90288065, name = "Lucian", hashedPW = bcrypt.generate_password_hash("Pass123").decode('utf-8'))
+    role = dbSession.query(Role).filter(Role.roleName == "Admin").first()
+    admin.roles.append(role)
+    dbSession.add(admin)
+    dbSession.commit()
+    dbSession.close()
 
 #configuring flask limiter
 limiter = Limiter(
@@ -406,8 +413,6 @@ def register():
                         flash('Allowed file types are - png, jpg, jpeg', 'danger')
                     
             new_user = Customer(phoneNumber = form.phoneNumber.data, name = form.name.data, hashedPW = hashed_password, profilePicture_location = profile_picture_filename)
-            role = dbSession.query(Role).filter(Role.roleName == "user").first()
-            new_user.roles.append(role)
             if isinstance(new_user, Customer):
                 dbSession.add(new_user)
                 dbSession.commit()
@@ -1097,4 +1102,5 @@ def unauthorized():
 
 
 if __name__ == '__main__':
+    createAdmin()
     app.run(debug = True)
