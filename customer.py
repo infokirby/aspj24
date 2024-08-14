@@ -58,6 +58,9 @@ class Customer():
     def get_id(self):
         return str(self.__phoneNumber)
     
+    def get_email(self):
+        return self.__email
+    
     def get_password(self):
         return self.__password
     
@@ -127,6 +130,9 @@ class Customer():
 
     def set_id(self, phoneNumber):
         self.__id = phoneNumber
+        
+    def set_email(self, email):
+        self.__email = email
 
     def set_password(self, password):
         self.__password = password
